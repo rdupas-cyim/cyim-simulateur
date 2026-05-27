@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration — Grille SYNTEC CYIM</title>
+<style>
+  :root {
+    --navy: #1E4E66;
+    --navy-deep: #143847;
+    --mint: #30DD92;
+    --mint-soft: #D6F8E8;
+    --bg: #FBFBFA;
+    --surface: #FFFFFF;
+    --border: #E5E7EB;
+    --border-strong: #D1D5DB;
+    --text: #1A2530;
+    --text-soft: #6B7280;
+    --text-faint: #9CA3AF;
+    --input-bg: #FFFBEB;
+    --input-border: #FDE68A;
+    --input-text: #1E3A8A;
+    --ok-bg: #ECFDF5;
+    --ok-text: #047857;
+    --ok-border: #6EE7B7;
+    --alert-bg: #FEE2E2;
+    --alert-text: #B91C1C;
+    --alert-border: #FCA5A5;
+    --warn-bg: #FEF3C7;
+    --warn-text: #92400E;
+    --warn-border: #FCD34D;
+    --info-bg: #EFF6FF;
+    --info-text: #1E40AF;
+    --info-border: #BFDBFE;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Calibri', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 20px 32px;
+  }
+  header h1 { margin: 0; font-size: 20px; }
+  header .subtitle { font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 4px; }
+  main { max-width: 1100px; margin: 24px auto; padding: 0 24px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .card h2 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    color: var(--navy);
+  }
+  .card .desc { color: var(--text-soft); font-size: 13px; margin-bottom: 16px; }
+  .card h3 {
+    margin: 20px 0 10px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-soft);
+  }
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--text-soft); margin-bottom: 4px; }
+  input[type="text"], input[type="number"], input[type="password"] {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius);
+    background: var(--input-bg);
+    color: var(--input-text);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+  }
+  input:focus { outline: none; border-color: var(--navy); background: white; box-shadow: 0 0 0 3px rgba(30,78,102,0.1); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    background: var(--navy);
+    color: white;
+    padding: 9px 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  td.center { text-align: center; font-weight: 700; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.readonly { color: var(--text-soft); font-weight: 500; }
+  table input { padding: 6px 8px; font-size: 13px; text-align: right; }
+  tbody tr:nth-child(even) td { background: #FAFAFA; }
+  td.alert-bg { background: var(--alert-bg) !important; }
+  td.alert-bg input { background: white; color: var(--alert-text); border-color: var(--alert-border); }
+  button.btn {
+    background: var(--navy);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    margin-right: 8px;
+  }
+  button.btn:hover { background: var(--navy-deep); }
+  button.btn.primary { background: var(--mint); color: var(--navy); }
+  button.btn.primary:hover { background: #28C284; }
+  button.btn.outline { background: white; color: var(--navy); border: 1px solid var(--border-strong); }
+  button.btn.outline:hover { background: var(--bg); }
+  button.btn.danger { background: white; color: var(--alert-text); border: 1px solid var(--alert-border); }
+  button.btn.danger:hover { background: var(--alert-bg); }
+  button.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+  .note {
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    margin: 16px 0;
+    border-left: 3px solid;
+  }
+  .note.info { background: var(--info-bg); border-color: var(--info-border); color: var(--info-text); }
+  .note.warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-text); }
+  .note.ok { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok-text); }
+  .note.alert { background: var(--alert-bg); border-color: var(--alert-border); color: var(--alert-text); }
+  #login-screen { max-width: 520px; margin: 80px auto; }
+  .input-mirror { display: block; margin-top: 4px; font-size: 12px; color: var(--text-faint); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .input-mirror::before { content: "= "; font-weight: normal; }
+  .flash {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--mint);
+    color: var(--navy);
+    padding: 12px 20px;
+    border-radius: var(--radius);
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .flash.visible { opacity: 1; }
+  .flash.error { background: var(--alert-bg); color: var(--alert-text); }
+  code {
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: var(--navy);
+  }
+  .status-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #F8FAFC;
+    border-radius: var(--radius);
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .col-key, th.col-key {
+    background: #F0EBFA !important;
+    border-left: 2px solid #7C3AED !important;
+    border-right: 2px solid #7C3AED !important;
+  }
+  th.col-key { background: #5E37B5 !important; color: white !important; }
+  details > summary {
+    cursor: pointer;
+    padding: 8px;
+    background: var(--bg);
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-soft);
+  }
+  details[open] > summary { margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔒 Administration — Grille SYNTEC CYIM</h1>
+  <div class="subtitle">Édition de la source partagée du simulateur de salaires</div>
+</header>
+
+<!-- ============================================================
+     ÉCRAN DE LOGIN — demande le token GitHub
+     ============================================================ -->
+<div id="login-screen" style="display:none;">
+  <div class="card">
+    <h2>Authentification</h2>
+    <div class="desc">
+      Pour publier des modifications, un <strong>jeton GitHub personnel</strong> est requis.
+      Il sera stocké uniquement dans votre navigateur (jamais transmis à un serveur tiers).
+    </div>
+
+    <div class="note info">
+      <strong>Comment obtenir un jeton GitHub ?</strong>
+      <ol style="margin: 8px 0 0 18px; padding: 0;">
+        <li>Allez sur <a href="https://github.com/settings/tokens?type=beta" target="_blank">github.com/settings/tokens</a> (jetons à granularité fine)</li>
+        <li>Cliquez sur <em>Generate new token → Fine-grained personal access token</em></li>
+        <li>Nom : <code>CYIM-Simulateur-Admin</code>, expiration : 1 an (ou personnalisé)</li>
+        <li>Resource owner : votre compte personnel</li>
+        <li>Permissions : sous <em>Account permissions</em>, activez <strong>Gists</strong> → Read and write</li>
+        <li>Générez le jeton et copiez-le immédiatement (il n'est affiché qu'une fois)</li>
+      </ol>
+    </div>
+
+    <label for="token-input">Jeton GitHub Personal Access Token</label>
+    <input type="password" id="token-input" placeholder="github_pat_..." autocomplete="off">
+    <div style="margin-top: 16px;">
+      <button class="btn primary" onclick="loginWithToken()">Se connecter</button>
+    </div>
+
+    <div class="note warn" style="margin-top: 24px;">
+      <strong>⚠ Sécurité :</strong> ce jeton donne accès à vos Gists GitHub.
+      Ne le partagez avec personne. Si vous l'utilisez sur un poste partagé, déconnectez-vous en fin de session
+      (bouton « Déconnexion » en haut à droite).
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     INTERFACE ADMIN
+     ============================================================ -->
+<main id="admin-screen" style="display:none;">
+
+  <div class="status-line">
+    <div>
+      <strong id="status-text">Chargement…</strong>
+      <span id="status-meta" style="color: var(--text-soft); margin-left: 12px;"></span>
+    </div>
+    <button class="btn outline" onclick="logout()">Déconnexion</button>
+  </div>
+
+  <!-- SMIC -->
+  <div class="card">
+    <h2>1. SMIC en vigueur</h2>
+    <div class="desc">À mettre à jour à chaque revalorisation officielle du SMIC.</div>
+    <div class="grid-3">
+      <div>
+        <label for="smic-horaire">SMIC horaire brut (€)</label>
+        <input type="number" id="smic-horaire" step="0.0001" data-mirror="eur4">
+      </div>
+      <div>
+        <label for="smic-mensuel">SMIC mensuel brut 35h (€)</label>
+        <input type="number" id="smic-mensuel" step="0.01" data-mirror="eur">
+      </div>
+      <div>
+        <label for="smic-date">Date d'application</label>
+        <input type="text" id="smic-date" placeholder="JJ/MM/AAAA">
+      </div>
+    </div>
+  </div>
+
+  <!-- BASES HORAIRES & MARGES -->
+  <div class="card">
+    <h2>2. Bases horaires et marges internes CYIM</h2>
+    <div class="desc">Ces valeurs changent rarement.</div>
+    <details>
+      <summary>Cliquer pour afficher / modifier</summary>
+      <div class="grid-2">
+        <div>
+          <label for="h35">Heures mensuelles base 35h</label>
+          <input type="number" id="h35" step="0.01">
+        </div>
+        <div>
+          <label for="h39">Heures mensuelles base 39h</label>
+          <input type="number" id="h39" step="0.01">
+        </div>
+        <div>
+          <label for="marge-etam">Marge ETAM (% au-dessus du plancher 39h)</label>
+          <input type="number" id="marge-etam" step="0.1">
+        </div>
+        <div>
+          <label for="marge-cadre">Marge Cadres - forfait jours (%)</label>
+          <input type="number" id="marge-cadre" step="0.1">
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- GRILLE ETAM -->
+  <div class="card">
+    <h2>3. Grille SYNTEC — ETAM</h2>
+    <div class="desc">
+      Modifier la colonne <em>Min. conv. SYNTEC 35h</em> (cellules jaunes) en cas d'avenant.
+      Les autres colonnes sont calculées automatiquement.
+    </div>
+    <table id="grille-etam">
+      <thead>
+        <tr>
+          <th class="center">Position</th>
+          <th class="center">Coef.</th>
+          <th class="num">Min. conv. 35h</th>
+          <th class="num">Min. 35h (MAX SMIC)</th>
+          <th class="num col-key">Minima 39h mensuel</th>
+          <th class="num col-key">Minima CYIM mensuel</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- GRILLE CADRES -->
+  <div class="card">
+    <h2>4. Grille SYNTEC — Cadres</h2>
+    <div class="desc">
+      Modifier la colonne <em>Min. conv. SYNTEC 35h</em> (cellules jaunes) en cas d'avenant.
+    </div>
+    <table id="grille-cadres">
+      <thead>
+        <tr>
+          <th class="center">Position</th>
+          <th class="center">Coef.</th>
+          <th class="num">Min. conv. 35h</th>
+          <th class="num">Min. 35h (MAX SMIC)</th>
+          <th class="num col-key">Forfait jours +20 %</th>
+          <th class="num col-key">Minima CYIM mensuel</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- PUBLICATION -->
+  <div class="card">
+    <h2>5. Publier les modifications</h2>
+    <div class="desc">
+      Une fois vos modifications terminées, cliquez ci-dessous pour les publier.
+      Tous les utilisateurs du simulateur verront les nouvelles valeurs à leur prochain rechargement.
+    </div>
+    <button class="btn primary" onclick="publishConfig()" id="publish-btn">
+      🚀 Publier les modifications
+    </button>
+    <button class="btn outline" onclick="reloadFromGist()">
+      🔄 Annuler — recharger depuis la source
+    </button>
+    <button class="btn outline" onclick="exportLocal()">
+      📥 Exporter en JSON (sauvegarde)
+    </button>
+    <div id="publish-status" style="margin-top: 12px;"></div>
+  </div>
+
+  <!-- HISTORIQUE -->
+  <div class="card">
+    <h2>6. Historique des publications</h2>
+    <div class="desc">Les 5 dernières révisions de la configuration partagée.</div>
+    <div id="history-list">Chargement…</div>
+  </div>
+
+</main>
+
+<div class="flash" id="flash"></div>
+
+<script>
+// =============================================================
+// CONFIGURATION
+// =============================================================
+const GIST_ID = "f551987088180b51484f6e13c38494db";
+const GIST_FILE = "cyim-config.json";
+const GIST_API_URL = `https://api.github.com/gists/${GIST_ID}`;
+const TOKEN_KEY = "cyim_admin_gh_token";
+
+// État courant
+let currentConfig = null;
+let currentGistData = null;
+
+// =============================================================
+// FORMATAGE (mini-version)
+// =============================================================
+function _norm(s) { return s.replace(/\u202F/g, "\u00A0"); }
+const fmtEur = (n) => isNaN(n) ? "—" : _norm(Number(n).toLocaleString("fr-FR", { style: "currency", currency: "EUR", minimumFractionDigits: 2 }));
+const fmtEur4 = (n) => isNaN(n) ? "—" : _norm(Number(n).toLocaleString("fr-FR", { style: "currency", currency: "EUR", minimumFractionDigits: 4, maximumFractionDigits: 4 }));
+
+// =============================================================
+// AUTHENTIFICATION
+// =============================================================
+function getToken() { return localStorage.getItem(TOKEN_KEY); }
+function setToken(t) { localStorage.setItem(TOKEN_KEY, t); }
+function clearToken() { localStorage.removeItem(TOKEN_KEY); }
+
+async function loginWithToken() {
+  const token = document.getElementById("token-input").value.trim();
+  if (!token) { flash("Saisis ton jeton GitHub", "error"); return; }
+
+  // Vérifier le jeton en appelant /user (lecture)
+  try {
+    const r = await fetch("https://api.github.com/user", {
+      headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" }
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const user = await r.json();
+    setToken(token);
+    flash(`✓ Connecté en tant que ${user.login}`);
+    showAdminScreen();
+  } catch (err) {
+    flash("Jeton invalide ou expiré : " + err.message, "error");
+  }
+}
+
+function logout() {
+  if (!confirm("Se déconnecter et supprimer le jeton du navigateur ?")) return;
+  clearToken();
+  location.reload();
+}
+
+// =============================================================
+// CHARGEMENT / SAUVEGARDE GIST
+// =============================================================
+async function loadConfigFromGist() {
+  if (!GIST_ID || GIST_ID === "f551987088180b51484f6e13c38494db") {
+    flash("Gist ID non configuré dans le code !", "error");
+    return null;
+  }
+  const token = getToken();
+  try {
+    const r = await fetch(`${GIST_API_URL}?_=${Date.now()}`, {
+      headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" }
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const gist = await r.json();
+    currentGistData = gist;
+    const file = gist.files[GIST_FILE];
+    if (!file) throw new Error(`Fichier ${GIST_FILE} absent du Gist`);
+    return JSON.parse(file.content);
+  } catch (err) {
+    flash("Erreur chargement : " + err.message, "error");
+    return null;
+  }
+}
+
+async function publishConfig() {
+  const btn = document.getElementById("publish-btn");
+  btn.disabled = true;
+  btn.textContent = "Publication en cours…";
+
+  // 1. Récupérer les valeurs depuis le formulaire
+  const config = readFormToConfig();
+
+  // 2. Validation minimale
+  if (!validateConfig(config)) {
+    btn.disabled = false;
+    btn.textContent = "🚀 Publier les modifications";
+    return;
+  }
+
+  // 3. Publier
+  const token = getToken();
+  try {
+    const r = await fetch(GIST_API_URL, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        files: {
+          [GIST_FILE]: { content: JSON.stringify(config, null, 2) }
+        }
+      })
+    });
+    if (!r.ok) {
+      const errBody = await r.text();
+      throw new Error(`HTTP ${r.status} : ${errBody.slice(0, 200)}`);
+    }
+    flash("✓ Publication réussie ! Les utilisateurs verront les nouvelles valeurs au prochain rechargement.");
+    currentConfig = config;
+    await loadHistory();
+  } catch (err) {
+    flash("Erreur publication : " + err.message, "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "🚀 Publier les modifications";
+  }
+}
+
+async function reloadFromGist() {
+  if (!confirm("Annuler tes modifications en cours et recharger depuis la source ?")) return;
+  await loadAdmin();
+}
+
+function exportLocal() {
+  const config = readFormToConfig();
+  const today = new Date().toISOString().split("T")[0];
+  const blob = new Blob([JSON.stringify(config, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `cyim-config-${today}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// =============================================================
+// VALIDATION
+// =============================================================
+function validateConfig(c) {
+  const errors = [];
+  if (!c.smic_horaire || c.smic_horaire <= 0) errors.push("SMIC horaire invalide");
+  if (!c.smic_mensuel || c.smic_mensuel <= 0) errors.push("SMIC mensuel invalide");
+  if (!c.h35 || c.h35 <= 0) errors.push("Base 35h invalide");
+  if (!c.h39 || c.h39 <= 0) errors.push("Base 39h invalide");
+  if (!Array.isArray(c.etam) || c.etam.length === 0) errors.push("Grille ETAM vide");
+  if (!Array.isArray(c.cadres) || c.cadres.length === 0) errors.push("Grille Cadres vide");
+  for (const row of (c.etam || [])) {
+    if (!row.pos || row.coef == null || row.min == null) {
+      errors.push(`Ligne ETAM ${row.pos || "?"} incomplète`);
+    }
+  }
+  for (const row of (c.cadres || [])) {
+    if (!row.pos || row.coef == null || row.min == null) {
+      errors.push(`Ligne Cadre ${row.pos || "?"} incomplète`);
+    }
+  }
+  if (errors.length > 0) {
+    alert("Configuration invalide :\n\n" + errors.join("\n"));
+    return false;
+  }
+  return true;
+}
+
+// =============================================================
+// FORMULAIRE
+// =============================================================
+function fillFormFromConfig(c) {
+  document.getElementById("smic-horaire").value = c.smic_horaire;
+  document.getElementById("smic-mensuel").value = c.smic_mensuel;
+  document.getElementById("smic-date").value = c.smic_date || "";
+  document.getElementById("h35").value = c.h35;
+  document.getElementById("h39").value = c.h39;
+  document.getElementById("marge-etam").value = c.marge_etam;
+  document.getElementById("marge-cadre").value = c.marge_cadre;
+  renderGrille("etam", c.etam, c.smic_mensuel, c.h35, c.h39, c.marge_etam, "etam");
+  renderGrille("cadres", c.cadres, c.smic_mensuel, c.h35, c.h39, c.marge_etam, "cadre", c.marge_cadre);
+  setupMirrors();
+}
+
+function readFormToConfig() {
+  return {
+    smic_horaire: parseFloat(document.getElementById("smic-horaire").value) || 0,
+    smic_mensuel: parseFloat(document.getElementById("smic-mensuel").value) || 0,
+    smic_date: document.getElementById("smic-date").value,
+    h35: parseFloat(document.getElementById("h35").value) || 0,
+    h39: parseFloat(document.getElementById("h39").value) || 0,
+    marge_etam: parseFloat(document.getElementById("marge-etam").value) || 0,
+    marge_cadre: parseFloat(document.getElementById("marge-cadre").value) || 0,
+    etam: readGrille("etam"),
+    cadres: readGrille("cadres")
+  };
+}
+
+function readGrille(type) {
+  const rows = document.querySelectorAll(`#grille-${type} tbody tr`);
+  const out = [];
+  rows.forEach(tr => {
+    const pos = tr.querySelector("[data-field='pos']").textContent.trim();
+    const coef = parseInt(tr.querySelector("[data-field='coef']").textContent);
+    const min = parseFloat(tr.querySelector("[data-field='min']").value) || 0;
+    out.push({ pos, coef, min });
+  });
+  return out;
+}
+
+function renderGrille(type, rows, smic, h35, h39, margeEtam, kind, margeCadre) {
+  const tbody = document.querySelector(`#grille-${type} tbody`);
+  tbody.innerHTML = "";
+  rows.forEach((row, idx) => {
+    const minApplicable = Math.max(row.min, smic);
+    const underSmic = row.min < smic;
+    let col5, col6;
+    if (kind === "etam") {
+      const plancher39 = minApplicable * (h39 / h35);
+      col5 = plancher39;
+      col6 = plancher39 * (1 + margeEtam / 100);
+    } else {
+      const forfait = minApplicable * (1 + margeCadre / 100);
+      col5 = forfait;
+      col6 = forfait * (1 + margeEtam / 100);
+    }
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="center" data-field="pos">${row.pos}</td>
+      <td class="center" data-field="coef">${row.coef}</td>
+      <td class="num ${underSmic ? 'alert-bg' : ''}"><input type="number" data-field="min" value="${row.min}" step="0.01"></td>
+      <td class="num readonly">${fmtEur(minApplicable)}</td>
+      <td class="num readonly col-key">${fmtEur(col5)}</td>
+      <td class="num readonly col-key">${fmtEur(col6)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  // Recalcul live quand un min change
+  tbody.querySelectorAll("input[data-field='min']").forEach(input => {
+    input.addEventListener("input", () => {
+      const config = readFormToConfig();
+      renderGrille(type, config[type], config.smic_mensuel, config.h35, config.h39,
+                   config.marge_etam, kind, config.marge_cadre);
+    });
+  });
+  // Recalcul aussi quand le SMIC change
+  ["smic-mensuel", "h35", "h39", "marge-etam", "marge-cadre"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.dataset.boundRecalc) {
+      el.addEventListener("input", () => {
+        const config = readFormToConfig();
+        renderGrille("etam", config.etam, config.smic_mensuel, config.h35, config.h39,
+                     config.marge_etam, "etam");
+        renderGrille("cadres", config.cadres, config.smic_mensuel, config.h35, config.h39,
+                     config.marge_etam, "cadre", config.marge_cadre);
+      });
+      el.dataset.boundRecalc = "1";
+    }
+  });
+}
+
+// =============================================================
+// MIROIRS (= valeur formatée sous l'input)
+// =============================================================
+function setupMirrors() {
+  document.querySelectorAll("input[data-mirror]").forEach(input => {
+    const type = input.dataset.mirror;
+    let mirror = input.parentElement.querySelector(".input-mirror");
+    if (!mirror) {
+      mirror = document.createElement("span");
+      mirror.className = "input-mirror";
+      input.insertAdjacentElement("afterend", mirror);
+    }
+    const update = () => {
+      const v = parseFloat(input.value);
+      if (isNaN(v)) { mirror.textContent = "—"; return; }
+      mirror.textContent = type === "eur4" ? fmtEur4(v) : fmtEur(v);
+    };
+    update();
+    if (!input.dataset.boundMirror) {
+      input.addEventListener("input", update);
+      input.dataset.boundMirror = "1";
+    }
+  });
+}
+
+// =============================================================
+// HISTORIQUE
+// =============================================================
+async function loadHistory() {
+  const token = getToken();
+  try {
+    const r = await fetch(`${GIST_API_URL}/commits?_=${Date.now()}`, {
+      headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" }
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const commits = await r.json();
+    const container = document.getElementById("history-list");
+    if (commits.length === 0) {
+      container.innerHTML = "<em>Aucune révision enregistrée.</em>";
+      return;
+    }
+    container.innerHTML = commits.slice(0, 5).map(c => {
+      const d = new Date(c.committed_at);
+      const dStr = d.toLocaleString("fr-FR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+      const user = c.user ? c.user.login : "—";
+      return `<div style="padding:10px 12px;background:#FAFAFA;border-radius:4px;margin-bottom:6px;font-size:13px;">
+        <strong>${dStr}</strong> par <code>${user}</code><br>
+        <small style="color: var(--text-soft);">Version : ${c.version.slice(0, 8)}</small>
+      </div>`;
+    }).join("");
+  } catch (err) {
+    document.getElementById("history-list").innerHTML = `<em>Erreur : ${err.message}</em>`;
+  }
+}
+
+// =============================================================
+// STATUS
+// =============================================================
+function updateStatus(gist) {
+  const d = new Date(gist.updated_at);
+  const dStr = d.toLocaleString("fr-FR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  document.getElementById("status-text").textContent = "✓ Source partagée chargée";
+  document.getElementById("status-meta").textContent = `Dernière publication : ${dStr}`;
+}
+
+// =============================================================
+// FLASH
+// =============================================================
+let flashTimer;
+function flash(msg, type) {
+  const f = document.getElementById("flash");
+  f.textContent = msg;
+  f.className = "flash visible" + (type === "error" ? " error" : "");
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => f.classList.remove("visible"), 3500);
+}
+
+// =============================================================
+// BOOT
+// =============================================================
+async function loadAdmin() {
+  const config = await loadConfigFromGist();
+  if (!config) return;
+  currentConfig = config;
+  fillFormFromConfig(config);
+  updateStatus(currentGistData);
+  await loadHistory();
+}
+
+function showAdminScreen() {
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("admin-screen").style.display = "block";
+  loadAdmin();
+}
+
+function showLoginScreen() {
+  document.getElementById("login-screen").style.display = "block";
+  document.getElementById("admin-screen").style.display = "none";
+}
+
+if (getToken()) {
+  showAdminScreen();
+} else {
+  showLoginScreen();
+}
+</script>
+
+</body>
+</html>

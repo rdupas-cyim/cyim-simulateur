@@ -1,0 +1,3080 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateur d'augmentation salariale CYIM</title>
+<style>
+  /* ========================================================
+     CHARTE CYIM — minimalisme professionnel
+     ======================================================== */
+  :root {
+    /* Couleurs CYIM officielles */
+    --navy: #1E4E66;
+    --navy-deep: #143847;
+    --mint: #30DD92;
+    --mint-soft: #D6F8E8;
+
+    /* Tons neutres soignés */
+    --bg: #FBFBFA;
+    --surface: #FFFFFF;
+    --border: #E5E7EB;
+    --border-strong: #D1D5DB;
+    --text: #1A2530;
+    --text-soft: #6B7280;
+    --text-faint: #9CA3AF;
+
+    /* États fonctionnels */
+    --input-bg: #FFFBEB;
+    --input-border: #FDE68A;
+    --input-text: #1E3A8A;
+
+    --ok-bg: #ECFDF5;
+    --ok-border: #6EE7B7;
+    --ok-text: #047857;
+
+    --warn-bg: #FEF3C7;
+    --warn-border: #FCD34D;
+    --warn-text: #92400E;
+
+    --alert-bg: #FEE2E2;
+    --alert-border: #FCA5A5;
+    --alert-text: #B91C1C;
+
+    --info-bg: #EFF6FF;
+    --info-border: #BFDBFE;
+    --info-text: #1E40AF;
+
+    /* Espacements */
+    --gap-xs: 4px;
+    --gap-sm: 8px;
+    --gap-md: 16px;
+    --gap-lg: 24px;
+    --gap-xl: 40px;
+
+    --radius: 6px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Calibri', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ========================================================
+     HEADER
+     ======================================================== */
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  header .subtitle {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    margin-top: 2px;
+  }
+  .mode-toggle {
+    display: inline-flex;
+    background: rgba(255,255,255,0.1);
+    border-radius: var(--radius);
+    padding: 3px;
+  }
+  .mode-toggle button {
+    background: transparent;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .mode-toggle button.active {
+    background: var(--mint);
+    color: var(--navy);
+  }
+
+  /* ========================================================
+     NAVIGATION ONGLETS
+     ======================================================== */
+  nav.tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  nav.tabs button {
+    background: none;
+    border: none;
+    padding: 16px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-soft);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  nav.tabs button:hover { color: var(--navy); }
+  nav.tabs button.active {
+    color: var(--navy);
+    border-bottom-color: var(--mint);
+  }
+
+  /* ========================================================
+     LAYOUT
+     ======================================================== */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px;
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ========================================================
+     CARTES (sections principales)
+     ======================================================== */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+  }
+  .section + .section { margin-top: 24px; }
+
+  .section h2 {
+    margin: 0 0 4px;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.01em;
+  }
+  .section .section-desc {
+    color: var(--text-soft);
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+  .section h3 {
+    margin: 24px 0 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .section h3:first-child { margin-top: 0; }
+
+  /* ========================================================
+     LÉGENDE
+     ======================================================== */
+  .legend-card {
+    background: linear-gradient(135deg, var(--mint-soft) 0%, #F0F9FF 100%);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .legend-card h2 {
+    margin: 0 0 14px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .legend-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--text);
+  }
+  .legend-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 12px;
+    border: 1px solid;
+    flex-shrink: 0;
+  }
+  .legend-chip.input {
+    background: var(--input-bg);
+    color: var(--input-text);
+    border-color: var(--input-border);
+  }
+  .legend-chip.result {
+    background: var(--surface);
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+  .legend-chip.synthesis {
+    background: var(--mint-soft);
+    color: var(--ok-text);
+    border-color: var(--ok-border);
+  }
+  .legend-chip.ok {
+    background: var(--ok-bg);
+    color: var(--ok-text);
+    border-color: var(--ok-border);
+  }
+  .legend-chip.warn {
+    background: var(--warn-bg);
+    color: var(--warn-text);
+    border-color: var(--warn-border);
+  }
+  .legend-chip.alert {
+    background: var(--alert-bg);
+    color: var(--alert-text);
+    border-color: var(--alert-border);
+  }
+  .legend-text {
+    font-size: 12px;
+    color: var(--text-soft);
+    line-height: 1.4;
+  }
+  .legend-text strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* ========================================================
+     CHAMPS DE SAISIE
+     ======================================================== */
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-soft);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+  input[type="text"], input[type="number"], select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius);
+    background: var(--input-bg);
+    color: var(--input-text);
+    font-size: 14px;
+    font-family: inherit;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--navy);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(30,78,102,0.1);
+  }
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+
+  /* Texte d'aide affichant la valeur formatée sous un input number */
+  .input-mirror {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .input-mirror::before {
+    content: "= ";
+    color: var(--text-faint);
+    font-weight: normal;
+  }
+
+  .input-grid {
+    display: grid;
+    gap: 16px;
+  }
+  .input-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .input-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 800px) {
+    .input-grid.cols-3, .input-grid.cols-2 { grid-template-columns: 1fr; }
+  }
+
+  /* ========================================================
+     RÉSULTATS
+     ======================================================== */
+  .results { display: grid; gap: 8px; }
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 14px;
+    background: #FAFAFA;
+    border-radius: var(--radius);
+    border-left: 3px solid var(--border-strong);
+  }
+  .result-row .label-side {
+    font-size: 13px;
+    color: var(--text-soft);
+    font-weight: 500;
+  }
+  .result-row .label-side .hint {
+    display: block;
+    font-size: 11px;
+    color: var(--text-faint);
+    font-weight: normal;
+    margin-top: 2px;
+  }
+  .result-row .value {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+  .result-row.highlight {
+    background: var(--mint-soft);
+    border-left-color: var(--mint);
+  }
+  .result-row.highlight .value {
+    color: var(--ok-text);
+    font-size: 16px;
+  }
+  .result-row.suggestion {
+    background: var(--info-bg);
+    border-left-color: var(--info-border);
+  }
+  .result-row.suggestion .value {
+    color: var(--info-text);
+    font-style: italic;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* Layout deux colonnes (saisie | résultats) */
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  @media (max-width: 900px) {
+    .scenario-grid { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  /* ========================================================
+     VERDICTS
+     ======================================================== */
+  .verdict {
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-weight: 700;
+    font-size: 13px;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid;
+  }
+  .verdict.ok    { background: var(--ok-bg); color: var(--ok-text); border-color: var(--ok-border); }
+  .verdict.warn  { background: var(--warn-bg); color: var(--warn-text); border-color: var(--warn-border); }
+  .verdict.alert { background: var(--alert-bg); color: var(--alert-text); border-color: var(--alert-border); }
+  .verdict.neutral {
+    background: var(--surface); color: var(--text-faint);
+    border-color: var(--border); font-weight: 500;
+  }
+
+  /* Ligne verdict condensée : valeur · ✓ Verdict */
+  .verdict-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    border: 1px solid;
+    margin-bottom: 8px;
+    font-size: 13px;
+    flex-wrap: wrap;
+  }
+  .verdict-line.ok    { background: var(--ok-bg); border-color: var(--ok-border); }
+  .verdict-line.warn  { background: var(--warn-bg); border-color: var(--warn-border); }
+  .verdict-line.alert { background: var(--alert-bg); border-color: var(--alert-border); }
+  .verdict-line.neutral { background: #FAFAFA; border-color: var(--border); }
+  .verdict-line .left-side {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .verdict-line .vl-label {
+    color: var(--text-soft);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .verdict-line .vl-value {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+  .verdict-line .vl-status {
+    font-weight: 700;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .verdict-line.ok .vl-status    { color: var(--ok-text); }
+  .verdict-line.warn .vl-status  { color: var(--warn-text); }
+  .verdict-line.alert .vl-status { color: var(--alert-text); }
+  .verdict-line.neutral .vl-status { color: var(--text-faint); }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    border: 1px solid;
+    gap: 4px;
+  }
+  .pill.ok    { background: var(--ok-bg); color: var(--ok-text); border-color: var(--ok-border); }
+  .pill.warn  { background: var(--warn-bg); color: var(--warn-text); border-color: var(--warn-border); }
+  .pill.alert { background: var(--alert-bg); color: var(--alert-text); border-color: var(--alert-border); }
+  .pill.neutral { background: var(--bg); color: var(--text-faint); border-color: var(--border); }
+
+  /* ========================================================
+     SÉLECTEUR DE SCÉNARIO (multi-sélection via cases à cocher)
+     ======================================================== */
+  .scenario-picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .scenario-option {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    font-family: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+  }
+  .scenario-option:hover {
+    border-color: var(--navy);
+    background: #F8FAFC;
+  }
+  .scenario-option.active {
+    border-color: var(--mint);
+    background: var(--mint-soft);
+    box-shadow: 0 0 0 3px rgba(48, 221, 146, 0.15);
+  }
+  .scenario-option .so-checkbox {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-strong);
+    border-radius: 4px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .scenario-option.active .so-checkbox {
+    background: var(--mint);
+    border-color: var(--mint);
+  }
+  .scenario-option.active .so-checkbox::after {
+    content: "✓";
+    color: var(--navy);
+    font-weight: 900;
+    font-size: 13px;
+    line-height: 1;
+  }
+  .scenario-option .so-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding-right: 28px;
+  }
+  .scenario-option.active .so-num { color: var(--navy); }
+  .scenario-option .so-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    padding-right: 28px;
+  }
+  .scenario-option.active .so-title { color: var(--navy); }
+  .scenario-option .so-desc {
+    font-size: 12px;
+    color: var(--text-soft);
+    line-height: 1.4;
+  }
+
+  /* Conteneur du scénario actif : seuls les actifs sont visibles */
+  .scenario-content { display: none; }
+  .scenario-content.active { display: block; }
+
+  /* Barre d'action au-dessus du picker (impression globale) */
+  .picker-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .picker-actions .selection-info {
+    font-size: 13px;
+    color: var(--text-soft);
+  }
+  .picker-actions .selection-info strong {
+    color: var(--navy);
+  }
+
+  /* Bouton imprimer en haut du scénario */
+  .scenario-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  /* ========================================================
+     PAGE D'IMPRESSION (modal et @media print)
+     ======================================================== */
+  .print-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(20, 30, 40, 0.5);
+    z-index: 9000;
+    overflow-y: auto;
+    padding: 30px 20px;
+  }
+  .print-modal.visible { display: block; }
+  .print-modal-content {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    padding: 0;
+  }
+  .print-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  .print-modal-header h2 {
+    margin: 0;
+    font-size: 16px;
+    color: var(--navy);
+  }
+  .print-modal-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .print-modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 22px;
+    color: var(--text-soft);
+    padding: 0 6px;
+    line-height: 1;
+  }
+  .print-modal-close:hover { color: var(--text); }
+
+  /* === Contenu imprimable === */
+  .print-sheet {
+    padding: 40px 48px;
+    color: #1A2530;
+    font-family: 'Calibri', 'Segoe UI', sans-serif;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  .print-sheet .ps-header {
+    border-bottom: 3px solid #1E4E66;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .print-sheet .ps-header h1 {
+    margin: 0;
+    color: #1E4E66;
+    font-size: 22pt;
+    letter-spacing: -0.01em;
+  }
+  .print-sheet .ps-header .ps-subtitle {
+    color: #6B7280;
+    font-size: 11pt;
+    margin-top: 4px;
+  }
+  .print-sheet .ps-header .ps-meta {
+    font-size: 10pt;
+    color: #6B7280;
+    text-align: right;
+  }
+  .print-sheet h3.ps-section {
+    color: #1E4E66;
+    font-size: 13pt;
+    margin: 24px 0 10px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #E5E7EB;
+  }
+  .print-sheet .ps-block {
+    background: #FAFAFA;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .print-sheet .ps-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid #EEF0F2;
+    font-size: 11pt;
+  }
+  .print-sheet .ps-row:last-child { border-bottom: none; }
+  .print-sheet .ps-row .ps-label { color: #6B7280; }
+  .print-sheet .ps-row .ps-val {
+    font-weight: 700;
+    color: #1A2530;
+    font-variant-numeric: tabular-nums;
+  }
+  .print-sheet .ps-row.ps-highlight {
+    background: #D6F8E8;
+    border-bottom: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 4px 0;
+  }
+  .print-sheet .ps-row.ps-highlight .ps-val { color: #047857; font-size: 13pt; }
+  .print-sheet .ps-verdict {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    border-radius: 4px;
+    border: 1px solid;
+    font-size: 11pt;
+  }
+  .print-sheet .ps-verdict.ok    { background: #ECFDF5; border-color: #6EE7B7; color: #047857; }
+  .print-sheet .ps-verdict.warn  { background: #FEF3C7; border-color: #FCD34D; color: #92400E; }
+  .print-sheet .ps-verdict.alert { background: #FEE2E2; border-color: #FCA5A5; color: #B91C1C; }
+  .print-sheet .ps-verdict .ps-vstatus { font-weight: 700; }
+  .print-sheet .ps-footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid #E5E7EB;
+    font-size: 9pt;
+    color: #9CA3AF;
+    text-align: center;
+  }
+  .print-sheet .ps-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* Bloc scénario dans une synthèse multi-scénarios */
+  .print-sheet .ps-scenario {
+    margin-top: 28px;
+    padding-top: 4px;
+    page-break-inside: avoid;
+  }
+  .print-sheet .ps-scenario + .ps-scenario {
+    border-top: 2px dashed #E5E7EB;
+    padding-top: 24px;
+    page-break-before: auto;
+  }
+  .print-sheet .ps-scenario-title {
+    color: white !important;
+    background: #1E4E66;
+    padding: 8px 14px;
+    border-radius: 4px;
+    border: none !important;
+    font-size: 12pt;
+    margin-bottom: 12px;
+  }
+  .print-sheet .ps-subsection {
+    color: #1E4E66;
+    font-size: 11pt;
+    margin: 14px 0 6px;
+    font-weight: 700;
+  }
+
+  /* Quand on imprime : masquer tout sauf la page d'impression */
+  @media print {
+    body * { visibility: hidden; }
+    .print-modal, .print-modal * { visibility: visible; }
+    .print-modal {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      background: white;
+      padding: 0;
+      display: block !important;
+    }
+    .print-modal-content {
+      box-shadow: none;
+      border-radius: 0;
+      max-width: 100%;
+      margin: 0;
+    }
+    .print-modal-header { display: none; }
+    .print-sheet { padding: 20px 30px; }
+    @page { size: A4; margin: 15mm; }
+  }
+  .table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th {
+    background: var(--navy);
+    color: white;
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-right: 1px solid rgba(255,255,255,0.1);
+  }
+  th:last-child { border-right: none; }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+  }
+  td.center { text-align: center; }
+  td.num { text-align: right; }
+  tbody tr:nth-child(even) td { background: #FAFAFA; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  td.cell-ok    { background: var(--ok-bg) !important; color: var(--ok-text); font-weight: 700; }
+  td.cell-warn  { background: var(--warn-bg) !important; color: var(--warn-text); font-weight: 700; }
+  td.cell-alert { background: var(--alert-bg) !important; color: var(--alert-text); font-weight: 700; }
+
+  /* Inputs dans le tableau (enveloppe + grilles éditables) */
+  table input[type="text"], table input[type="number"], table select {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+  .grid-cell-input {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    padding: 5px 8px;
+    text-align: right;
+    font-weight: 600;
+    color: var(--input-text);
+    font-variant-numeric: tabular-nums;
+  }
+  td.alert-grid {
+    background: var(--alert-bg) !important;
+  }
+  td.alert-grid .grid-cell-input {
+    background: white;
+    color: var(--alert-text);
+    border-color: var(--alert-border);
+  }
+
+  /* Mise en évidence des colonnes principales des grilles SYNTEC */
+  th.col-key, td.col-key {
+    background: #F0EBFA !important;
+    border-left: 2px solid #7C3AED !important;
+    border-right: 2px solid #7C3AED !important;
+  }
+  th.col-key {
+    background: #5E37B5 !important;
+    color: white !important;
+    position: relative;
+  }
+  th.col-key-first, td.col-key-first {
+    border-left: 2px solid #7C3AED !important;
+  }
+  th.col-key-last, td.col-key-last {
+    border-right: 2px solid #7C3AED !important;
+  }
+  tbody tr td.col-key {
+    color: #1A2530;
+    font-weight: 700;
+  }
+  tbody tr:nth-child(even) td.col-key {
+    background: #E8E0F5 !important;
+  }
+  .col-key-legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: #F0EBFA;
+    border: 1px solid #7C3AED;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #5E37B5;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+  .col-key-legend::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    background: #5E37B5;
+    border-radius: 2px;
+  }
+
+  tfoot td {
+    background: var(--navy) !important;
+    color: white;
+    font-weight: 700;
+    border-bottom: none;
+  }
+
+  /* ========================================================
+     BOUTONS
+     ======================================================== */
+  button.btn {
+    background: var(--navy);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+    font-family: inherit;
+    margin-right: 8px;
+    margin-top: 8px;
+  }
+  button.btn:hover { background: var(--navy-deep); }
+  button.btn.primary { background: var(--mint); color: var(--navy); }
+  button.btn.primary:hover { background: #28C284; }
+  button.btn.outline {
+    background: white;
+    color: var(--navy);
+    border: 1px solid var(--border-strong);
+  }
+  button.btn.outline:hover { background: var(--bg); border-color: var(--navy); }
+  button.btn.danger {
+    background: white;
+    color: var(--alert-text);
+    border: 1px solid var(--alert-border);
+  }
+  button.btn.danger:hover { background: var(--alert-bg); }
+  button.btn.small { padding: 5px 10px; font-size: 12px; }
+
+  /* ========================================================
+     MESSAGES / INFO
+     ======================================================== */
+  .note {
+    background: var(--info-bg);
+    border-left: 3px solid var(--info-border);
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--info-text);
+    margin: 16px 0;
+    line-height: 1.5;
+  }
+  .note strong { color: var(--info-text); }
+  .note.warning {
+    background: var(--warn-bg);
+    border-left-color: var(--warn-border);
+    color: var(--warn-text);
+  }
+  .note.warning strong { color: var(--warn-text); }
+
+  /* ========================================================
+     MODE COMPACT — vue dense
+     ======================================================== */
+  .compact-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-sm);
+    display: grid;
+    grid-template-columns: 180px 1fr 1.2fr auto;
+    gap: 24px;
+    align-items: center;
+  }
+  @media (max-width: 1000px) {
+    .compact-card { grid-template-columns: 1fr; gap: 14px; }
+  }
+  .compact-label {
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 14px;
+  }
+  .compact-input label {
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+  .compact-input select {
+    margin-bottom: 8px;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  .compact-results {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+  }
+  .compact-results .lab {
+    color: var(--text-soft);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .compact-results .val { font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+  .compact-results .val.primary { color: var(--ok-text); font-size: 16px; }
+  .compact-results .val.suggest {
+    color: var(--info-text);
+    font-style: italic;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .compact-verdicts {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-end;
+  }
+  @media (max-width: 1000px) {
+    .compact-verdicts { align-items: flex-start; }
+  }
+
+  /* ========================================================
+     PIED DE PAGE
+     ======================================================== */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 16px 32px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  /* ========================================================
+     DIVERS
+     ======================================================== */
+  .row-flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .docs h3 {
+    color: var(--navy);
+    text-transform: none;
+    font-size: 15px;
+    letter-spacing: normal;
+    margin-top: 24px;
+  }
+  .docs ul, .docs ol {
+    padding-left: 20px;
+    margin: 8px 0;
+  }
+  .docs li {
+    margin-bottom: 6px;
+    color: var(--text);
+    font-size: 13px;
+  }
+  .docs p { font-size: 13px; color: var(--text); margin: 8px 0; }
+
+  /* Toast */
+  .flash {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: var(--mint);
+    color: var(--navy);
+    padding: 12px 20px;
+    border-radius: var(--radius);
+    font-weight: 700;
+    box-shadow: var(--shadow);
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.2s;
+  }
+  .flash.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Simulateur d'augmentation salariale</h1>
+    <div class="subtitle">CYIM · Convention SYNTEC (IDCC 1486) · Contrôle SMIC + planchers conventionnels intégrés</div>
+  </div>
+  <div class="mode-toggle">
+    <button id="mode-detailed" class="active" onclick="switchMode('detailed')">Détaillé</button>
+    <button id="mode-compact" onclick="switchMode('compact')">Compact</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="sim">Simulations</button>
+  <button class="tab-btn" data-tab="enveloppe">Enveloppe équipe</button>
+  <button class="tab-btn" data-tab="grilles">Grilles SYNTEC</button>
+  <button class="tab-btn" data-tab="params">Paramètres</button>
+  <button class="tab-btn" data-tab="doc">Documentation</button>
+</nav>
+
+<main>
+
+<!-- ============================================================
+     LÉGENDE (visible sur tous les onglets de calcul)
+     ============================================================ -->
+<div class="legend-card" id="legend-card">
+  <h2>📋 Comment lire ce simulateur</h2>
+  <div class="legend-grid">
+    <div class="legend-item">
+      <span class="legend-chip input">À COMPLÉTER</span>
+      <span class="legend-text"><strong>Champs jaunes :</strong> à saisir ou modifier</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-chip result">Résultat</span>
+      <span class="legend-text"><strong>Cellules grises :</strong> calculées automatiquement, ne pas toucher</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-chip synthesis">Synthèse</span>
+      <span class="legend-text"><strong>Encadrés verts :</strong> résultat clé (variation, nouveau salaire)</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-chip ok">✓ Conforme</span>
+      <span class="legend-text"><strong>Vert :</strong> au-dessus des minima SYNTEC et CYIM</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-chip warn">⚠ Sous CYIM</span>
+      <span class="legend-text"><strong>Orange :</strong> sous le minima interne CYIM (alerte modérée)</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-chip alert">✗ Non conforme</span>
+      <span class="legend-text"><strong>Rouge :</strong> sous le minima SYNTEC ou le SMIC (alerte forte)</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ONGLET SIMULATIONS
+     ============================================================ -->
+<section class="panel active" id="panel-sim">
+
+  <!-- Données du salarié (commun à tous les scénarios) -->
+  <div class="section">
+    <h2>Données du salarié</h2>
+    <div class="section-desc">Ces informations sont communes à tous les scénarios ci-dessous.</div>
+    <div class="input-grid cols-3">
+      <div class="field">
+        <label for="emp-name">Nom du salarié</label>
+        <input type="text" id="emp-name" value="DUPONT Marie">
+      </div>
+      <div class="field">
+        <label for="emp-position">Classification SYNTEC</label>
+        <select id="emp-position"></select>
+      </div>
+      <div class="field">
+        <label for="emp-salary">Salaire brut annuel actuel (€)</label>
+        <input type="number" id="emp-salary" value="28718.52" step="0.01" data-mirror="eur">
+      </div>
+    </div>
+  </div>
+
+  <!-- =============== MODE COMPACT =============== -->
+  <div id="compact-view" style="display:none;">
+    <div class="section" style="padding: 24px 28px;">
+      <h2>Vue compacte — 3 simulations en parallèle</h2>
+      <div class="section-desc">Saisissez ci-dessous, les verdicts SYNTEC apparaissent à droite.</div>
+
+      <!-- Compact 1 : Salaire → % -->
+      <div class="compact-card">
+        <div class="compact-label">▸ Salaire → %</div>
+        <div class="compact-input">
+          <label for="c1-new">Nouveau salaire annuel (€)</label>
+          <input type="number" id="c1-new" value="29500" step="0.01" data-mirror="eur">
+        </div>
+        <div class="compact-results">
+          <span class="lab">Augmentation</span>
+          <span class="val" id="c1-aug">—</span>
+          <span class="val primary" id="c1-pct">—</span>
+          <span class="lab" style="margin-top:6px;">Position SYNTEC minima possible</span>
+          <span class="val suggest" id="c1-suggest">—</span>
+        </div>
+        <div class="compact-verdicts">
+          <span class="pill" id="c1-verdict-syntec">—</span>
+          <span class="pill" id="c1-verdict-cyim">—</span>
+        </div>
+      </div>
+
+      <!-- Compact 2 : % → Salaire -->
+      <div class="compact-card">
+        <div class="compact-label">▸ % → Salaire</div>
+        <div class="compact-input">
+          <label for="c2-pct">Pourcentage (%)</label>
+          <input type="number" id="c2-pct" value="2.72" step="0.01" data-mirror="pct">
+        </div>
+        <div class="compact-results">
+          <span class="lab">Nouveau salaire annuel</span>
+          <span class="val primary" id="c2-new">—</span>
+          <span class="val" id="c2-aug">—</span>
+          <span class="lab" style="margin-top:6px;">Position SYNTEC minima possible</span>
+          <span class="val suggest" id="c2-suggest">—</span>
+        </div>
+        <div class="compact-verdicts">
+          <span class="pill" id="c2-verdict-syntec">—</span>
+          <span class="pill" id="c2-verdict-cyim">—</span>
+        </div>
+      </div>
+
+      <!-- Compact 3 : Montant € → Salaire -->
+      <div class="compact-card">
+        <div class="compact-label">▸ Montant € → Salaire</div>
+        <div class="compact-input">
+          <label for="c3-mode">Mode de saisie</label>
+          <select id="c3-mode">
+            <option value="Mensuel">Mensuel</option>
+            <option value="Annuel">Annuel</option>
+          </select>
+          <label for="c3-montant" id="c3-montant-label">Montant (€)</label>
+          <input type="number" id="c3-montant" value="65" step="0.01" data-mirror="eur">
+        </div>
+        <div class="compact-results">
+          <span class="lab">Nouveau salaire annuel</span>
+          <span class="val primary" id="c3-new">—</span>
+          <span class="val" id="c3-pct">—</span>
+          <span class="lab" style="margin-top:6px;">Position SYNTEC minima possible</span>
+          <span class="val suggest" id="c3-suggest">—</span>
+        </div>
+        <div class="compact-verdicts">
+          <span class="pill" id="c3-verdict-syntec">—</span>
+          <span class="pill" id="c3-verdict-cyim">—</span>
+        </div>
+      </div>
+
+      <div class="note">
+        Pour le tableau de sensibilité, la conversion horaire et la répartition d'enveloppe,
+        passez en mode <strong>Détaillé</strong> (bouton en haut à droite).
+      </div>
+    </div>
+  </div>
+
+  <!-- =============== MODE DÉTAILLÉ — SCÉNARIO À LA CARTE =============== -->
+  <div id="detailed-view">
+
+    <!-- Sélecteur de scénario -->
+    <div class="section">
+      <h2>Choisir le(s) scénario(s) à afficher</h2>
+      <div class="section-desc">Sélectionne un ou plusieurs scénarios. Les scénarios sélectionnés s'affichent ci-dessous et peuvent être imprimés ensemble.</div>
+      <div class="scenario-picker">
+        <button class="scenario-option active" data-scenario="s1">
+          <span class="so-checkbox"></span>
+          <span class="so-num">Scénario 1</span>
+          <span class="so-title">Nouveau salaire → %</span>
+          <span class="so-desc">Saisir le nouveau salaire envisagé</span>
+        </button>
+        <button class="scenario-option" data-scenario="s2">
+          <span class="so-checkbox"></span>
+          <span class="so-num">Scénario 2</span>
+          <span class="so-title">% → Nouveau salaire</span>
+          <span class="so-desc">Avec tableau de sensibilité</span>
+        </button>
+        <button class="scenario-option" data-scenario="s3">
+          <span class="so-checkbox"></span>
+          <span class="so-num">Scénario 3</span>
+          <span class="so-title">Montant € → Nouveau salaire</span>
+          <span class="so-desc">Mensuel ou annuel au choix</span>
+        </button>
+        <button class="scenario-option" data-scenario="s4">
+          <span class="so-checkbox"></span>
+          <span class="so-num">Scénario 4</span>
+          <span class="so-title">Conversion horaire</span>
+          <span class="so-desc">Annuel / mensuel / horaire</span>
+        </button>
+      </div>
+      <div class="picker-actions">
+        <div class="selection-info" id="selection-info">1 scénario sélectionné</div>
+        <button class="btn primary" id="btn-print-selection" onclick="openPrintModalSelection()">
+          🖨️ Imprimer / Enregistrer la sélection
+        </button>
+      </div>
+    </div>
+
+    <!-- Scénario 1 -->
+    <div class="section scenario-content active" data-scenario="s1">
+      <h2>Scénario 1 — Du nouveau salaire au % d'augmentation</h2>
+      <div class="section-desc">Saisissez le nouveau salaire envisagé, le pourcentage et l'écart sont calculés.</div>
+      <div class="scenario-grid">
+        <div>
+          <h3>Saisie</h3>
+          <div class="field">
+            <label for="s1-new-salary">Nouveau salaire brut annuel proposé (€)</label>
+            <input type="number" id="s1-new-salary" value="29500" step="0.01" data-mirror="eur">
+          </div>
+
+          <h3>Résultats</h3>
+          <div class="results">
+            <div class="result-row">
+              <span class="label-side">Augmentation annuelle</span>
+              <span class="value" id="s1-aug-an">—</span>
+            </div>
+            <div class="result-row">
+              <span class="label-side">Augmentation mensuelle</span>
+              <span class="value" id="s1-aug-mens">—</span>
+            </div>
+            <div class="result-row highlight">
+              <span class="label-side">Variation salaire</span>
+              <span class="value" id="s1-pct">—</span>
+            </div>
+            <div class="result-row" id="s1-mens39-row" style="display:none;">
+              <span class="label-side">
+                Nouveau mensuel base 39h <span class="hint">— ETAM, sans majoration HS</span>
+              </span>
+              <span class="value" id="s1-mens39">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3>Contrôle SYNTEC</h3>
+          <div class="results">
+            <div class="verdict-line" id="s1-vl-syntec">
+              <span class="left-side">
+                <span class="vl-label">Minima SYNTEC annuel</span>
+                <span class="vl-value" id="s1-min-syntec">—</span>
+              </span>
+              <span class="vl-status" id="s1-status-syntec">—</span>
+            </div>
+            <div class="verdict-line" id="s1-vl-cyim">
+              <span class="left-side">
+                <span class="vl-label">Minima interne CYIM annuel</span>
+                <span class="vl-value" id="s1-min-cyim">—</span>
+              </span>
+              <span class="vl-status" id="s1-status-cyim">—</span>
+            </div>
+            <div class="result-row suggestion">
+              <span class="label-side">
+                Position SYNTEC minima possible
+                <span class="hint">Position SYNTEC la plus élevée dont le minima conventionnel reste compatible avec ce salaire. À titre indicatif — la classification effective relève du choix RH/managérial.</span>
+              </span>
+              <span class="value" id="s1-suggest">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scénario 2 -->
+    <div class="section scenario-content" data-scenario="s2">
+      <h2>Scénario 2 — Du % d'augmentation au nouveau salaire</h2>
+      <div class="section-desc">Avec un tableau de sensibilité pour comparer plusieurs pourcentages d'un coup d'œil.</div>
+      <div class="scenario-grid">
+        <div>
+          <h3>Saisie</h3>
+          <div class="field">
+            <label for="s2-pct">Pourcentage d'augmentation (%)</label>
+            <input type="number" id="s2-pct" value="2.72" step="0.01" data-mirror="pct">
+          </div>
+
+          <h3>Résultats</h3>
+          <div class="results">
+            <div class="result-row highlight">
+              <span class="label-side">Nouveau salaire brut annuel</span>
+              <span class="value" id="s2-new-sal">—</span>
+            </div>
+            <div class="result-row">
+              <span class="label-side">Augmentation annuelle</span>
+              <span class="value" id="s2-aug-an">—</span>
+            </div>
+            <div class="result-row">
+              <span class="label-side">Augmentation mensuelle</span>
+              <span class="value" id="s2-aug-mens">—</span>
+            </div>
+            <div class="result-row" id="s2-mens39-row" style="display:none;">
+              <span class="label-side">
+                Nouveau mensuel base 39h <span class="hint">— ETAM, sans majoration HS</span>
+              </span>
+              <span class="value" id="s2-mens39">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3>Contrôle SYNTEC</h3>
+          <div class="results">
+            <div class="verdict-line" id="s2-vl-syntec">
+              <span class="left-side">
+                <span class="vl-label">Minima SYNTEC annuel</span>
+                <span class="vl-value" id="s2-min-syntec">—</span>
+              </span>
+              <span class="vl-status" id="s2-status-syntec">—</span>
+            </div>
+            <div class="verdict-line" id="s2-vl-cyim">
+              <span class="left-side">
+                <span class="vl-label">Minima interne CYIM annuel</span>
+                <span class="vl-value" id="s2-min-cyim">—</span>
+              </span>
+              <span class="vl-status" id="s2-status-cyim">—</span>
+            </div>
+            <div class="result-row suggestion">
+              <span class="label-side">
+                Position SYNTEC minima possible
+                <span class="hint">Position SYNTEC la plus élevée dont le minima conventionnel reste compatible avec ce salaire.</span>
+              </span>
+              <span class="value" id="s2-suggest">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Tableau de sensibilité</h3>
+      <div class="table-wrapper">
+        <table id="s2-sensitivity">
+          <thead>
+            <tr>
+              <th>%</th>
+              <th class="num">Nouveau salaire annuel</th>
+              <th class="num">Aug. annuelle</th>
+              <th class="num">Nouveau sal. mensuel</th>
+              <th class="num">Aug. mensuelle</th>
+              <th class="center">SYNTEC</th>
+              <th class="center">CYIM</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Scénario 3 -->
+    <div class="section scenario-content" data-scenario="s3">
+      <h2>Scénario 3 — D'un montant en € au nouveau salaire</h2>
+      <div class="section-desc">Saisie au choix : montant mensuel OU montant annuel.</div>
+      <div class="scenario-grid">
+        <div>
+          <h3>Saisie</h3>
+          <div class="field">
+            <label for="s3-mode">Mode de saisie du montant</label>
+            <select id="s3-mode">
+              <option value="Mensuel">Montant mensuel</option>
+              <option value="Annuel">Montant annuel</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="s3-montant" id="s3-montant-label">Montant d'augmentation MENSUELLE (€)</label>
+            <input type="number" id="s3-montant" value="65" step="0.01" data-mirror="eur">
+          </div>
+
+          <h3>Résultats</h3>
+          <div class="results">
+            <div class="result-row">
+              <span class="label-side">Augmentation annuelle</span>
+              <span class="value" id="s3-aug-an">—</span>
+            </div>
+            <div class="result-row">
+              <span class="label-side">Augmentation mensuelle</span>
+              <span class="value" id="s3-aug-mens">—</span>
+            </div>
+            <div class="result-row highlight">
+              <span class="label-side">Nouveau salaire brut annuel</span>
+              <span class="value" id="s3-new-sal">—</span>
+            </div>
+            <div class="result-row">
+              <span class="label-side">Nouveau salaire brut mensuel</span>
+              <span class="value" id="s3-new-sal-mens">—</span>
+            </div>
+            <div class="result-row highlight">
+              <span class="label-side">Variation salaire</span>
+              <span class="value" id="s3-pct">—</span>
+            </div>
+            <div class="result-row" id="s3-mens39-row" style="display:none;">
+              <span class="label-side">
+                Nouveau mensuel base 39h <span class="hint">— ETAM, sans majoration HS</span>
+              </span>
+              <span class="value" id="s3-mens39">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3>Contrôle SYNTEC</h3>
+          <div class="results">
+            <div class="verdict-line" id="s3-vl-syntec">
+              <span class="left-side">
+                <span class="vl-label">Minima SYNTEC annuel</span>
+                <span class="vl-value" id="s3-min-syntec">—</span>
+              </span>
+              <span class="vl-status" id="s3-status-syntec">—</span>
+            </div>
+            <div class="verdict-line" id="s3-vl-cyim">
+              <span class="left-side">
+                <span class="vl-label">Minima interne CYIM annuel</span>
+                <span class="vl-value" id="s3-min-cyim">—</span>
+              </span>
+              <span class="vl-status" id="s3-status-cyim">—</span>
+            </div>
+            <div class="result-row suggestion">
+              <span class="label-side">
+                Position SYNTEC minima possible
+                <span class="hint">Position SYNTEC la plus élevée dont le minima conventionnel reste compatible avec ce salaire.</span>
+              </span>
+              <span class="value" id="s3-suggest">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scénario 4 -->
+    <div class="section scenario-content" data-scenario="s4">
+      <h2>Scénario 4 — Conversion annuel / mensuel / horaire</h2>
+      <div class="section-desc">Modifiez l'une des trois entrées, les conversions se mettent à jour automatiquement.</div>
+      <div class="input-grid cols-3">
+        <div>
+          <h3>Depuis le salaire annuel</h3>
+          <div class="field">
+            <label for="s4-annuel">Salaire brut annuel (€)</label>
+            <input type="number" id="s4-annuel" value="28718.52" step="0.01" data-mirror="eur">
+          </div>
+          <div class="results">
+            <div class="result-row"><span class="label-side">→ Mensuel (12 mois)</span><span class="value" id="s4-from-an-mens">—</span></div>
+            <div class="result-row"><span class="label-side">→ Taux horaire 35h</span><span class="value" id="s4-from-an-tx35">—</span></div>
+            <div class="result-row"><span class="label-side">→ Équivalent mensuel 39h</span><span class="value" id="s4-from-an-mens39">—</span></div>
+          </div>
+        </div>
+        <div>
+          <h3>Depuis le salaire mensuel</h3>
+          <div class="field">
+            <label for="s4-mensuel">Salaire brut mensuel (€)</label>
+            <input type="number" id="s4-mensuel" value="2393.21" step="0.01" data-mirror="eur">
+          </div>
+          <div class="results">
+            <div class="result-row"><span class="label-side">→ Annuel (12 mois)</span><span class="value" id="s4-from-mens-an">—</span></div>
+            <div class="result-row"><span class="label-side">→ Taux horaire 35h</span><span class="value" id="s4-from-mens-tx35">—</span></div>
+            <div class="result-row"><span class="label-side">→ Équivalent mensuel 39h</span><span class="value" id="s4-from-mens-mens39">—</span></div>
+          </div>
+        </div>
+        <div>
+          <h3>Depuis le taux horaire</h3>
+          <div class="field">
+            <label for="s4-horaire">Taux horaire brut (€/h)</label>
+            <input type="number" id="s4-horaire" value="15.78" step="0.0001" data-mirror="eur4">
+          </div>
+          <div class="results">
+            <div class="result-row"><span class="label-side">→ Mensuel 35h</span><span class="value" id="s4-from-h-mens35">—</span></div>
+            <div class="result-row"><span class="label-side">→ Annuel 35h</span><span class="value" id="s4-from-h-an">—</span></div>
+            <div class="result-row"><span class="label-side">→ Mensuel 39h</span><span class="value" id="s4-from-h-mens39">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /detailed-view -->
+
+
+</section>
+
+
+<!-- ============================================================
+     ONGLET ENVELOPPE ÉQUIPE
+     ============================================================ -->
+<section class="panel" id="panel-enveloppe">
+  <div class="section">
+    <h2>Scénario 5 — Répartition d'une enveloppe d'augmentation</h2>
+    <div class="section-desc">Saisissez le budget global, puis répartissez-le entre les salariés.</div>
+
+    <div class="input-grid cols-2">
+      <div class="field">
+        <label for="envelope-budget">Enveloppe annuelle disponible (€)</label>
+        <input type="number" id="envelope-budget" value="5000" step="0.01" data-mirror="eur">
+      </div>
+    </div>
+
+    <h3>Répartition individuelle</h3>
+    <div class="table-wrapper">
+      <table id="team-table">
+        <thead>
+          <tr>
+            <th>Salarié</th>
+            <th>Classification</th>
+            <th class="num">Salaire actuel</th>
+            <th class="num">Aug. €/an</th>
+            <th class="num">Aug. €/mois</th>
+            <th class="num">Nouveau salaire</th>
+            <th class="num">Variation %</th>
+            <th class="center">Conformité SYNTEC</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px;">
+      <button class="btn primary" onclick="addTeamRow()">+ Ajouter un salarié</button>
+    </div>
+
+    <h3>Suivi de l'enveloppe</h3>
+    <div class="input-grid cols-2">
+      <div class="results">
+        <div class="result-row">
+          <span class="label-side">Total alloué (€/an)</span>
+          <span class="value" id="env-alloue">—</span>
+        </div>
+        <div class="result-row">
+          <span class="label-side">Enveloppe disponible</span>
+          <span class="value" id="env-dispo">—</span>
+        </div>
+      </div>
+      <div class="results">
+        <div class="result-row highlight">
+          <span class="label-side">Solde restant</span>
+          <span class="value" id="env-solde">—</span>
+        </div>
+        <div class="result-row highlight">
+          <span class="label-side">% enveloppe consommée</span>
+          <span class="value" id="env-pct">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     ONGLET GRILLES SYNTEC
+     ============================================================ -->
+<section class="panel" id="panel-grilles">
+
+  <div class="note warning" id="smic-alert" style="display:none;">
+    <strong>⚠ Attention :</strong> certaines positions SYNTEC ont un minimum conventionnel
+    <strong>inférieur au SMIC en vigueur</strong>. Le plancher applicable est automatiquement remonté au SMIC.
+  </div>
+
+  <div class="section">
+    <h2>Grille ETAM</h2>
+    <div class="section-desc">Base 39h CYIM — minima interne CYIM = plancher 39h + marge ETAM (+10 % par défaut).</div>
+    <div class="col-key-legend">Colonnes principales de référence pour le contrôle CYIM</div>
+    <div class="table-wrapper">
+      <table id="grille-etam-table">
+        <thead>
+          <tr>
+            <th class="center">Position</th>
+            <th class="center">Coef.</th>
+            <th class="num">Min. conv. SYNTEC 35h</th>
+            <th class="num">Minima 35h applicable (MAX SMIC)</th>
+            <th class="num col-key">Minima 39h mensuel</th>
+            <th class="num">Minima 39h annuel</th>
+            <th class="num col-key">Minima CYIM mensuel</th>
+            <th class="num">Minima CYIM annuel</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Grille Cadres</h2>
+    <div class="section-desc">Base 35h + forfait jours +20 % — minima interne CYIM appliqué au forfait.</div>
+    <div class="col-key-legend">Colonnes principales de référence pour le contrôle CYIM</div>
+    <div class="table-wrapper">
+      <table id="grille-cadre-table">
+        <thead>
+          <tr>
+            <th class="center">Position</th>
+            <th class="center">Coef.</th>
+            <th class="num">Min. conv. SYNTEC 35h</th>
+            <th class="num">Minima 35h applicable (MAX SMIC)</th>
+            <th class="num col-key">Forfait jours mensuel +20 %</th>
+            <th class="num">Forfait jours annuel</th>
+            <th class="num col-key">Minima CYIM mensuel</th>
+            <th class="num">Minima CYIM annuel</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="note">
+      La grille officielle SYNTEC contient effectivement <strong>deux positions « 2.1 » Cadres</strong>
+      (coefficients 105 et 115) — valeurs reproduites telles que publiées par la Fédération Syntec.
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Mise à jour de la grille</h2>
+    <div class="section-desc">Modifier directement les cellules <em>Min. conv. 35h</em> dans les tableaux ci-dessus.
+    Toutes les valeurs dérivées se recalculent automatiquement.</div>
+    <button class="btn danger" onclick="resetGrille()">🔄 Réinitialiser la grille (valeurs SYNTEC au 01/01/2025)</button>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     ONGLET PARAMÈTRES
+     ============================================================ -->
+<section class="panel" id="panel-params">
+  <div class="section">
+    <h2>SMIC en vigueur</h2>
+    <div class="section-desc">À mettre à jour à chaque revalorisation officielle.</div>
+    <div class="input-grid cols-3">
+      <div class="field">
+        <label for="param-smic-horaire">SMIC horaire brut (€)</label>
+        <input type="number" id="param-smic-horaire" value="12.31" step="0.0001" data-mirror="eur4">
+      </div>
+      <div class="field">
+        <label for="param-smic-mensuel">SMIC mensuel brut 35h (€)</label>
+        <input type="number" id="param-smic-mensuel" value="1867.02" step="0.01" data-mirror="eur">
+      </div>
+      <div class="field">
+        <label for="param-smic-date">Date d'application</label>
+        <input type="text" id="param-smic-date" value="01/06/2026">
+      </div>
+    </div>
+    <div class="note">
+      État au 22/05/2026 : SMIC revalorisé de +2,41 % à 12,31 €/h soit 1 867,02 €/mois (35h).
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Bases horaires</h2>
+    <div class="input-grid cols-2">
+      <div class="field">
+        <label for="param-h35">Heures mensuelles base 35h</label>
+        <input type="number" id="param-h35" value="151.67" step="0.01">
+      </div>
+      <div class="field">
+        <label for="param-h39">Heures mensuelles base 39h</label>
+        <input type="number" id="param-h39" value="169" step="0.01">
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Marges internes CYIM</h2>
+    <div class="input-grid cols-2">
+      <div class="field">
+        <label for="param-marge-etam">Marge ETAM (% au-dessus du plancher 39h)</label>
+        <input type="number" id="param-marge-etam" value="10" step="0.1">
+      </div>
+      <div class="field">
+        <label for="param-marge-cadre">Marge Cadres - forfait jours (%)</label>
+        <input type="number" id="param-marge-cadre" value="20" step="0.1">
+      </div>
+    </div>
+    <div class="note">
+      <strong>Logique :</strong> pour les ETAM, le minima interne CYIM = plancher 39h × (1 + marge ETAM).
+      Pour les Cadres, le forfait jours = plancher 35h × (1 + marge Cadres), et le minima interne
+      = forfait jours × (1 + marge ETAM).
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Gestion des données</h2>
+    <div class="row-flex">
+      <button class="btn primary" onclick="saveAll()">💾 Sauvegarder</button>
+      <button class="btn outline" onclick="exportData()">📥 Exporter (JSON)</button>
+      <button class="btn outline" onclick="document.getElementById('import-file').click()">📤 Importer (JSON)</button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="btn danger" onclick="resetAll()">🔄 Tout réinitialiser</button>
+    </div>
+    <div class="note">
+      Tes paramètres et tes modifications de grille sont enregistrés automatiquement dans ton navigateur.
+      Pour partager tes paramètres avec un collègue, utilise « Exporter ».
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     ONGLET DOCUMENTATION
+     ============================================================ -->
+<section class="panel" id="panel-doc">
+  <div class="section docs">
+    <h2>Documentation — Mode d'emploi</h2>
+
+    <h3>À quoi sert cet outil ?</h3>
+    <p>Le simulateur permet de calculer des augmentations salariales sous plusieurs angles
+    (du nouveau salaire au %, du % au nouveau salaire, d'un montant en € au nouveau salaire),
+    en vérifiant automatiquement la conformité avec :</p>
+    <ul>
+      <li>les <strong>minima conventionnels SYNTEC</strong> (IDCC 1486) en vigueur</li>
+      <li>les <strong>seuils internes CYIM</strong> (+10 % ETAM / +20 % Cadres) — marge de sûreté</li>
+      <li>le <strong>SMIC en vigueur</strong> (plancher légal absolu)</li>
+    </ul>
+
+    <h3>Les deux modes d'affichage</h3>
+    <ul>
+      <li><strong>Mode Détaillé :</strong> tous les scénarios avec leurs détails (résultats mensuels/annuels,
+        tableau de sensibilité, conversion annuel/mensuel/horaire). Idéal pour préparer un dossier
+        d'augmentation argumenté.</li>
+      <li><strong>Mode Compact :</strong> les 3 simulations principales (Salaire→%, %→Salaire, Montant→Salaire)
+        condensées avec les verdicts SYNTEC et CYIM en pastilles colorées.
+        Idéal pour un cycle de simulations rapides.</li>
+    </ul>
+
+    <h3>Logique des seuils</h3>
+    <p><strong>Pour les ETAM :</strong></p>
+    <ul>
+      <li>Plancher légal mensuel = MAX(minimum conventionnel SYNTEC 35h ; SMIC mensuel)</li>
+      <li>Plancher 39h = plancher 35h × (169 / 151,67)</li>
+      <li>Minima interne CYIM = plancher 39h × (1 + marge ETAM, par défaut +10 %)</li>
+    </ul>
+    <p><strong>Pour les Cadres :</strong></p>
+    <ul>
+      <li>Plancher légal mensuel = MAX(minimum conventionnel SYNTEC ; SMIC mensuel)</li>
+      <li>Forfait jours mensuel = plancher 35h × (1 + marge Cadres, par défaut +20 %)</li>
+      <li>Minima interne CYIM = forfait jours × (1 + marge ETAM, par défaut +10 %)</li>
+    </ul>
+
+    <h3>Quand mettre à jour les valeurs ?</h3>
+    <ul>
+      <li><strong>SMIC :</strong> à chaque revalorisation officielle.</li>
+      <li><strong>Grille SYNTEC :</strong> à chaque publication d'un nouvel avenant par la branche (négociation annuelle CPPNI au plus tard le 30 juin).</li>
+      <li><strong>Bases horaires :</strong> rarement (uniquement si la durée légale ou la convention horaire CYIM change).</li>
+      <li><strong>Marges internes :</strong> selon la politique RH interne.</li>
+    </ul>
+
+    <h3>Comment modifier la grille SYNTEC ?</h3>
+    <ol>
+      <li>Va dans l'onglet <em>Grilles SYNTEC</em></li>
+      <li>Clique dans la cellule <em>Min. conv. 35h</em> de la ligne à modifier</li>
+      <li>Saisis la nouvelle valeur. Toutes les colonnes dérivées se recalculent immédiatement</li>
+      <li>La sauvegarde est automatique (stockage navigateur)</li>
+    </ol>
+
+    <h3>Persistance des données</h3>
+    <p>Toutes tes modifications (paramètres, grilles SYNTEC, salariés saisis dans le tableau d'enveloppe)
+    sont automatiquement sauvegardées dans le stockage local de ton navigateur.
+    Pour partager une configuration : <em>Paramètres → Exporter (JSON)</em>, et le collègue fait <em>Importer (JSON)</em>.</p>
+
+    <h3>État au 22/05/2026</h3>
+    <ul>
+      <li>SMIC : <strong>12,31 €/h</strong> ; <strong>1 867,02 €/mois</strong> (revalorisation +2,41 % au 01/06/2026)</li>
+      <li>Grille SYNTEC : valeurs officielles au 01/01/2025 (source : <em>syntec.fr</em>)</li>
+      <li><strong>Conséquence :</strong> positions ETAM 1.1 (1 815 €) et 1.2 (1 845 €) sont inférieures
+        au nouveau SMIC. Leur plancher applicable est automatiquement remonté au SMIC.</li>
+    </ul>
+
+    <h3>Glossaire</h3>
+    <ul>
+      <li><strong>SYNTEC :</strong> Convention collective nationale des bureaux d'études techniques,
+        cabinets d'ingénieurs-conseils et sociétés de conseils (IDCC 1486).</li>
+      <li><strong>ETAM :</strong> Employés, Techniciens et Agents de Maîtrise.</li>
+      <li><strong>Forfait jours :</strong> dispositif de décompte du temps de travail en jours
+        (218 jours/an) applicable aux Cadres autonomes (positions 3.x SYNTEC en règle générale).</li>
+      <li><strong>Base 39h CYIM :</strong> les ETAM de CYIM sont contractuellement à 39h/semaine,
+        soit 169 h/mois (vs 151,67 h pour 35 h). Les heures supplémentaires majorées (25 %) sont
+        gérées séparément en paie.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================================================
+     MODAL D'IMPRESSION / SYNTHÈSE
+     ============================================================ -->
+<div class="print-modal" id="print-modal">
+  <div class="print-modal-content">
+    <div class="print-modal-header">
+      <h2>Synthèse de la simulation</h2>
+      <div class="print-modal-actions">
+        <button class="btn primary" onclick="window.print()">🖨️ Imprimer / Enregistrer PDF</button>
+        <button class="print-modal-close" onclick="closePrintModal()" aria-label="Fermer">×</button>
+      </div>
+    </div>
+    <div class="print-sheet" id="print-content">
+      <!-- Contenu généré dynamiquement -->
+    </div>
+  </div>
+</div>
+
+<footer>
+  Simulateur CYIM · usage interne RH · données locales (navigateur) · convention SYNTEC IDCC 1486
+</footer>
+
+<div class="flash" id="flash-msg"></div>
+
+<script>
+// =============================================================
+// DONNÉES PAR DÉFAUT — Grille SYNTEC officielle au 01/01/2025
+// =============================================================
+// =============================================================
+// CONFIGURATION — Source de données partagée (Gist GitHub privé)
+// =============================================================
+// Cette URL pointe vers un Gist GitHub contenant la configuration partagée
+// (grille SYNTEC, SMIC, paramètres). À remplacer par votre Gist ID après création.
+// L'URL "raw" est utilisée pour bypasser le cache de l'API Gist.
+const GIST_ID = "f551987088180b51484f6e13c38494db";
+const GIST_FILE = "cyim-config.json";
+// On utilise l'API Gist (et pas raw_url direct) car raw_url change à chaque révision
+// alors que l'API renvoie toujours le dernier contenu. Le cache-busting par timestamp
+// garantit qu'on a toujours la version la plus récente.
+const GIST_API_URL = `https://api.github.com/gists/${GIST_ID}`;
+
+const DEFAULT_DATA = {
+  smic_horaire: 12.31,
+  smic_mensuel: 1867.02,
+  smic_date: "01/06/2026",
+  h35: 151.67,
+  h39: 169,
+  marge_etam: 10,
+  marge_cadre: 20,
+  etam: [
+    { pos: "1.1", coef: 240, min: 1815 },
+    { pos: "1.2", coef: 250, min: 1845 },
+    { pos: "2.1", coef: 275, min: 1875 },
+    { pos: "2.2", coef: 310, min: 1905 },
+    { pos: "2.3", coef: 355, min: 2045 },
+    { pos: "3.1", coef: 400, min: 2185 },
+    { pos: "3.2", coef: 450, min: 2340 },
+    { pos: "3.3", coef: 500, min: 2490 }
+  ],
+  cadres: [
+    { pos: "1.1", coef: 95,  min: 2135 },
+    { pos: "1.2", coef: 100, min: 2240 },
+    { pos: "2.1", coef: 105, min: 2315 },
+    { pos: "2.1", coef: 115, min: 2530 },
+    { pos: "2.2", coef: 130, min: 2850 },
+    { pos: "2.3", coef: 150, min: 3275 },
+    { pos: "3.1", coef: 170, min: 3650 },
+    { pos: "3.2", coef: 210, min: 4495 },
+    { pos: "3.3", coef: 270, min: 5755 }
+  ]
+};
+
+const STORAGE_KEY = "cyim_simulateur_v1";
+const DEFAULT_TEAM = [
+  { name: "DUPONT Marie",   classif: "ETAM 2.1 (coef 275)", salary: 28718.52, aug: 800 },
+  { name: "MARTIN Paul",    classif: "ETAM 2.3 (coef 355)", salary: 32500.00, aug: 650 },
+  { name: "LEROY Sophie",   classif: "ETAM 3.1 (coef 400)", salary: 35200.00, aug: 700 },
+  { name: "BERNARD Thomas", classif: "Cadre 1.2 (coef 100)", salary: 41000.00, aug: 500 },
+  { name: "PETIT Julie",    classif: "ETAM 2.2 (coef 310)", salary: 29800.00, aug: 600 }
+];
+
+let state = JSON.parse(JSON.stringify(DEFAULT_DATA)); // valeur initiale temporaire
+let teamData = loadTeamData();
+let currentMode = localStorage.getItem("cyim_mode") || "detailed";
+// Métadonnées sur la source de la grille
+let configSource = { type: "fallback", updatedAt: null };
+
+// =============================================================
+// PERSISTANCE — la grille SYNTEC + paramètres viennent du Gist partagé.
+// Le localStorage ne sert plus que pour les données utilisateur (équipe simulée).
+// =============================================================
+
+// Charge la config depuis le Gist GitHub (source de vérité partagée).
+// Fallback : DEFAULT_DATA si le Gist est inaccessible ou mal configuré.
+async function loadStateFromGist() {
+  if (!GIST_ID || GIST_ID === "f551987088180b51484f6e13c38494db") {
+    console.warn("Gist ID non configuré — utilisation des valeurs par défaut");
+    configSource = { type: "fallback-not-configured", updatedAt: null };
+    return JSON.parse(JSON.stringify(DEFAULT_DATA));
+  }
+
+  try {
+    // Cache-busting léger : on ajoute un timestamp horaire pour rafraîchir
+    // au moins toutes les heures, sans pénaliser le rate limit GitHub
+    const cacheBust = Math.floor(Date.now() / 3600000);
+    const response = await fetch(`${GIST_API_URL}?_=${cacheBust}`, {
+      headers: { "Accept": "application/vnd.github+json" }
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const gist = await response.json();
+    const file = gist.files[GIST_FILE];
+    if (!file) throw new Error(`Fichier ${GIST_FILE} absent du Gist`);
+    const remoteConfig = JSON.parse(file.content);
+
+    // Validation minimale : on vérifie que la structure attendue est là
+    if (!remoteConfig.etam || !remoteConfig.cadres ||
+        typeof remoteConfig.smic_mensuel !== "number") {
+      throw new Error("Structure du Gist invalide");
+    }
+
+    configSource = {
+      type: "gist",
+      updatedAt: gist.updated_at,
+      url: gist.html_url
+    };
+    return remoteConfig;
+  } catch (err) {
+    console.error("Erreur chargement Gist :", err);
+    configSource = { type: "fallback-error", updatedAt: null, error: err.message };
+    return JSON.parse(JSON.stringify(DEFAULT_DATA));
+  }
+}
+
+function loadTeamData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY + "_team");
+    if (raw) return JSON.parse(raw);
+  } catch(e) { console.warn("Erreur chargement team:", e); }
+  return JSON.parse(JSON.stringify(DEFAULT_TEAM));
+}
+
+// Côté utilisateur final, seules les données de l'équipe (Scénario 5) sont
+// sauvegardées en localStorage. La grille SYNTEC + paramètres sont en lecture
+// seule et viennent du Gist partagé.
+function saveAll() {
+  localStorage.setItem(STORAGE_KEY + "_team", JSON.stringify(teamData));
+  flashMessage("✓ Sauvegardé");
+}
+
+function autoSave() {
+  try {
+    localStorage.setItem(STORAGE_KEY + "_team", JSON.stringify(teamData));
+  } catch(e) { console.warn("Auto-save:", e); }
+}
+
+function resetAll() {
+  if (!confirm("Réinitialiser les données utilisateur (salariés saisis dans l'enveloppe) ?\n\nNote : la grille SYNTEC et les paramètres sont gérés par l'administrateur RH et ne peuvent pas être modifiés ici.")) return;
+  teamData = JSON.parse(JSON.stringify(DEFAULT_TEAM));
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(STORAGE_KEY + "_team");
+  renderTeam();
+  flashMessage("✓ Données utilisateur réinitialisées");
+}
+
+// La grille SYNTEC est en lecture seule côté utilisateur final.
+// Cette fonction n'est plus utilisée mais on la garde pour compatibilité ;
+// elle informe l'utilisateur.
+function resetGrille() {
+  alert("La grille SYNTEC est gérée par l'administrateur RH et ne peut pas être modifiée ici.\n\nPour toute évolution (avenant SYNTEC, revalorisation SMIC), contactez le service RH.");
+}
+
+function exportData() {
+  const data = { state, teamData, exportDate: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `CYIM_simulateur_${new Date().toISOString().split("T")[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.state) state = data.state;
+      if (data.teamData) teamData = data.teamData;
+      autoSave();
+      initAll();
+      flashMessage("✓ Importé");
+    } catch(err) {
+      alert("Erreur d'import : " + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+let flashTimer;
+function flashMessage(msg) {
+  const flash = document.getElementById("flash-msg");
+  flash.textContent = msg;
+  flash.classList.add("visible");
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => flash.classList.remove("visible"), 2000);
+}
+
+// =============================================================
+// MODE COMPACT / DÉTAILLÉ
+// =============================================================
+function switchMode(mode) {
+  currentMode = mode;
+  localStorage.setItem("cyim_mode", mode);
+  document.getElementById("mode-detailed").classList.toggle("active", mode === "detailed");
+  document.getElementById("mode-compact").classList.toggle("active", mode === "compact");
+  document.getElementById("detailed-view").style.display = mode === "detailed" ? "block" : "none";
+  document.getElementById("compact-view").style.display = mode === "compact" ? "block" : "none";
+  computeAll();
+}
+
+// =============================================================
+// FORMATAGE
+// =============================================================
+// Normalise le formatage : remplace les espaces fines insécables (U+202F) que le locale fr-FR
+// utilise comme séparateur de milliers par des espaces insécables classiques (U+00A0).
+// Plus universellement rendus, et plus visibles à l'écran.
+function _normalize(s) {
+  return s.replace(/\u202F/g, "\u00A0");
+}
+const fmtEur = (n) => isNaN(n) || n === null ? "—" :
+  _normalize(n.toLocaleString("fr-FR", { style: "currency", currency: "EUR", minimumFractionDigits: 2 }));
+const fmtEur4 = (n) => isNaN(n) || n === null ? "—" :
+  _normalize(n.toLocaleString("fr-FR", { style: "currency", currency: "EUR", minimumFractionDigits: 4, maximumFractionDigits: 4 }));
+const fmtEurSigned = (n) => {
+  if (isNaN(n) || n === null) return "—";
+  if (n === 0) return "—";
+  const abs = _normalize(Math.abs(n).toLocaleString("fr-FR", { style: "currency", currency: "EUR", minimumFractionDigits: 2 }));
+  return (n > 0 ? "+\u00A0" : "−\u00A0") + abs;
+};
+const fmtPct = (n) => isNaN(n) || n === null ? "—" :
+  (n >= 0 ? "+" : "") + _normalize((n * 100).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })) + "\u00A0%";
+
+// =============================================================
+// CALCULS PLANCHERS
+// =============================================================
+function getPlancherFor(positionLabel) {
+  const smic = state.smic_mensuel;
+  const ratio39 = state.h39 / state.h35;
+  const margeE = state.marge_etam / 100;
+  const margeC = state.marge_cadre / 100;
+
+  if (positionLabel.startsWith("ETAM ")) {
+    let pos, row;
+    const matchCoef = positionLabel.match(/ETAM (\S+) \(coef (\d+)\)/);
+    if (matchCoef) {
+      pos = matchCoef[1];
+      const coef = parseInt(matchCoef[2]);
+      row = state.etam.find(r => r.pos === pos && r.coef === coef);
+    } else {
+      pos = positionLabel.replace("ETAM ", "").trim();
+      row = state.etam.find(r => r.pos === pos);
+    }
+    if (!row) return null;
+    const plancher35 = Math.max(row.min, smic);
+    const plancher39 = plancher35 * ratio39;
+    const seuilCYIM = plancher39 * (1 + margeE);
+    return { plancherMensuel: plancher39, seuilCYIMMensuel: seuilCYIM, statut: "ETAM" };
+  } else if (positionLabel.startsWith("Cadre ")) {
+    const match = positionLabel.match(/Cadre (\S+) \(coef (\d+)\)/);
+    if (!match) return null;
+    const pos = match[1], coef = parseInt(match[2]);
+    const row = state.cadres.find(r => r.pos === pos && r.coef === coef);
+    if (!row) return null;
+    const plancher35 = Math.max(row.min, smic);
+    const forfait = plancher35 * (1 + margeC);
+    const seuilCYIM = forfait * (1 + margeE);
+    return { plancherMensuel: forfait, seuilCYIMMensuel: seuilCYIM, statut: "Cadre" };
+  }
+  return null;
+}
+
+// Cherche la position SYNTEC la plus BASSE compatible avec le salaire :
+// la position la plus haute dont le minima conventionnel SYNTEC est encore <= au salaire.
+// C'est la "position min exigée" : celle qui correspond formellement à ce salaire
+// au sens conventionnel (le minimum SYNTEC qu'on doit garantir).
+//
+// Note technique : la comparaison se fait sur le minima SYNTEC 35h
+// (avec MAX au SMIC), pas sur le plancher 39h CYIM. Pour les ETAM en 39h,
+// on ramène donc le salaire à un équivalent 35h.
+function suggestMinPosition(newSalaryAnnual, statut) {
+  if (!newSalaryAnnual || newSalaryAnnual <= 0) return null;
+  const smic = state.smic_mensuel;
+  const ratio39 = state.h39 / state.h35;
+
+  // Salaire mensuel ramené en équivalent 35h (pour comparer aux minima SYNTEC)
+  let salaireMensuel35;
+  if (statut === "ETAM") {
+    // ETAM CYIM payé en 39h → on revient à l'équivalent 35h pour comparer aux minima conventionnels
+    salaireMensuel35 = (newSalaryAnnual / 12) / ratio39;
+  } else {
+    // Cadres : pas de conversion (forfait jours ou 35h)
+    salaireMensuel35 = newSalaryAnnual / 12;
+  }
+
+  // Liste filtrée selon le statut (ETAM ou Cadre)
+  const positions = [];
+  if (statut === "ETAM") {
+    state.etam.forEach(r => positions.push({
+      label: `ETAM ${r.pos} (coef ${r.coef})`,
+      pos: r.pos, coef: r.coef,
+      minSyntec: Math.max(r.min, smic)
+    }));
+  } else if (statut === "Cadre") {
+    state.cadres.forEach(r => positions.push({
+      label: `Cadre ${r.pos} (coef ${r.coef})`,
+      pos: r.pos, coef: r.coef,
+      minSyntec: Math.max(r.min, smic)
+    }));
+  } else {
+    return null;
+  }
+
+  // Tri par minima croissant
+  positions.sort((a, b) => a.minSyntec - b.minSyntec);
+
+  // Position la plus haute dont le minima est encore <= salaire mensuel équivalent 35h
+  let best = null;
+  for (const p of positions) {
+    if (p.minSyntec <= salaireMensuel35) best = p;
+    else break;
+  }
+  return best;
+}
+
+// =============================================================
+// DROPDOWN POSITIONS
+// =============================================================
+function buildPositionsDropdown() {
+  const dropdowns = document.querySelectorAll("#emp-position, .team-classif-select");
+  const options = [];
+  state.etam.forEach(r => options.push({
+    value: `ETAM ${r.pos} (coef ${r.coef})`,
+    label: `ETAM ${r.pos} (coef ${r.coef})`
+  }));
+  state.cadres.forEach(r => options.push({
+    value: `Cadre ${r.pos} (coef ${r.coef})`,
+    label: `Cadre ${r.pos} (coef ${r.coef})`
+  }));
+
+  dropdowns.forEach(sel => {
+    const currentVal = sel.value;
+    sel.innerHTML = "";
+    options.forEach(o => {
+      const opt = document.createElement("option");
+      opt.value = o.value; opt.textContent = o.label;
+      sel.appendChild(opt);
+    });
+    if (currentVal && options.some(o => o.value === currentVal)) sel.value = currentVal;
+  });
+}
+
+// =============================================================
+// RENDU GRILLES SYNTEC
+// =============================================================
+function renderGrilles() {
+  const smic = state.smic_mensuel;
+  const ratio39 = state.h39 / state.h35;
+  const margeE = state.marge_etam / 100;
+  const margeC = state.marge_cadre / 100;
+  let hasSmicAlert = false;
+
+  const tbodyE = document.querySelector("#grille-etam-table tbody");
+  tbodyE.innerHTML = "";
+  state.etam.forEach((row, idx) => {
+    const plancher35 = Math.max(row.min, smic);
+    const plancher39 = plancher35 * ratio39;
+    const plancher39An = plancher39 * 12;
+    const seuilCYIM = plancher39 * (1 + margeE);
+    const seuilAn = seuilCYIM * 12;
+    const underSmic = row.min < smic;
+    if (underSmic) hasSmicAlert = true;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="center"><strong>${row.pos}</strong></td>
+      <td class="center">${row.coef}</td>
+      <td class="num ${underSmic ? 'alert-grid' : ''}">
+        <input type="number" class="grid-cell-input grille-input" data-grid="etam" data-idx="${idx}" value="${row.min}" step="0.01">
+      </td>
+      <td class="num">${fmtEur(plancher35)}</td>
+      <td class="num col-key">${fmtEur(plancher39)}</td>
+      <td class="num">${fmtEur(plancher39An)}</td>
+      <td class="num col-key">${fmtEur(seuilCYIM)}</td>
+      <td class="num">${fmtEur(seuilAn)}</td>`;
+    tbodyE.appendChild(tr);
+  });
+
+  const tbodyC = document.querySelector("#grille-cadre-table tbody");
+  tbodyC.innerHTML = "";
+  state.cadres.forEach((row, idx) => {
+    const plancher35 = Math.max(row.min, smic);
+    const forfait = plancher35 * (1 + margeC);
+    const forfaitAn = forfait * 12;
+    const seuilCYIM = forfait * (1 + margeE);
+    const seuilAn = seuilCYIM * 12;
+    const underSmic = row.min < smic;
+    if (underSmic) hasSmicAlert = true;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="center"><strong>${row.pos}</strong></td>
+      <td class="center">${row.coef}</td>
+      <td class="num ${underSmic ? 'alert-grid' : ''}">
+        <input type="number" class="grid-cell-input grille-input" data-grid="cadres" data-idx="${idx}" value="${row.min}" step="0.01">
+      </td>
+      <td class="num">${fmtEur(plancher35)}</td>
+      <td class="num col-key">${fmtEur(forfait)}</td>
+      <td class="num">${fmtEur(forfaitAn)}</td>
+      <td class="num col-key">${fmtEur(seuilCYIM)}</td>
+      <td class="num">${fmtEur(seuilAn)}</td>`;
+    tbodyC.appendChild(tr);
+  });
+
+  document.getElementById("smic-alert").style.display = hasSmicAlert ? "block" : "none";
+
+  document.querySelectorAll(".grille-input").forEach(inp => {
+    inp.addEventListener("change", (e) => {
+      const grid = e.target.dataset.grid;
+      const idx = parseInt(e.target.dataset.idx);
+      const val = parseFloat(e.target.value);
+      if (!isNaN(val)) {
+        state[grid][idx].min = val;
+        autoSave();
+        renderGrilles();
+        computeAll();
+      }
+    });
+  });
+}
+
+// =============================================================
+// SCÉNARIOS — CALCULS
+// =============================================================
+function computeAll() {
+  const position = document.getElementById("emp-position").value;
+  const salaryAct = parseFloat(document.getElementById("emp-salary").value) || 0;
+  const plancher = getPlancherFor(position);
+  const plancherAn = plancher ? plancher.plancherMensuel * 12 : null;
+  const seuilCYIMAn = plancher ? plancher.seuilCYIMMensuel * 12 : null;
+  const isETAM = plancher && plancher.statut === "ETAM";
+  const ratio39 = state.h39 / state.h35;
+
+  const applySuggestion = (id, newSal) => {
+    const statut = plancher ? plancher.statut : null;
+    const sugg = suggestMinPosition(newSal, statut);
+    const el = document.getElementById(id);
+    if (sugg) {
+      el.textContent = sugg.label;
+    } else if (!statut) {
+      el.textContent = "—";
+    } else {
+      el.textContent = "Aucune position compatible (salaire sous le minima)";
+    }
+  };
+  const applyMens39 = (rowId, valId, newSalAnnual) => {
+    const row = document.getElementById(rowId);
+    const valEl = document.getElementById(valId);
+    if (isETAM && newSalAnnual > 0) {
+      row.style.display = "flex";
+      valEl.textContent = fmtEur(newSalAnnual / 12 * ratio39);
+    } else {
+      row.style.display = "none";
+    }
+  };
+
+  // ===== MODE DÉTAILLÉ =====
+  // Scénario 1
+  const s1New = parseFloat(document.getElementById("s1-new-salary").value) || 0;
+  const s1Aug = s1New - salaryAct;
+  const s1Pct = salaryAct ? s1Aug / salaryAct : 0;
+  document.getElementById("s1-aug-an").textContent = fmtEurSigned(s1Aug);
+  document.getElementById("s1-aug-mens").textContent = fmtEurSigned(s1Aug / 12);
+  document.getElementById("s1-pct").textContent = fmtPct(s1Pct);
+  setVerdictLine("s1", "syntec", s1New, plancherAn);
+  setVerdictLine("s1", "cyim",   s1New, seuilCYIMAn);
+  applyMens39("s1-mens39-row", "s1-mens39", s1New);
+  applySuggestion("s1-suggest", s1New);
+
+  // Scénario 2
+  const s2Pct = (parseFloat(document.getElementById("s2-pct").value) || 0) / 100;
+  const s2New = salaryAct * (1 + s2Pct);
+  const s2Aug = salaryAct * s2Pct;
+  document.getElementById("s2-new-sal").textContent = fmtEur(s2New);
+  document.getElementById("s2-aug-an").textContent = fmtEurSigned(s2Aug);
+  document.getElementById("s2-aug-mens").textContent = fmtEurSigned(s2Aug / 12);
+  setVerdictLine("s2", "syntec", s2New, plancherAn);
+  setVerdictLine("s2", "cyim",   s2New, seuilCYIMAn);
+  applyMens39("s2-mens39-row", "s2-mens39", s2New);
+  applySuggestion("s2-suggest", s2New);
+
+  const tbody = document.querySelector("#s2-sensitivity tbody");
+  tbody.innerHTML = "";
+  const sensPcts = [0.01, 0.015, 0.02, 0.025, 0.03, 0.035, 0.04, 0.05];
+  sensPcts.forEach(pct => {
+    const newSal = salaryAct * (1 + pct);
+    const augAn = salaryAct * pct;
+    const tr = document.createElement("tr");
+    const okSyntec = plancherAn !== null && newSal >= plancherAn;
+    const okCyim = seuilCYIMAn !== null && newSal >= seuilCYIMAn;
+    tr.innerHTML = `
+      <td class="center"><strong>${(pct*100).toLocaleString("fr-FR",{minimumFractionDigits:1,maximumFractionDigits:2})} %</strong></td>
+      <td class="num">${fmtEur(newSal)}</td>
+      <td class="num">${fmtEurSigned(augAn)}</td>
+      <td class="num">${fmtEur(newSal/12)}</td>
+      <td class="num">${fmtEurSigned(augAn/12)}</td>
+      <td class="center ${plancherAn===null?'':(okSyntec?'cell-ok':'cell-alert')}">${plancherAn===null?'—':(okSyntec?'✓':'✗')}</td>
+      <td class="center ${seuilCYIMAn===null?'':(okCyim?'cell-ok':'cell-warn')}">${seuilCYIMAn===null?'—':(okCyim?'✓':'⚠')}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Scénario 3
+  const s3Mode = document.getElementById("s3-mode").value;
+  const s3Montant = parseFloat(document.getElementById("s3-montant").value) || 0;
+  document.getElementById("s3-montant-label").textContent =
+    s3Mode === "Mensuel" ? "Montant d'augmentation MENSUELLE (€)" : "Montant d'augmentation ANNUELLE (€)";
+  const s3AugAn = s3Mode === "Mensuel" ? s3Montant * 12 : s3Montant;
+  const s3AugMens = s3Mode === "Mensuel" ? s3Montant : s3Montant / 12;
+  const s3New = salaryAct + s3AugAn;
+  const s3Pct = salaryAct ? s3AugAn / salaryAct : 0;
+  document.getElementById("s3-aug-an").textContent = fmtEurSigned(s3AugAn);
+  document.getElementById("s3-aug-mens").textContent = fmtEurSigned(s3AugMens);
+  document.getElementById("s3-new-sal").textContent = fmtEur(s3New);
+  document.getElementById("s3-new-sal-mens").textContent = fmtEur(s3New / 12);
+  document.getElementById("s3-pct").textContent = fmtPct(s3Pct);
+  setVerdictLine("s3", "syntec", s3New, plancherAn);
+  setVerdictLine("s3", "cyim",   s3New, seuilCYIMAn);
+  applyMens39("s3-mens39-row", "s3-mens39", s3New);
+  applySuggestion("s3-suggest", s3New);
+
+  // Scénario 4
+  const s4An = parseFloat(document.getElementById("s4-annuel").value) || 0;
+  const s4Mens = parseFloat(document.getElementById("s4-mensuel").value) || 0;
+  const s4Hor = parseFloat(document.getElementById("s4-horaire").value) || 0;
+  const h35 = state.h35, h39 = state.h39;
+  document.getElementById("s4-from-an-mens").textContent = fmtEur(s4An / 12);
+  document.getElementById("s4-from-an-tx35").textContent = fmtEur4(s4An / 12 / h35);
+  document.getElementById("s4-from-an-mens39").textContent = fmtEur(s4An / 12 * h39 / h35);
+  document.getElementById("s4-from-mens-an").textContent = fmtEur(s4Mens * 12);
+  document.getElementById("s4-from-mens-tx35").textContent = fmtEur4(s4Mens / h35);
+  document.getElementById("s4-from-mens-mens39").textContent = fmtEur(s4Mens * h39 / h35);
+  document.getElementById("s4-from-h-mens35").textContent = fmtEur(s4Hor * h35);
+  document.getElementById("s4-from-h-an").textContent = fmtEur(s4Hor * h35 * 12);
+  document.getElementById("s4-from-h-mens39").textContent = fmtEur(s4Hor * h39);
+
+  // ===== MODE COMPACT =====
+  const c1New = parseFloat(document.getElementById("c1-new").value) || 0;
+  const c1Aug = c1New - salaryAct;
+  const c1Pct = salaryAct ? c1Aug / salaryAct : 0;
+  document.getElementById("c1-aug").textContent = fmtEurSigned(c1Aug) + " /an";
+  document.getElementById("c1-pct").textContent = fmtPct(c1Pct);
+  setVerdict("c1-verdict-syntec", c1New, plancherAn, "syntec", true);
+  setVerdict("c1-verdict-cyim", c1New, seuilCYIMAn, "cyim", true);
+  applySuggestion("c1-suggest", c1New);
+
+  const c2Pct = (parseFloat(document.getElementById("c2-pct").value) || 0) / 100;
+  const c2New = salaryAct * (1 + c2Pct);
+  const c2Aug = salaryAct * c2Pct;
+  document.getElementById("c2-new").textContent = fmtEur(c2New);
+  document.getElementById("c2-aug").textContent = fmtEurSigned(c2Aug) + " /an";
+  setVerdict("c2-verdict-syntec", c2New, plancherAn, "syntec", true);
+  setVerdict("c2-verdict-cyim", c2New, seuilCYIMAn, "cyim", true);
+  applySuggestion("c2-suggest", c2New);
+
+  const c3Mode = document.getElementById("c3-mode").value;
+  const c3Montant = parseFloat(document.getElementById("c3-montant").value) || 0;
+  document.getElementById("c3-montant-label").textContent =
+    c3Mode === "Mensuel" ? "Augmentation €/mois" : "Augmentation €/an";
+  const c3AugAn = c3Mode === "Mensuel" ? c3Montant * 12 : c3Montant;
+  const c3New = salaryAct + c3AugAn;
+  const c3Pct = salaryAct ? c3AugAn / salaryAct : 0;
+  document.getElementById("c3-new").textContent = fmtEur(c3New);
+  document.getElementById("c3-pct").textContent = fmtPct(c3Pct);
+  setVerdict("c3-verdict-syntec", c3New, plancherAn, "syntec", true);
+  setVerdict("c3-verdict-cyim", c3New, seuilCYIMAn, "cyim", true);
+  applySuggestion("c3-suggest", c3New);
+}
+
+function setVerdict(id, salary, threshold, type, small) {
+  const el = document.getElementById(id);
+  const baseCls = small ? "pill" : "verdict";
+  if (threshold === null || threshold === undefined || isNaN(threshold)) {
+    el.textContent = "—"; el.className = baseCls + " neutral"; return;
+  }
+  if (salary >= threshold) {
+    if (type === "syntec") {
+      el.textContent = small ? "✓ SYNTEC OK" : "✓ Conforme SYNTEC";
+      el.className = baseCls + " ok";
+    } else {
+      el.textContent = small ? "✓ CYIM OK" : "✓ Au-dessus du minima interne CYIM";
+      el.className = baseCls + " ok";
+    }
+  } else {
+    if (type === "syntec") {
+      el.textContent = small ? "✗ Sous minima SYNTEC" : "✗ NON conforme SYNTEC";
+      el.className = baseCls + " alert";
+    } else {
+      el.textContent = small ? "⚠ Sous CYIM" : "⚠ Sous le minima interne CYIM";
+      el.className = baseCls + " warn";
+    }
+  }
+}
+
+// Met à jour une "verdict-line" qui combine label + valeur + statut sur une seule ligne.
+// prefix : 's1' / 's2' / 's3' — utilisé pour reconstruire les IDs ${prefix}-vl-${type}, etc.
+function setVerdictLine(prefix, type, salary, threshold) {
+  const container = document.getElementById(`${prefix}-vl-${type}`);
+  const valueEl   = document.getElementById(`${prefix}-min-${type}`);
+  const statusEl  = document.getElementById(`${prefix}-status-${type}`);
+  if (!container || !valueEl || !statusEl) return;
+
+  // Valeur du minima
+  if (threshold === null || threshold === undefined || isNaN(threshold)) {
+    valueEl.textContent = "—";
+    statusEl.textContent = "—";
+    container.className = "verdict-line neutral";
+    return;
+  }
+  valueEl.textContent = fmtEur(threshold);
+
+  // Statut selon dépassement du minima
+  if (salary >= threshold) {
+    if (type === "syntec") {
+      statusEl.textContent = "✓ Conforme SYNTEC";
+    } else {
+      statusEl.textContent = "✓ Au-dessus du minima CYIM";
+    }
+    container.className = "verdict-line ok";
+  } else {
+    if (type === "syntec") {
+      statusEl.textContent = "✗ NON conforme SYNTEC";
+      container.className = "verdict-line alert";
+    } else {
+      statusEl.textContent = "⚠ Sous le minima interne CYIM";
+      container.className = "verdict-line warn";
+    }
+  }
+}
+
+// =============================================================
+// ENVELOPPE ÉQUIPE
+// =============================================================
+function renderTeam() {
+  const tbody = document.querySelector("#team-table tbody");
+  tbody.innerHTML = "";
+  let totalSal = 0, totalAug = 0;
+
+  teamData.forEach((emp, idx) => {
+    const plancher = getPlancherFor(emp.classif);
+    const newSal = (emp.salary || 0) + (emp.aug || 0);
+    const variation = emp.salary ? (emp.aug / emp.salary) : 0;
+    const augMens = (emp.aug || 0) / 12;
+    let conf = "—", confCls = "";
+    if (plancher && emp.salary && emp.salary > 0) {
+      const seuil = plancher.plancherMensuel * 12;
+      if (newSal >= seuil) { conf = "✓ OK"; confCls = "cell-ok"; }
+      else { conf = "✗ Sous plancher"; confCls = "cell-alert"; }
+    }
+    totalSal += emp.salary || 0;
+    totalAug += emp.aug || 0;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="text" class="team-name" data-idx="${idx}" value="${emp.name || ''}" style="width:140px;"></td>
+      <td><select class="team-classif-select" data-idx="${idx}" style="width:200px;"></select></td>
+      <td class="num"><input type="number" class="grid-cell-input team-salary" data-idx="${idx}" value="${emp.salary || 0}" step="0.01"></td>
+      <td class="num"><input type="number" class="grid-cell-input team-aug" data-idx="${idx}" value="${emp.aug || 0}" step="0.01"></td>
+      <td class="num">${fmtEurSigned(augMens)}</td>
+      <td class="num">${fmtEur(newSal)}</td>
+      <td class="num">${fmtPct(variation)}</td>
+      <td class="center ${confCls}">${conf}</td>
+      <td class="center"><button class="btn danger small" onclick="removeTeamRow(${idx})">×</button></td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Footer total
+  const tfoot = document.createElement("tr");
+  tfoot.innerHTML = `
+    <td colspan="2" style="background:var(--navy);color:white;font-weight:700;">TOTAL</td>
+    <td class="num" style="background:var(--navy);color:white;font-weight:700;">${fmtEur(totalSal)}</td>
+    <td class="num" style="background:var(--navy);color:white;font-weight:700;">${fmtEurSigned(totalAug)}</td>
+    <td class="num" style="background:var(--navy);color:white;font-weight:700;">${fmtEurSigned(totalAug/12)}</td>
+    <td class="num" style="background:var(--navy);color:white;font-weight:700;">${fmtEur(totalSal+totalAug)}</td>
+    <td class="num" style="background:var(--navy);color:white;font-weight:700;">${fmtPct(totalSal?totalAug/totalSal:0)}</td>
+    <td colspan="2" style="background:var(--navy);"></td>`;
+  tbody.appendChild(tfoot);
+
+  buildPositionsDropdown();
+  document.querySelectorAll(".team-classif-select").forEach(sel => {
+    const idx = parseInt(sel.dataset.idx);
+    if (teamData[idx]) sel.value = teamData[idx].classif || "";
+  });
+
+  const budget = parseFloat(document.getElementById("envelope-budget").value) || 0;
+  document.getElementById("env-alloue").textContent = fmtEur(totalAug);
+  document.getElementById("env-dispo").textContent = fmtEur(budget);
+  const solde = budget - totalAug;
+  const soldeEl = document.getElementById("env-solde");
+  soldeEl.textContent = fmtEur(solde);
+  soldeEl.style.color = solde < 0 ? "var(--alert-text)" : "var(--ok-text)";
+  document.getElementById("env-pct").textContent = budget ?
+    ((totalAug/budget)*100).toLocaleString("fr-FR",{minimumFractionDigits:1,maximumFractionDigits:1}) + " %" : "—";
+
+  document.querySelectorAll(".team-name").forEach(inp => {
+    inp.addEventListener("input", (e) => {
+      const idx = parseInt(e.target.dataset.idx);
+      teamData[idx].name = e.target.value;
+      autoSave();
+    });
+  });
+  document.querySelectorAll(".team-classif-select").forEach(sel => {
+    sel.addEventListener("change", (e) => {
+      const idx = parseInt(e.target.dataset.idx);
+      teamData[idx].classif = e.target.value;
+      autoSave();
+      renderTeam();
+    });
+  });
+  document.querySelectorAll(".team-salary").forEach(inp => {
+    inp.addEventListener("change", (e) => {
+      const idx = parseInt(e.target.dataset.idx);
+      teamData[idx].salary = parseFloat(e.target.value) || 0;
+      autoSave();
+      renderTeam();
+    });
+  });
+  document.querySelectorAll(".team-aug").forEach(inp => {
+    inp.addEventListener("change", (e) => {
+      const idx = parseInt(e.target.dataset.idx);
+      teamData[idx].aug = parseFloat(e.target.value) || 0;
+      autoSave();
+      renderTeam();
+    });
+  });
+}
+
+function addTeamRow() {
+  teamData.push({ name: "", classif: "ETAM 2.1 (coef 275)", salary: 0, aug: 0 });
+  autoSave();
+  renderTeam();
+}
+function removeTeamRow(idx) {
+  if (!confirm("Supprimer cette ligne ?")) return;
+  teamData.splice(idx, 1);
+  autoSave();
+  renderTeam();
+}
+
+// =============================================================
+// MASQUER LA LÉGENDE SUR LES ONGLETS NON CALCULATOIRES
+// =============================================================
+function updateLegendVisibility(tabName) {
+  const legend = document.getElementById("legend-card");
+  // La légende est utile sur Simulations, Enveloppe et Grilles (qui ont les codes couleur)
+  const showOn = ["sim", "enveloppe", "grilles"];
+  legend.style.display = showOn.includes(tabName) ? "block" : "none";
+}
+
+// =============================================================
+// MODAL D'IMPRESSION / SYNTHÈSE
+// =============================================================
+function openPrintModal(scenario) {
+  const content = buildPrintContent([scenario]);
+  document.getElementById("print-content").innerHTML = content;
+  document.getElementById("print-modal").classList.add("visible");
+}
+
+// Imprime la sélection courante (un ou plusieurs scénarios cochés)
+function openPrintModalSelection() {
+  const selected = Array.from(document.querySelectorAll(".scenario-option.active"))
+    .map(b => b.dataset.scenario)
+    .filter(s => s !== "s4"); // S4 = conversion utilitaire, pas pertinent en synthèse
+  if (selected.length === 0) {
+    flashMessage("Aucun scénario à imprimer (S1, S2 ou S3 attendu)");
+    return;
+  }
+  const content = buildPrintContent(selected);
+  document.getElementById("print-content").innerHTML = content;
+  document.getElementById("print-modal").classList.add("visible");
+}
+
+function closePrintModal() {
+  document.getElementById("print-modal").classList.remove("visible");
+}
+
+// Génère un bloc HTML imprimable pour un scénario (sans en-tête ni section salarié)
+function buildScenarioBlock(scenario) {
+  // Données salarié communes
+  const salaryAct = parseFloat(document.getElementById("emp-salary").value) || 0;
+  const position = document.getElementById("emp-position").value;
+  const plancher = getPlancherFor(position);
+  const plancherAn = plancher ? plancher.plancherMensuel * 12 : null;
+  const seuilCYIMAn = plancher ? plancher.seuilCYIMMensuel * 12 : null;
+  const isETAM = plancher && plancher.statut === "ETAM";
+  const ratio39 = state.h39 / state.h35;
+
+  let scenarioName, newSal, augAn, augMens, pct, extraRows = "";
+
+  if (scenario === "s1") {
+    scenarioName = "Scénario 1 — Du nouveau salaire au % d'augmentation";
+    newSal = parseFloat(document.getElementById("s1-new-salary").value) || 0;
+    augAn = newSal - salaryAct;
+    augMens = augAn / 12;
+    pct = salaryAct ? augAn / salaryAct : 0;
+    extraRows = `
+      <div class="ps-row"><span class="ps-label">Nouveau salaire brut annuel proposé</span><span class="ps-val">${fmtEur(newSal)}</span></div>
+      <div class="ps-row"><span class="ps-label">Nouveau salaire brut mensuel (12 mois)</span><span class="ps-val">${fmtEur(newSal/12)}</span></div>`;
+  } else if (scenario === "s2") {
+    scenarioName = "Scénario 2 — Du % d'augmentation au nouveau salaire";
+    pct = (parseFloat(document.getElementById("s2-pct").value) || 0) / 100;
+    newSal = salaryAct * (1 + pct);
+    augAn = salaryAct * pct;
+    augMens = augAn / 12;
+    extraRows = `
+      <div class="ps-row"><span class="ps-label">% d'augmentation saisi</span><span class="ps-val">${fmtPct(pct)}</span></div>
+      <div class="ps-row"><span class="ps-label">Nouveau salaire brut annuel</span><span class="ps-val">${fmtEur(newSal)}</span></div>
+      <div class="ps-row"><span class="ps-label">Nouveau salaire brut mensuel (12 mois)</span><span class="ps-val">${fmtEur(newSal/12)}</span></div>`;
+  } else if (scenario === "s3") {
+    const mode = document.getElementById("s3-mode").value;
+    const montant = parseFloat(document.getElementById("s3-montant").value) || 0;
+    scenarioName = "Scénario 3 — D'un montant en € au nouveau salaire";
+    augAn = mode === "Mensuel" ? montant * 12 : montant;
+    augMens = mode === "Mensuel" ? montant : montant / 12;
+    newSal = salaryAct + augAn;
+    pct = salaryAct ? augAn / salaryAct : 0;
+    extraRows = `
+      <div class="ps-row"><span class="ps-label">Mode de saisie</span><span class="ps-val">${mode}</span></div>
+      <div class="ps-row"><span class="ps-label">Montant saisi</span><span class="ps-val">${fmtEur(montant)} ${mode === "Mensuel" ? "/mois" : "/an"}</span></div>
+      <div class="ps-row"><span class="ps-label">Nouveau salaire brut annuel</span><span class="ps-val">${fmtEur(newSal)}</span></div>
+      <div class="ps-row"><span class="ps-label">Nouveau salaire brut mensuel (12 mois)</span><span class="ps-val">${fmtEur(newSal/12)}</span></div>`;
+  } else {
+    return ""; // s4 ou autre : non imprimable
+  }
+
+  let mens39Row = "";
+  if (isETAM && newSal > 0) {
+    const mens39 = newSal / 12 * ratio39;
+    mens39Row = `<div class="ps-row"><span class="ps-label">Nouveau mensuel base 39h (ETAM, hors majo HS)</span><span class="ps-val">${fmtEur(mens39)}</span></div>`;
+  }
+
+  const okSyntec = plancherAn !== null && newSal >= plancherAn;
+  const okCyim   = seuilCYIMAn !== null && newSal >= seuilCYIMAn;
+  const syntecVerdict = plancherAn === null
+    ? `<div class="ps-verdict"><span>Minima SYNTEC annuel</span><span class="ps-vstatus">—</span></div>`
+    : `<div class="ps-verdict ${okSyntec ? 'ok' : 'alert'}">
+        <span>Minima SYNTEC annuel : <strong>${fmtEur(plancherAn)}</strong></span>
+        <span class="ps-vstatus">${okSyntec ? "✓ Conforme SYNTEC" : "✗ NON conforme SYNTEC"}</span>
+       </div>`;
+  const cyimVerdict = seuilCYIMAn === null
+    ? `<div class="ps-verdict"><span>Minima interne CYIM annuel</span><span class="ps-vstatus">—</span></div>`
+    : `<div class="ps-verdict ${okCyim ? 'ok' : 'warn'}">
+        <span>Minima interne CYIM annuel : <strong>${fmtEur(seuilCYIMAn)}</strong></span>
+        <span class="ps-vstatus">${okCyim ? "✓ Au-dessus du minima CYIM" : "⚠ Sous le minima interne CYIM"}</span>
+       </div>`;
+
+  const sugg = plancher ? suggestMinPosition(newSal, plancher.statut) : null;
+  const suggText = sugg
+    ? `${sugg.label} <span style="color:#6B7280;font-weight:normal;">(minima ${fmtEur(sugg.minSyntec)}/mois en 35h)</span>`
+    : "Aucune position compatible (salaire sous le minima)";
+
+  return `
+    <div class="ps-scenario">
+      <h3 class="ps-section ps-scenario-title">${scenarioName}</h3>
+
+      <h4 class="ps-subsection">Détails de la simulation</h4>
+      <div class="ps-block">
+        ${extraRows}
+        <div class="ps-row ps-highlight"><span class="ps-label">Augmentation annuelle</span><span class="ps-val">${fmtEurSigned(augAn)}</span></div>
+        <div class="ps-row ps-highlight"><span class="ps-label">Augmentation mensuelle</span><span class="ps-val">${fmtEurSigned(augMens)}</span></div>
+        <div class="ps-row ps-highlight"><span class="ps-label">Variation salaire</span><span class="ps-val">${fmtPct(pct)}</span></div>
+        ${mens39Row}
+      </div>
+
+      <h4 class="ps-subsection">Contrôle SYNTEC & interne CYIM</h4>
+      ${syntecVerdict}
+      ${cyimVerdict}
+      <div class="ps-block" style="margin-top:8px;">
+        <div class="ps-row">
+          <span class="ps-label">Position SYNTEC minima possible</span>
+          <span class="ps-val">${suggText}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Génère le HTML imprimable pour un ou plusieurs scénarios
+function buildPrintContent(scenarios) {
+  if (!Array.isArray(scenarios)) scenarios = [scenarios];
+  // Filtrer pour ne garder que ceux qui produisent un bloc utile
+  const usable = scenarios.filter(s => ["s1", "s2", "s3"].includes(s));
+  if (usable.length === 0) {
+    return "<p style='padding:40px;text-align:center;color:#6B7280;'>Aucun scénario imprimable dans la sélection (le scénario de conversion horaire n'est pas inclus dans la synthèse).</p>";
+  }
+
+  const today = new Date().toLocaleDateString("fr-FR", {
+    day: "2-digit", month: "long", year: "numeric"
+  });
+
+  // Données salarié communes
+  const name = document.getElementById("emp-name").value || "—";
+  const position = document.getElementById("emp-position").value;
+  const salaryAct = parseFloat(document.getElementById("emp-salary").value) || 0;
+
+  // Titre adapté au nombre de scénarios
+  const titleSub = usable.length === 1
+    ? "Synthèse d'une simulation"
+    : `Synthèse comparative de ${usable.length} simulations`;
+
+  // Blocs scénarios
+  const scenarioBlocks = usable.map(s => buildScenarioBlock(s)).join("\n");
+
+  return `
+    <div class="ps-header">
+      <div>
+        <h1>Synthèse de simulation salariale</h1>
+        <div class="ps-subtitle">${titleSub}</div>
+      </div>
+      <div class="ps-meta">
+        <strong>CYIM</strong><br>
+        Édité le ${today}
+      </div>
+    </div>
+
+    <h3 class="ps-section">Salarié concerné</h3>
+    <div class="ps-block">
+      <div class="ps-row"><span class="ps-label">Nom du salarié</span><span class="ps-val">${name}</span></div>
+      <div class="ps-row"><span class="ps-label">Classification SYNTEC actuelle</span><span class="ps-val">${position}</span></div>
+      <div class="ps-row"><span class="ps-label">Salaire brut annuel actuel</span><span class="ps-val">${fmtEur(salaryAct)}</span></div>
+      <div class="ps-row"><span class="ps-label">Salaire brut mensuel actuel (12 mois)</span><span class="ps-val">${fmtEur(salaryAct/12)}</span></div>
+    </div>
+
+    ${scenarioBlocks}
+
+    <div class="ps-footer">
+      Simulateur d'augmentation salariale CYIM — Convention SYNTEC IDCC 1486<br>
+      Document à usage interne RH — non transmissible au salarié sans validation managériale
+    </div>
+  `;
+}
+
+
+// =============================================================
+// INIT
+// =============================================================
+function initAll() {
+  document.getElementById("param-smic-horaire").value = state.smic_horaire;
+  document.getElementById("param-smic-mensuel").value = state.smic_mensuel;
+  document.getElementById("param-smic-date").value = state.smic_date;
+  document.getElementById("param-h35").value = state.h35;
+  document.getElementById("param-h39").value = state.h39;
+  document.getElementById("param-marge-etam").value = state.marge_etam;
+  document.getElementById("param-marge-cadre").value = state.marge_cadre;
+
+  buildPositionsDropdown();
+  renderGrilles();
+  renderTeam();
+  switchMode(currentMode);
+  computeAll();
+}
+
+function bindParamInputs() {
+  const map = {
+    "param-smic-horaire": "smic_horaire",
+    "param-smic-mensuel": "smic_mensuel",
+    "param-smic-date": "smic_date",
+    "param-h35": "h35",
+    "param-h39": "h39",
+    "param-marge-etam": "marge_etam",
+    "param-marge-cadre": "marge_cadre"
+  };
+  Object.keys(map).forEach(id => {
+    document.getElementById(id).addEventListener("change", (e) => {
+      const val = e.target.type === "number" ? parseFloat(e.target.value) : e.target.value;
+      state[map[id]] = isNaN(val) && e.target.type === "number" ? 0 : val;
+      autoSave();
+      renderGrilles();
+      renderTeam();
+      computeAll();
+    });
+  });
+}
+
+// =============================================================
+// MIROIRS DES INPUTS — affiche la valeur formatée sous chaque input
+// =============================================================
+function setupInputMirrors() {
+  document.querySelectorAll("input[data-mirror]").forEach(input => {
+    const type = input.dataset.mirror;
+    // Créer le span miroir si pas encore présent
+    let mirror = input.parentElement.querySelector(".input-mirror[data-for='" + input.id + "']");
+    if (!mirror) {
+      mirror = document.createElement("span");
+      mirror.className = "input-mirror";
+      mirror.dataset.for = input.id;
+      input.insertAdjacentElement("afterend", mirror);
+    }
+    const update = () => {
+      const v = parseFloat(input.value);
+      if (isNaN(v)) { mirror.textContent = "—"; return; }
+      if (type === "eur") mirror.textContent = fmtEur(v);
+      else if (type === "eur4") mirror.textContent = fmtEur4(v);
+      else if (type === "pct") {
+        // Le champ contient déjà le pourcentage en chiffres (ex 2.72), on l'affiche tel quel
+        mirror.textContent = v.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "\u00A0%";
+      }
+    };
+    update();
+    input.addEventListener("input", update);
+    input.addEventListener("change", update);
+  });
+}
+
+function bindScenarioInputs() {
+  const detailedInputs = ["emp-position", "emp-salary",
+                          "s1-new-salary", "s2-pct",
+                          "s3-mode", "s3-montant",
+                          "s4-annuel", "s4-mensuel", "s4-horaire"];
+  detailedInputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("input", computeAll);
+      el.addEventListener("change", computeAll);
+    }
+  });
+  ["c1-new", "c2-pct", "c3-mode", "c3-montant"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("input", computeAll);
+      el.addEventListener("change", computeAll);
+    }
+  });
+  document.getElementById("envelope-budget").addEventListener("change", renderTeam);
+
+  // Sélecteur de scénario — multi-sélection via toggle
+  document.querySelectorAll(".scenario-option").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.scenario;
+      // Toggle l'état actif
+      btn.classList.toggle("active");
+      const content = document.querySelector(`.scenario-content[data-scenario="${target}"]`);
+      if (content) content.classList.toggle("active");
+
+      // S'assurer qu'au moins 1 scénario reste sélectionné
+      const actives = document.querySelectorAll(".scenario-option.active");
+      if (actives.length === 0) {
+        // Restaurer celui qu'on vient de désactiver
+        btn.classList.add("active");
+        if (content) content.classList.add("active");
+        flashMessage("Au moins un scénario doit rester affiché");
+      }
+
+      // Sauvegarder la sélection
+      const selected = Array.from(document.querySelectorAll(".scenario-option.active"))
+        .map(b => b.dataset.scenario);
+      localStorage.setItem("cyim_active_scenarios", JSON.stringify(selected));
+
+      updateSelectionInfo();
+    });
+  });
+
+  // Restaurer la dernière sélection (compatible avec l'ancien format single-select)
+  const storedMulti = localStorage.getItem("cyim_active_scenarios");
+  const storedSingle = localStorage.getItem("cyim_active_scenario");
+  let toRestore = null;
+  if (storedMulti) {
+    try { toRestore = JSON.parse(storedMulti); } catch(e) { toRestore = null; }
+  } else if (storedSingle) {
+    toRestore = [storedSingle];
+  }
+  if (Array.isArray(toRestore) && toRestore.length > 0) {
+    // Désactiver tout, puis activer la sélection
+    document.querySelectorAll(".scenario-option").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".scenario-content").forEach(c => c.classList.remove("active"));
+    toRestore.forEach(s => {
+      const b = document.querySelector(`.scenario-option[data-scenario="${s}"]`);
+      const c = document.querySelector(`.scenario-content[data-scenario="${s}"]`);
+      if (b) b.classList.add("active");
+      if (c) c.classList.add("active");
+    });
+    // Garantir au moins 1 actif
+    if (document.querySelectorAll(".scenario-option.active").length === 0) {
+      document.querySelector('.scenario-option[data-scenario="s1"]').classList.add("active");
+      document.querySelector('.scenario-content[data-scenario="s1"]').classList.add("active");
+    }
+  }
+  updateSelectionInfo();
+}
+
+function updateSelectionInfo() {
+  const actives = document.querySelectorAll(".scenario-option.active");
+  const n = actives.length;
+  const info = document.getElementById("selection-info");
+  if (info) {
+    info.innerHTML = n === 1
+      ? "<strong>1</strong> scénario sélectionné"
+      : `<strong>${n}</strong> scénarios sélectionnés`;
+  }
+}
+
+// Tabs
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("panel-" + btn.dataset.tab).classList.add("active");
+    updateLegendVisibility(btn.dataset.tab);
+  });
+});
+
+// =============================================================
+// BOOT — charge la config depuis le Gist puis initialise l'app
+// =============================================================
+async function boot() {
+  // Affichage temporaire pendant le chargement
+  showBootBanner("Chargement de la grille SYNTEC à jour…", "loading");
+  state = await loadStateFromGist();
+  hideBootBanner();
+  showSourceBadge();
+
+  // Initialisation classique
+  initAll();
+  bindParamInputs();
+  bindScenarioInputs();
+  setupInputMirrors();
+  updateLegendVisibility("sim");
+  applyReadOnlyMode();
+}
+
+function showBootBanner(msg, type) {
+  let banner = document.getElementById("boot-banner");
+  if (!banner) {
+    banner = document.createElement("div");
+    banner.id = "boot-banner";
+    banner.style.cssText = "position:fixed;top:0;left:0;right:0;padding:8px 16px;text-align:center;font-size:13px;z-index:10000;font-family:Calibri,sans-serif;";
+    document.body.appendChild(banner);
+  }
+  banner.textContent = msg;
+  banner.style.background = type === "loading" ? "#FEF3C7" : type === "error" ? "#FEE2E2" : "#ECFDF5";
+  banner.style.color = type === "loading" ? "#92400E" : type === "error" ? "#B91C1C" : "#047857";
+}
+function hideBootBanner() {
+  const banner = document.getElementById("boot-banner");
+  if (banner) banner.remove();
+}
+
+// Affiche un petit badge en bas du footer indiquant la source de la grille
+function showSourceBadge() {
+  const footer = document.querySelector("footer");
+  if (!footer) return;
+  let badge = document.getElementById("source-badge");
+  if (!badge) {
+    badge = document.createElement("div");
+    badge.id = "source-badge";
+    badge.style.cssText = "margin-top:6px;font-size:11px;";
+    footer.appendChild(badge);
+  }
+  if (configSource.type === "gist") {
+    const d = new Date(configSource.updatedAt);
+    const dStr = d.toLocaleString("fr-FR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    badge.innerHTML = `<span style="color:#047857;">✓ Grille SYNTEC à jour (publiée le ${dStr})</span>`;
+  } else if (configSource.type === "fallback-error") {
+    badge.innerHTML = `<span style="color:#B91C1C;">⚠ Impossible de joindre la source partagée — valeurs locales utilisées (${configSource.error || ""}). Contactez l'administrateur RH.</span>`;
+  } else if (configSource.type === "fallback-not-configured") {
+    badge.innerHTML = `<span style="color:#92400E;">⚠ Source partagée non configurée — valeurs par défaut utilisées.</span>`;
+  }
+}
+
+// Met les champs de paramètres et de grille en lecture seule pour l'utilisateur final.
+// (la grille reste visible mais non modifiable)
+function applyReadOnlyMode() {
+  // Paramètres : tous les inputs deviennent disabled
+  document.querySelectorAll("#panel-params input").forEach(i => {
+    i.disabled = true;
+    i.style.background = "#F3F4F6";
+    i.style.color = "#1A2530";
+    i.style.borderColor = "#D1D5DB";
+    i.style.cursor = "not-allowed";
+  });
+
+  // Masquer la section "Gestion des données" du panneau Paramètres (sauf l'export/import perso)
+  // mais on garde le bouton "Tout réinitialiser" pour les données utilisateur
+  // Le "Sauvegarder" et le "Importer/Exporter" du panneau Paramètres ne servent plus à grand-chose
+  // pour la grille, mais restent valides pour les données utilisateur — on les laisse.
+
+  // Grille SYNTEC : désactiver l'édition des cellules minimum
+  // (renderGrilles va le faire à chaque rendu — il faut aussi le faire ici si déjà rendu)
+  document.querySelectorAll(".grille-input").forEach(i => {
+    i.disabled = true;
+    i.style.background = "transparent";
+    i.style.borderColor = "transparent";
+    i.style.color = "#1A2530";
+    i.style.cursor = "default";
+    i.style.fontWeight = "700";
+    i.style.textAlign = "right";
+  });
+
+  // Cacher le bouton "Réinitialiser la grille"
+  const resetBtn = document.querySelector('button[onclick="resetGrille()"]');
+  if (resetBtn) resetBtn.style.display = "none";
+
+  // Ajouter un bandeau "lecture seule" en haut du panneau Grilles
+  const grillesPanel = document.getElementById("panel-grilles");
+  if (grillesPanel && !grillesPanel.querySelector(".readonly-banner")) {
+    const banner = document.createElement("div");
+    banner.className = "readonly-banner note";
+    banner.style.cssText = "background:#EFF6FF;border-left:3px solid #BFDBFE;color:#1E40AF;margin-bottom:16px;";
+    banner.innerHTML = "🔒 <strong>Lecture seule.</strong> Cette grille est gérée centralement par l'administrateur RH. Pour toute évolution (nouvel avenant SYNTEC, revalorisation SMIC), contactez le service RH.";
+    grillesPanel.insertBefore(banner, grillesPanel.firstChild);
+  }
+
+  // Idem pour les paramètres
+  const paramsPanel = document.getElementById("panel-params");
+  if (paramsPanel && !paramsPanel.querySelector(".readonly-banner")) {
+    const banner = document.createElement("div");
+    banner.className = "readonly-banner note";
+    banner.style.cssText = "background:#EFF6FF;border-left:3px solid #BFDBFE;color:#1E40AF;margin-bottom:16px;";
+    banner.innerHTML = "🔒 <strong>Lecture seule.</strong> Les paramètres SMIC, bases horaires et marges sont gérés par l'administrateur RH.";
+    paramsPanel.insertBefore(banner, paramsPanel.firstChild);
+  }
+}
+
+boot();
+</script>
+
+</body>
+</html>
