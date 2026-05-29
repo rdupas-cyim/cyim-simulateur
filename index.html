@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulateur d'augmentation salariale CYIM</title>
+<title>Simulateur salarial CYIM</title>
 <style>
   /* ========================================================
      CHARTE CYIM — minimalisme professionnel
@@ -422,12 +422,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
+    gap: 10px;
+    padding: 7px 12px;
     border-radius: var(--radius);
     border: 1px solid;
-    margin-bottom: 8px;
-    font-size: 13px;
+    margin-bottom: 6px;
+    font-size: 12px;
     flex-wrap: wrap;
   }
   .verdict-line.ok    { background: var(--ok-bg); border-color: var(--ok-border); }
@@ -436,23 +436,25 @@
   .verdict-line.neutral { background: #FAFAFA; border-color: var(--border); }
   .verdict-line .left-side {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
   }
   .verdict-line .vl-label {
     color: var(--text-soft);
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 600;
   }
   .verdict-line .vl-value {
     font-weight: 700;
     color: var(--text);
-    font-size: 15px;
+    font-size: 13px;
     font-variant-numeric: tabular-nums;
   }
   .verdict-line .vl-status {
     font-weight: 700;
-    font-size: 13px;
+    font-size: 11.5px;
     white-space: nowrap;
   }
   .verdict-line.ok .vl-status    { color: var(--ok-text); }
@@ -552,6 +554,173 @@
     font-size: 12px;
     color: var(--text-soft);
     line-height: 1.4;
+  }
+
+  /* ========================================================
+     SCÉNARIO 4 — Toggle statut (ETAM / Cadre)
+     ======================================================== */
+  .s4-statut-toggle {
+    display: flex;
+    gap: 8px;
+  }
+  .s4-statut-btn {
+    flex: 1;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    color: var(--text);
+    transition: all 0.15s;
+    font-size: 14px;
+    line-height: 1.3;
+  }
+  .s4-statut-btn:hover {
+    border-color: var(--navy);
+    background: #F8FAFC;
+  }
+  .s4-statut-btn.active {
+    border-color: var(--mint);
+    background: var(--mint-soft);
+    color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(48, 221, 146, 0.15);
+  }
+  .s4-formula-note {
+    background: #EFF6FF !important;
+    border-left: 3px solid #BFDBFE !important;
+    color: #1E40AF !important;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+  .s4-formula-note code {
+    background: rgba(255,255,255,0.6);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 11.5px;
+    color: var(--navy);
+  }
+
+  /* ========================================================
+     ONGLET ALTERNANTS
+     ======================================================== */
+  .alt-toggle {
+    display: flex;
+    gap: 8px;
+  }
+  .alt-type-btn {
+    flex: 1;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    color: var(--text);
+    transition: all 0.15s;
+    font-size: 14px;
+    line-height: 1.3;
+  }
+  .alt-type-btn:hover {
+    border-color: var(--navy);
+    background: #F8FAFC;
+  }
+  .alt-type-btn.active {
+    border-color: var(--mint);
+    background: var(--mint-soft);
+    color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(48, 221, 146, 0.15);
+  }
+  #alt-formula-note {
+    background: #EFF6FF !important;
+    border-left: 3px solid #BFDBFE !important;
+    color: #1E40AF !important;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+  #alt-formula-note code {
+    background: rgba(255,255,255,0.6);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--navy);
+  }
+  .alt-aide-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--mint);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .alt-aide-card.eligible {
+    border-left-color: var(--mint);
+    background: #ECFDF5;
+  }
+  .alt-aide-card.non-eligible {
+    border-left-color: #9CA3AF;
+    background: #F9FAFB;
+    opacity: 0.7;
+  }
+  .alt-aide-card h4 {
+    margin: 0 0 4px;
+    font-size: 14px;
+    color: var(--navy);
+  }
+  .alt-aide-card .alt-aide-mt {
+    float: right;
+    font-weight: 800;
+    color: var(--navy);
+    font-size: 15px;
+  }
+  .alt-aide-card .alt-aide-desc {
+    font-size: 12px;
+    color: var(--text-soft);
+    line-height: 1.4;
+    margin-top: 4px;
+  }
+  .alt-aide-card .alt-aide-status {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-right: 8px;
+  }
+  .alt-aide-card.eligible .alt-aide-status {
+    background: var(--mint);
+    color: var(--navy);
+  }
+  .alt-aide-card.non-eligible .alt-aide-status {
+    background: #E5E7EB;
+    color: var(--text-soft);
+  }
+  .alt-grille-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 6px;
+  }
+  .alt-grille-table th {
+    background: var(--navy);
+    color: white;
+    padding: 9px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .alt-grille-table th.num,
+  .alt-grille-table td.num {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .alt-grille-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
   }
 
   /* Conteneur du scénario actif : seuls les actifs sont visibles */
@@ -731,6 +900,26 @@
     gap: 16px;
   }
 
+  /* Layout 2 colonnes pour un scénario (détails | contrôle) */
+  .print-sheet .ps-scenario-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+  .print-sheet .ps-verdicts-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .print-sheet .ps-row.ps-suggest {
+    background: #F8FAFC;
+    border: 1px solid #E5E7EB;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-top: 2px;
+  }
+
   /* Bloc scénario dans une synthèse multi-scénarios */
   .print-sheet .ps-scenario {
     margin-top: 28px;
@@ -749,7 +938,7 @@
     border-radius: 4px;
     border: none !important;
     font-size: 12pt;
-    margin-bottom: 12px;
+    margin: 0 0 10px;
   }
   .print-sheet .ps-subsection {
     color: #1E4E66;
@@ -760,24 +949,192 @@
 
   /* Quand on imprime : masquer tout sauf la page d'impression */
   @media print {
-    body * { visibility: hidden; }
-    .print-modal, .print-modal * { visibility: visible; }
+    /* Forcer le document à ne pas déborder en pages vides */
+    html, body {
+      height: auto !important;
+      overflow: visible !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: white !important;
+    }
+
+    /* Cacher tous les enfants directs de body sauf la modal d'impression */
+    body > * { display: none !important; }
+    body > .print-modal { display: block !important; }
+
     .print-modal {
-      position: absolute;
-      top: 0; left: 0; right: 0;
+      position: static !important;
+      top: auto; left: auto; right: auto;
+      width: 100%;
       background: white;
       padding: 0;
-      display: block !important;
+      overflow: visible !important;
     }
     .print-modal-content {
       box-shadow: none;
       border-radius: 0;
       max-width: 100%;
       margin: 0;
+      max-height: none;
+      overflow: visible !important;
+      height: auto !important;
     }
-    .print-modal-header { display: none; }
-    .print-sheet { padding: 20px 30px; }
-    @page { size: A4; margin: 15mm; }
+    .print-modal-header { display: none !important; }
+
+    /* Page A4 — marges réduites pour densifier */
+    @page { size: A4; margin: 10mm 12mm; }
+
+    /* Densification globale du contenu */
+    .print-sheet {
+      padding: 0;
+      font-size: 9pt;
+      line-height: 1.25;
+      color: #000;
+    }
+
+    /* En-tête : 1 ligne compacte au lieu de 3 */
+    .print-sheet .ps-header {
+      margin-bottom: 8pt;
+      padding-bottom: 4pt;
+      border-bottom: 1.5pt solid #1E4E66;
+      page-break-after: avoid;
+    }
+    .print-sheet .ps-header h1 {
+      font-size: 14pt;
+      margin: 0;
+      color: #1E4E66;
+    }
+    .print-sheet .ps-header .ps-subtitle {
+      font-size: 9pt;
+      color: #6B7280;
+      margin-top: 1pt;
+    }
+    .print-sheet .ps-header .ps-meta {
+      font-size: 8pt;
+      color: #6B7280;
+    }
+
+    /* Sections compactes */
+    .print-sheet h3.ps-section {
+      font-size: 10pt;
+      margin: 6pt 0 3pt;
+      padding-bottom: 1pt;
+      border-bottom: 1pt solid #E5E7EB;
+      color: #1E4E66;
+      page-break-after: avoid;
+    }
+    .print-sheet h4.ps-subsection {
+      font-size: 9pt;
+      margin: 4pt 0 2pt;
+      color: #1E4E66;
+      font-weight: 700;
+      page-break-after: avoid;
+    }
+
+    /* Bloc-rangées compact */
+    .print-sheet .ps-block {
+      background: white !important;
+      border: 1pt solid #E5E7EB !important;
+      padding: 4pt 8pt !important;
+      margin: 0 !important;
+      border-radius: 2pt !important;
+    }
+    .print-sheet .ps-row {
+      padding: 2pt 0 !important;
+      border-bottom: 0.5pt solid #F3F4F6 !important;
+    }
+    .print-sheet .ps-row:last-child {
+      border-bottom: none !important;
+    }
+    .print-sheet .ps-row .ps-label {
+      font-size: 9pt !important;
+      color: #4B5563 !important;
+    }
+    .print-sheet .ps-row .ps-val {
+      font-size: 9pt !important;
+      font-weight: 700 !important;
+      color: #1E4E66 !important;
+    }
+    .print-sheet .ps-row.ps-highlight {
+      background: #ECFDF5 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      margin: 0 -8pt !important;
+      padding: 2pt 8pt !important;
+    }
+    .print-sheet .ps-row.ps-highlight .ps-val {
+      color: #047857 !important;
+      font-size: 10pt !important;
+    }
+
+    /* Verdicts SYNTEC/CYIM : compacts */
+    .print-sheet .ps-verdict {
+      padding: 3pt 8pt !important;
+      margin: 2pt 0 !important;
+      font-size: 9pt !important;
+      border-radius: 2pt !important;
+      border-left-width: 2pt !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .print-sheet .ps-verdict.ok    { background: #ECFDF5 !important; border-color: #6EE7B7 !important; color: #047857 !important; }
+    .print-sheet .ps-verdict.warn  { background: #FEF3C7 !important; border-color: #FCD34D !important; color: #92400E !important; }
+    .print-sheet .ps-verdict.alert { background: #FEE2E2 !important; border-color: #FCA5A5 !important; color: #B91C1C !important; }
+
+    /* Layout 2 colonnes en print */
+    .print-sheet .ps-scenario-grid {
+      display: grid !important;
+      grid-template-columns: 1.1fr 1fr !important;
+      gap: 6pt !important;
+      align-items: start;
+    }
+    .print-sheet .ps-verdicts-col {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 2pt !important;
+    }
+    .print-sheet .ps-row.ps-suggest {
+      background: #F8FAFC !important;
+      border: 0.5pt solid #E5E7EB !important;
+      border-radius: 2pt !important;
+      padding: 3pt 8pt !important;
+      margin-top: 1pt !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Bloc scénario : densification + saut de page intelligent */
+    .print-sheet .ps-scenario {
+      margin-top: 8pt !important;
+      padding-top: 2pt !important;
+      page-break-inside: avoid;
+    }
+    .print-sheet .ps-scenario + .ps-scenario {
+      border-top: 1pt dashed #E5E7EB !important;
+      padding-top: 6pt !important;
+      page-break-before: auto;
+    }
+    .print-sheet .ps-scenario-title {
+      background: #1E4E66 !important;
+      color: white !important;
+      padding: 3pt 8pt !important;
+      border-radius: 2pt !important;
+      font-size: 10pt !important;
+      margin: 0 0 4pt !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      border: none !important;
+    }
+
+    /* Footer du document */
+    .print-sheet .ps-footer {
+      margin-top: 8pt !important;
+      padding-top: 4pt !important;
+      border-top: 0.5pt solid #E5E7EB !important;
+      font-size: 7pt !important;
+      color: #9CA3AF !important;
+      text-align: center;
+    }
   }
   .table-wrapper {
     overflow-x: auto;
@@ -1012,6 +1369,10 @@
   /* ========================================================
      PIED DE PAGE
      ======================================================== */
+  #admin-link-header:hover {
+    background: rgba(255,255,255,0.22) !important;
+    border-color: rgba(255,255,255,0.4) !important;
+  }
   footer {
     background: var(--surface);
     border-top: 1px solid var(--border);
@@ -1019,6 +1380,11 @@
     text-align: center;
     font-size: 12px;
     color: var(--text-faint);
+  }
+  #admin-link:hover {
+    opacity: 1 !important;
+    color: var(--navy) !important;
+    text-decoration: underline !important;
   }
 
   /* ========================================================
@@ -1071,18 +1437,25 @@
 
 <header>
   <div>
-    <h1>Simulateur d'augmentation salariale</h1>
+    <h1>Simulateur salarial</h1>
     <div class="subtitle">CYIM · Convention SYNTEC (IDCC 1486) · Contrôle SMIC + planchers conventionnels intégrés</div>
   </div>
-  <div class="mode-toggle">
-    <button id="mode-detailed" class="active" onclick="switchMode('detailed')">Détaillé</button>
-    <button id="mode-compact" onclick="switchMode('compact')">Compact</button>
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div class="mode-toggle">
+      <button id="mode-detailed" class="active" onclick="switchMode('detailed')">Détaillé</button>
+      <button id="mode-compact" onclick="switchMode('compact')">Compact</button>
+    </div>
+    <a href="admin.html" id="admin-link-header" title="Accès réservé à l'administrateur RH"
+       style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:6px;color:white;text-decoration:none;font-size:13px;font-weight:600;transition:all 0.15s;">
+      🔒 Administration
+    </a>
   </div>
 </header>
 
 <nav class="tabs">
   <button class="tab-btn active" data-tab="sim">Simulations</button>
   <button class="tab-btn" data-tab="enveloppe">Enveloppe équipe</button>
+  <button class="tab-btn" data-tab="alternants">Alternants</button>
   <button class="tab-btn" data-tab="grilles">Grilles SYNTEC</button>
   <button class="tab-btn" data-tab="params">Paramètres</button>
   <button class="tab-btn" data-tab="doc">Documentation</button>
@@ -1132,6 +1505,9 @@
   <div class="section">
     <h2>Données du salarié</h2>
     <div class="section-desc">Ces informations sont communes à tous les scénarios ci-dessous.</div>
+    <div style="font-size:11.5px; color: var(--text-faint); font-style: italic; margin-top: -4px; margin-bottom: 14px;">
+      ℹ️ Tous les montants saisis et affichés sont exprimés en <strong>salaire brut</strong> (hors charges salariales).
+    </div>
     <div class="input-grid cols-3">
       <div class="field">
         <label for="emp-name">Nom du salarié</label>
@@ -1143,7 +1519,7 @@
       </div>
       <div class="field">
         <label for="emp-salary">Salaire brut annuel actuel (€)</label>
-        <input type="number" id="emp-salary" value="28718.52" step="0.01" data-mirror="eur">
+        <input type="text" id="emp-salary" value="28 718,52 €" data-money="true" inputmode="decimal">
       </div>
     </div>
   </div>
@@ -1254,8 +1630,8 @@
         </button>
         <button class="scenario-option" data-scenario="s4">
           <span class="so-checkbox"></span>
-          <span class="so-num">Scénario 4</span>
-          <span class="so-title">Conversion horaire</span>
+          <span class="so-num">Outil</span>
+          <span class="so-title">Convertisseur</span>
           <span class="so-desc">Annuel / mensuel / horaire</span>
         </button>
       </div>
@@ -1294,8 +1670,8 @@
               <span class="value" id="s1-pct">—</span>
             </div>
             <div class="result-row" id="s1-mens39-row" style="display:none;">
-              <span class="label-side">
-                Nouveau mensuel base 39h <span class="hint">— ETAM, sans majoration HS</span>
+              <span class="label-side" id="s1-mens39-label">
+                Nouveau mensuel <span class="hint">— ETAM, base 39h CYIM, HS 25% incluses</span>
               </span>
               <span class="value" id="s1-mens39">—</span>
             </div>
@@ -1358,8 +1734,8 @@
               <span class="value" id="s2-aug-mens">—</span>
             </div>
             <div class="result-row" id="s2-mens39-row" style="display:none;">
-              <span class="label-side">
-                Nouveau mensuel base 39h <span class="hint">— ETAM, sans majoration HS</span>
+              <span class="label-side" id="s2-mens39-label">
+                Nouveau mensuel <span class="hint">— ETAM, base 39h CYIM, HS 25% incluses</span>
               </span>
               <span class="value" id="s2-mens39">—</span>
             </div>
@@ -1455,8 +1831,8 @@
               <span class="value" id="s3-pct">—</span>
             </div>
             <div class="result-row" id="s3-mens39-row" style="display:none;">
-              <span class="label-side">
-                Nouveau mensuel base 39h <span class="hint">— ETAM, sans majoration HS</span>
+              <span class="label-side" id="s3-mens39-label">
+                Nouveau mensuel <span class="hint">— ETAM, base 39h CYIM, HS 25% incluses</span>
               </span>
               <span class="value" id="s3-mens39">—</span>
             </div>
@@ -1492,45 +1868,179 @@
       </div>
     </div>
 
-    <!-- Scénario 4 -->
+    <!-- Scénario 4 — Module de conversion (annuel / mensuel / horaire) -->
     <div class="section scenario-content" data-scenario="s4">
-      <h2>Scénario 4 — Conversion annuel / mensuel / horaire</h2>
-      <div class="section-desc">Modifiez l'une des trois entrées, les conversions se mettent à jour automatiquement.</div>
-      <div class="input-grid cols-3">
-        <div>
-          <h3>Depuis le salaire annuel</h3>
-          <div class="field">
-            <label for="s4-annuel">Salaire brut annuel (€)</label>
-            <input type="number" id="s4-annuel" value="28718.52" step="0.01" data-mirror="eur">
+      <h2>Convertisseur (annuel / mensuel / horaire)</h2>
+      <div class="section-desc">
+        Saisissez l'un des trois montants (annuel, mensuel ou horaire) — les deux autres se mettent à jour automatiquement.
+      </div>
+
+      <!-- Toggle statut -->
+      <div class="s4-statut-toggle" style="display:flex; gap:8px; margin-bottom:20px;">
+        <button type="button" class="s4-statut-btn active" data-statut="etam" onclick="s4SetStatut('etam')">
+          <strong>ETAM 39h</strong>
+          <span style="display:block; font-size:11px; font-weight:normal; opacity:0.85; margin-top:2px;">39h hebdo · 4 HS majorées 25% incluses</span>
+        </button>
+        <button type="button" class="s4-statut-btn" data-statut="cadre" onclick="s4SetStatut('cadre')">
+          <strong>Cadre forfait jours</strong>
+          <span style="display:block; font-size:11px; font-weight:normal; opacity:0.85; margin-top:2px;">218 jours / an · pas de base horaire</span>
+        </button>
+      </div>
+
+      <!-- Note explicative dynamique -->
+      <div class="note info s4-formula-note" id="s4-formula-note" style="margin-bottom:20px;">
+        <!-- contenu injecté par JS -->
+      </div>
+
+      <!-- Saisie : 3 champs synchronisés -->
+      <div class="input-grid cols-3" id="s4-inputs-row">
+        <div class="field">
+          <label for="s4-annuel">Salaire brut annuel</label>
+          <input type="text" id="s4-annuel" value="28 718,52 €" data-money="true" data-s4="annuel" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="s4-mensuel">Salaire brut mensuel</label>
+          <input type="text" id="s4-mensuel" value="2 393,21 €" data-money="true" data-s4="mensuel" inputmode="decimal">
+        </div>
+        <div class="field" id="s4-horaire-field">
+          <label for="s4-horaire">Taux horaire brut</label>
+          <input type="text" id="s4-horaire" value="14,16 €" data-money="true" data-s4="horaire" inputmode="decimal" data-decimals="4">
+        </div>
+      </div>
+
+      <!-- Bloc résultats ETAM -->
+      <div id="s4-results-etam" style="margin-top:24px;">
+        <h3 style="font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 10px;">Décomposition ETAM</h3>
+        <div class="results">
+          <div class="result-row"><span class="label-side">Salaire annuel brut (39h, HS majorées 25% incluses)</span><span class="value" id="s4-r-annuel">—</span></div>
+          <div class="result-row"><span class="label-side">Mensuel brut 39h (= annuel / 12, HS majorées incluses)</span><span class="value" id="s4-r-mens39-tot">—</span></div>
+          <div class="result-row"><span class="label-side">Mensuel brut 39h avant majoration des HS (35h + 4h × 1)</span><span class="value" id="s4-r-mens39-nomaj">—</span></div>
+          <div class="result-row"><span class="label-side">Mensuel brut 35h (de référence pour le taux horaire)</span><span class="value" id="s4-r-mens35">—</span></div>
+          <div class="result-row"><span class="label-side">Taux horaire brut</span><span class="value" id="s4-r-horaire">—</span></div>
+        </div>
+
+        <!-- Simulateur d'heures supplémentaires (au-delà de 39h) -->
+        <div class="card" style="margin-top:20px; background: var(--mint-soft); border:1px solid #BBF7D0; padding:16px 18px; border-radius:8px;">
+          <h3 style="margin:0 0 4px; color: var(--navy); font-size:14px;">⏱️ Simulateur d'heures supplémentaires (au-delà de 39h)</h3>
+          <div style="font-size:12px; color: var(--text-soft); margin-bottom:14px;">
+            Saisissez le nombre d'heures effectuées au-delà des 39h hebdo. Majorations cumulatives selon la 43e heure et le jour. Les jours de repos hebdomadaires et fériés ne se cumulent pas entre eux.
           </div>
-          <div class="results">
-            <div class="result-row"><span class="label-side">→ Mensuel (12 mois)</span><span class="value" id="s4-from-an-mens">—</span></div>
-            <div class="result-row"><span class="label-side">→ Taux horaire 35h</span><span class="value" id="s4-from-an-tx35">—</span></div>
-            <div class="result-row"><span class="label-side">→ Équivalent mensuel 39h</span><span class="value" id="s4-from-an-mens39">—</span></div>
+          <div class="input-grid cols-2" style="gap:14px;">
+            <div class="field">
+              <label for="s4-hs-40-43">HS entre 40h et 43h (semaine ouvrée) — majoration 25%</label>
+              <input type="number" id="s4-hs-40-43" value="0" step="0.5" min="0">
+            </div>
+            <div class="field">
+              <label for="s4-hs-44plus">HS à partir de 44h (semaine ouvrée) — majoration 50%</label>
+              <input type="number" id="s4-hs-44plus" value="0" step="0.5" min="0">
+            </div>
+            <div class="field">
+              <label for="s4-hs-dim">HS le dimanche / jour férié (CYIM : majoration 50%, cumul exclusif)</label>
+              <input type="number" id="s4-hs-dim" value="0" step="0.5" min="0">
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <button type="button" class="btn outline" onclick="s4ResetHS()" style="width:100%;">Réinitialiser les HS</button>
+            </div>
+          </div>
+
+          <!-- Sélecteur contexte congrès -->
+          <div class="field" style="margin-top:12px;">
+            <label class="checkbox-label" style="display:flex; align-items:center; gap:8px; padding:8px 12px; background: rgba(255,255,255,0.6); border: 1px solid var(--border); border-radius:6px; cursor:pointer; font-size:13px;">
+              <input type="checkbox" id="s4-hs-congres">
+              <span>⚡ Semaine de congrès (régime dérogatoire — accord CYIM du 01/08/2023)</span>
+            </label>
+          </div>
+
+          <div class="results" style="margin-top:14px;">
+            <div class="result-row"><span class="label-side">HS 40–43h × taux horaire × 1,25</span><span class="value" id="s4-hs-r-40-43">—</span></div>
+            <div class="result-row"><span class="label-side">HS ≥ 44h × taux horaire × 1,50</span><span class="value" id="s4-hs-r-44plus">—</span></div>
+            <div class="result-row"><span class="label-side">HS dimanche/férié × taux horaire × 1,50 (50% CYIM)</span><span class="value" id="s4-hs-r-dim">—</span></div>
+            <div class="result-row" style="background: var(--mint); color: var(--navy); font-weight: 800; border-radius: 4px; padding: 8px 12px; margin-top: 6px;">
+              <span class="label-side" style="color: var(--navy);">Total brut à ajouter à la paie</span>
+              <span class="value" id="s4-hs-r-total" style="color: var(--navy);">—</span>
+            </div>
+          </div>
+
+          <!-- Alerte plafonds CYIM -->
+          <div id="s4-hs-alert" class="note" style="margin-top:12px; font-size:12px;">
+            <!-- Injecté par JS selon le contexte -->
+          </div>
+
+          <div style="margin-top: 14px; text-align: right;">
+            <button type="button" class="btn primary" onclick="openS4PrintModal()" style="padding: 8px 18px;">
+              🖨️ Imprimer / Enregistrer le convertisseur
+            </button>
           </div>
         </div>
-        <div>
-          <h3>Depuis le salaire mensuel</h3>
-          <div class="field">
-            <label for="s4-mensuel">Salaire brut mensuel (€)</label>
-            <input type="number" id="s4-mensuel" value="2393.21" step="0.01" data-mirror="eur">
-          </div>
-          <div class="results">
-            <div class="result-row"><span class="label-side">→ Annuel (12 mois)</span><span class="value" id="s4-from-mens-an">—</span></div>
-            <div class="result-row"><span class="label-side">→ Taux horaire 35h</span><span class="value" id="s4-from-mens-tx35">—</span></div>
-            <div class="result-row"><span class="label-side">→ Équivalent mensuel 39h</span><span class="value" id="s4-from-mens-mens39">—</span></div>
-          </div>
+      </div>
+
+      <!-- Bloc résultats Cadre -->
+      <div id="s4-results-cadre" style="display:none; margin-top:24px;">
+        <h3 style="font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 10px;">Décomposition Cadre forfait jours</h3>
+        <div class="results">
+          <div class="result-row"><span class="label-side">Salaire annuel brut</span><span class="value" id="s4-c-annuel">—</span></div>
+          <div class="result-row"><span class="label-side">Salaire mensuel brut (= annuel / 12)</span><span class="value" id="s4-c-mensuel">—</span></div>
         </div>
-        <div>
-          <h3>Depuis le taux horaire</h3>
-          <div class="field">
-            <label for="s4-horaire">Taux horaire brut (€/h)</label>
-            <input type="number" id="s4-horaire" value="15.78" step="0.0001" data-mirror="eur4">
+        <div class="note info" style="margin-top:10px; font-size:12px;">
+          Pour un cadre en forfait jours, le salaire n'est pas décomposé en taux horaire : la rémunération couvre 218 jours travaillés par an, sans référence à un volume horaire.
+        </div>
+
+        <!-- Module RTT -->
+        <div class="card" style="margin-top:20px; background: var(--mint-soft); border:1px solid #BBF7D0; padding:16px 18px; border-radius:8px;">
+          <h3 style="margin:0 0 4px; color: var(--navy); font-size:14px;">📅 Calcul des jours de repos (RTT)</h3>
+          <div style="font-size:12px; color: var(--text-soft); margin-bottom:14px;">
+            <strong>Formule :</strong> Jours de repos = Nombre de jours dans l'année − (jours du forfait − jours d'ancienneté) − jours de week-end − congés payés − jours fériés ouvrés.
           </div>
-          <div class="results">
-            <div class="result-row"><span class="label-side">→ Mensuel 35h</span><span class="value" id="s4-from-h-mens35">—</span></div>
-            <div class="result-row"><span class="label-side">→ Annuel 35h</span><span class="value" id="s4-from-h-an">—</span></div>
-            <div class="result-row"><span class="label-side">→ Mensuel 39h</span><span class="value" id="s4-from-h-mens39">—</span></div>
+          <div class="input-grid cols-3" style="gap:14px;">
+            <div class="field">
+              <label for="s4-rtt-annee">Année</label>
+              <select id="s4-rtt-annee"></select>
+            </div>
+            <div class="field">
+              <label for="s4-rtt-forfait">Jours du forfait</label>
+              <input type="number" id="s4-rtt-forfait" value="218" step="1" min="1" max="365">
+            </div>
+            <div class="field">
+              <label for="s4-rtt-cp">Congés payés acquis</label>
+              <input type="number" id="s4-rtt-cp" value="25" step="0.5" min="0" max="40">
+            </div>
+          </div>
+          <div class="input-grid cols-2" style="gap:14px; margin-top:14px;">
+            <div class="field">
+              <label for="s4-rtt-anciennete">Jours d'ancienneté SYNTEC</label>
+              <select id="s4-rtt-anciennete">
+                <option value="0" selected>0 jour — moins de 5 ans</option>
+                <option value="1">1 jour — 5 à 10 ans</option>
+                <option value="2">2 jours — 10 à 15 ans</option>
+                <option value="3">3 jours — 15 à 20 ans</option>
+                <option value="4">4 jours — 20 ans et plus</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="s4-rtt-date-entree">Date d'entrée (proratisation si arrivée en cours d'année)</label>
+              <input type="date" id="s4-rtt-date-entree" placeholder="JJ/MM/AAAA">
+            </div>
+          </div>
+          <div class="results" style="margin-top:14px;">
+            <div class="result-row"><span class="label-side">Jours dans l'année</span><span class="value" id="s4-rtt-jours-annee">—</span></div>
+            <div class="result-row"><span class="label-side">− Jours du forfait (forfait − ancienneté)</span><span class="value" id="s4-rtt-d-forfait">—</span></div>
+            <div class="result-row"><span class="label-side">− Jours de week-end</span><span class="value" id="s4-rtt-d-we">—</span></div>
+            <div class="result-row"><span class="label-side">− Congés payés ouvrés</span><span class="value" id="s4-rtt-d-cp">—</span></div>
+            <div class="result-row"><span class="label-side">− Jours fériés ouvrés (hors week-end)</span><span class="value" id="s4-rtt-d-feries">—</span></div>
+            <div class="result-row" id="s4-rtt-prorata-row" style="display:none;"><span class="label-side">× Coefficient de proratisation (présence partielle)</span><span class="value" id="s4-rtt-d-prorata">—</span></div>
+            <div class="result-row" style="background: var(--mint); color: var(--navy); font-weight: 800; border-radius: 4px; padding: 8px 12px; margin-top: 6px;">
+              <span class="label-side" style="color: var(--navy);">= Jours de repos (RTT) théoriques</span>
+              <span class="value" id="s4-rtt-r-total" style="color: var(--navy);">—</span>
+            </div>
+          </div>
+          <div style="font-size:11px; color: var(--text-soft); margin-top:10px;">
+            Calcul effectué pour une présence sur une année complète, sauf cas proratisés pour une arrivée en cours d'année. Les jours d'ancienneté SYNTEC réduisent le forfait travaillé (218 − ancienneté) et n'amputent pas les jours de repos.
+          </div>
+          <div style="margin-top: 14px; text-align: right;">
+            <button type="button" class="btn primary" onclick="openS4PrintModal()" style="padding: 8px 18px;">
+              🖨️ Imprimer / Enregistrer le convertisseur
+            </button>
           </div>
         </div>
       </div>
@@ -1604,6 +2114,206 @@
       </div>
     </div>
   </div>
+</section>
+
+
+<!-- ============================================================
+     ONGLET ALTERNANTS
+     ============================================================ -->
+<section class="panel" id="panel-alternants">
+
+  <!-- Carte 1 : configuration du contrat -->
+  <div class="section">
+    <h2>Configuration du contrat d'alternance</h2>
+    <div class="section-desc">
+      Sélectionnez les paramètres de l'alternant pour calculer son salaire brut, le coût employeur estimé et les aides applicables.
+      <br><strong>Sources :</strong> service-public.gouv.fr, URSSAF, OPCO Atlas (Bureaux d'études — SYNTEC), Code du travail.
+    </div>
+
+    <!-- Type de contrat -->
+    <div class="alt-toggle" style="display:flex; gap:8px; margin-bottom:18px;">
+      <button type="button" class="alt-type-btn active" data-type="apprentissage" onclick="altSetType('apprentissage')">
+        <strong>Contrat d'apprentissage</strong>
+        <span style="display:block; font-size:11px; font-weight:normal; opacity:0.85; margin-top:2px;">% du SMIC ou SMC selon âge × année de contrat</span>
+      </button>
+      <button type="button" class="alt-type-btn" data-type="professionnalisation" onclick="altSetType('professionnalisation')">
+        <strong>Contrat de professionnalisation</strong>
+        <span style="display:block; font-size:11px; font-weight:normal; opacity:0.85; margin-top:2px;">% du SMIC selon âge × niveau de diplôme</span>
+      </button>
+    </div>
+
+    <!-- Critères communs -->
+    <div class="input-grid cols-3">
+      <div class="field">
+        <label for="alt-nom">Nom de l'alternant (optionnel)</label>
+        <input type="text" id="alt-nom" placeholder="Ex : DURAND Lucas">
+      </div>
+      <div class="field">
+        <label for="alt-age">Âge au début du contrat</label>
+        <input type="number" id="alt-age" value="21" min="15" max="35" step="1">
+      </div>
+      <div class="field">
+        <label for="alt-date-debut">Date de début du contrat</label>
+        <input type="date" id="alt-date-debut">
+      </div>
+    </div>
+
+    <div class="input-grid cols-3" style="margin-top:14px;">
+      <div class="field">
+        <label for="alt-formation">Formation préparée</label>
+        <input type="text" id="alt-formation" placeholder="Ex : Master Communication digitale">
+      </div>
+      <div class="field">
+        <label for="alt-niveau">Niveau de diplôme préparé</label>
+        <select id="alt-niveau">
+          <option value="3">Niveau 3 — CAP / BEP</option>
+          <option value="4">Niveau 4 — Baccalauréat</option>
+          <option value="5">Niveau 5 — BTS / DUT / Bac+2</option>
+          <option value="6" selected>Niveau 6 — Licence / Bac+3</option>
+          <option value="7">Niveau 7 — Master / Bac+5</option>
+          <option value="8">Niveau 8 — Doctorat / Bac+8</option>
+        </select>
+      </div>
+      <div class="field" id="alt-annee-field">
+        <label for="alt-annee">Année d'exécution du contrat</label>
+        <select id="alt-annee">
+          <option value="1" selected>1ère année</option>
+          <option value="2">2ème année</option>
+          <option value="3">3ème année</option>
+        </select>
+      </div>
+      <div class="field" id="alt-niveau-deja-field" style="display:none;">
+        <label for="alt-niveau-deja">Niveau de diplôme déjà obtenu</label>
+        <select id="alt-niveau-deja">
+          <option value="lt-bac">Inférieur au Bac pro</option>
+          <option value="gte-bac" selected>≥ Bac pro / BAC / titre équivalent</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Cas particuliers -->
+    <h3 style="margin: 20px 0 10px; font-size:12px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.06em;">Cas particuliers</h3>
+    <div class="input-grid cols-3" style="gap:14px;">
+      <div class="field">
+        <label class="checkbox-label" style="display:flex; align-items:center; gap:8px; padding:8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius:6px; cursor:pointer;">
+          <input type="checkbox" id="alt-rqth">
+          <span>Travailleur handicapé (RQTH)</span>
+        </label>
+      </div>
+      <div class="field" id="alt-succession-field">
+        <label class="checkbox-label" style="display:flex; align-items:center; gap:8px; padding:8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius:6px; cursor:pointer;">
+          <input type="checkbox" id="alt-succession">
+          <span>Succession de contrats (rémunération minimale = dernière année du précédent)</span>
+        </label>
+      </div>
+      <div class="field" id="alt-majoration15-field">
+        <label class="checkbox-label" style="display:flex; align-items:center; gap:8px; padding:8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius:6px; cursor:pointer;">
+          <input type="checkbox" id="alt-majoration15">
+          <span>Majoration +15 pts (contrat ≤ 1 an, diplôme de même niveau, qualification liée)</span>
+        </label>
+      </div>
+    </div>
+    <div class="input-grid cols-3" style="gap:14px; margin-top:10px;">
+      <div class="field" id="alt-licencepro-field">
+        <label class="checkbox-label" style="display:flex; align-items:center; gap:8px; padding:8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius:6px; cursor:pointer;">
+          <input type="checkbox" id="alt-licencepro">
+          <span>Licence professionnelle en 1 an (rémunération = 2ème année)</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carte 2 : résultat salaire -->
+  <div class="section">
+    <h2>Salaire brut de l'alternant</h2>
+    <div class="section-desc">
+      Le salaire applicable est le plus élevé entre le pourcentage légal/SYNTEC du SMIC et le salaire minimum conventionnel (SMC) lié à la classification visée.
+    </div>
+
+    <div class="note info" id="alt-formula-note" style="margin-bottom:16px;">
+      <!-- Injecté par JS : explication du calcul -->
+    </div>
+
+    <div class="results">
+      <div class="result-row"><span class="label-side">Pourcentage applicable</span><span class="value" id="alt-pct">—</span></div>
+      <div class="result-row"><span class="label-side">Base de calcul : <span id="alt-base-label">SMIC</span></span><span class="value" id="alt-base-val">—</span></div>
+      <div class="result-row ps-highlight" style="background:#ECFDF5; padding:8px 12px; border-radius:4px; margin-top:4px;">
+        <span class="label-side"><strong>Salaire brut mensuel minimum (35h)</strong></span>
+        <span class="value" id="alt-sal-mens" style="font-size:16px; color: #047857;">—</span>
+      </div>
+      <div class="result-row"><span class="label-side">→ Salaire brut annuel (35h × 12)</span><span class="value" id="alt-sal-an">—</span></div>
+      <div class="result-row"><span class="label-side">→ Équivalent mensuel 39h (CYIM, HS majorées 25% incluses)</span><span class="value" id="alt-sal-mens39">—</span></div>
+      <div class="result-row"><span class="label-side">→ Équivalent annuel 39h CYIM</span><span class="value" id="alt-sal-an39">—</span></div>
+    </div>
+
+    <div class="note warning" id="alt-warning" style="display:none; margin-top:14px;">
+      <!-- Injecté par JS si attention particulière -->
+    </div>
+  </div>
+
+  <!-- Carte 3 : avantages CYIM + coût employeur + aides -->
+  <div class="section">
+    <h2>Avantages CYIM et coût employeur</h2>
+
+    <h3 style="margin: 0 0 10px; font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.06em;">Avantages applicables chez CYIM</h3>
+    <ul style="margin:0 0 14px; padding-left: 20px; font-size:13px; color: var(--text); line-height: 1.7;">
+      <li><strong>Prise en charge transport en commun :</strong> 50 % du coût de l'abonnement souscrit par l'alternant (obligation légale — Code du travail, art. L3261-2).</li>
+      <li><strong>Indemnité kilométrique vélo (IK vélo) :</strong> 0,25 €/km pour les déplacements domicile-travail à vélo, dans la limite d'un plafond annuel de 400 €.</li>
+      <li><strong>Titres-restaurant :</strong> valeur faciale 7,50 €, dont 60 % pris en charge par l'employeur (soit 4,50 €/TR), pour les jours travaillés en présentiel.</li>
+    </ul>
+
+    <h3 style="margin: 20px 0 10px; font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.06em;">Particularité des jours de révision</h3>
+    <div class="note info" style="font-size:12.5px;">
+      Pour le contrat d'apprentissage, l'apprenti bénéficie d'un <strong>congé supplémentaire de 5 jours ouvrables</strong> pour réviser ses examens, à prendre dans le mois précédant les épreuves (article L6222-35 Code du travail). Ces jours sont <strong>rémunérés intégralement</strong> par l'employeur. Pour la professionnalisation, aucun congé révision spécifique n'est prévu par le Code du travail (sauf disposition conventionnelle).
+    </div>
+
+    <h3 style="margin: 20px 0 10px; font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.06em;">Coût employeur estimé (par mois)</h3>
+    <div class="results">
+      <div class="result-row"><span class="label-side">Salaire brut</span><span class="value" id="alt-cout-brut">—</span></div>
+      <div class="result-row"><span class="label-side">Charges patronales estimées</span><span class="value" id="alt-cout-charges">—</span></div>
+      <div class="result-row ps-highlight" style="background:#FEF3C7; padding:8px 12px; border-radius:4px; margin-top:4px;">
+        <span class="label-side"><strong>Coût salarial mensuel estimé</strong></span>
+        <span class="value" id="alt-cout-total" style="font-size:16px; color: #92400E;">—</span>
+      </div>
+      <div class="result-row"><span class="label-side">→ Coût salarial annuel estimé</span><span class="value" id="alt-cout-annuel">—</span></div>
+    </div>
+    <div class="note info" style="margin-top:12px; font-size:12px;">
+      <strong>Note méthodologique sur les charges patronales :</strong>
+      <ul style="margin: 6px 0 0; padding-left: 18px;">
+        <li><strong>Apprentissage</strong> — exonération totale des cotisations salariales et patronales (sauf AT/MP : ~0,55 % selon votre taux) sur la fraction de rémunération inférieure ou égale à 79 % du SMIC (art. L6243-2 Code du travail, art. L241-13 CSS). Au-delà de ce seuil, le régime général s'applique avec la réduction générale des cotisations.</li>
+        <li><strong>Professionnalisation</strong> — régime général de droit commun avec application de la réduction générale des cotisations (ex-réduction Fillon) jusqu'à 1,6 SMIC. Le taux effectif estimé est de l'ordre de 22 % du brut.</li>
+      </ul>
+      Le coût indiqué <strong>n'inclut pas</strong> le transport, l'IK vélo ni la part employeur des TR (qui dépendent de la situation personnelle de l'alternant). Pour un calcul précis, utilisez le simulateur officiel URSSAF.
+    </div>
+
+    <h3 style="margin: 20px 0 10px; font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.06em;">Aides à l'embauche en vigueur (2026)</h3>
+    <div id="alt-aides-list">
+      <!-- Injecté par JS -->
+    </div>
+  </div>
+
+  <!-- Carte 4 : grille de référence -->
+  <div class="section">
+    <h2>Grille de rémunération applicable</h2>
+    <div class="section-desc">Tableau des pourcentages du SMIC selon les critères de l'alternant. La ligne correspondant à la situation saisie est mise en évidence.</div>
+    <div id="alt-grille-display">
+      <!-- Injecté par JS selon le type de contrat -->
+    </div>
+  </div>
+
+  <!-- Carte 4 : impression -->
+  <div class="section">
+    <div style="display:flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h2 style="margin:0;">Synthèse imprimable</h2>
+        <div class="section-desc" style="margin-top:4px;">Générer un document récapitulatif pour le dossier RH.</div>
+      </div>
+      <button class="btn primary" onclick="openAltPrintModal()">
+        🖨️ Imprimer / Enregistrer la synthèse
+      </button>
+    </div>
+  </div>
+
 </section>
 
 
@@ -1880,6 +2590,8 @@ const GIST_FILE = "cyim-config.json";
 const GIST_API_URL = `https://api.github.com/gists/${GIST_ID}`;
 
 const DEFAULT_DATA = {
+  syntec_avenant_date: "01/01/2025",
+  syntec_avenant_ref: "Avenant SYNTEC en vigueur au 01/01/2025",
   smic_horaire: 12.31,
   smic_mensuel: 1867.02,
   smic_date: "01/06/2026",
@@ -2082,6 +2794,1114 @@ const fmtEurSigned = (n) => {
 };
 const fmtPct = (n) => isNaN(n) || n === null ? "—" :
   (n >= 0 ? "+" : "") + _normalize((n * 100).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })) + "\u00A0%";
+
+// Parser tolérant pour les champs monétaires en texte ("28 718,52 €" → 28718.52)
+// Supprime les espaces (insécables, fines, normaux), le €, et convertit la virgule en point.
+function parseMoney(s) {
+  if (s == null) return NaN;
+  if (typeof s === "number") return s;
+  const cleaned = String(s)
+    .replace(/[\u00A0\u202F\s]/g, "")
+    .replace(/€/g, "")
+    .replace(/,/g, ".");
+  return parseFloat(cleaned);
+}
+
+// Configure les inputs data-money="true" :
+// - au focus : affiche la valeur "nue" pour faciliter l'édition (28718.52)
+// - au blur  : reformate joliment (28 718,52 €)
+// - input  : déclenche le recalcul live
+function setupMoneyInputs() {
+  document.querySelectorAll("input[data-money='true']").forEach(input => {
+    if (input.dataset.moneyBound === "1") return;
+    input.dataset.moneyBound = "1";
+
+    const formatter = input.dataset.decimals === "4" ? fmtEur4 : fmtEur;
+    const decimals = input.dataset.decimals === "4" ? 4 : 2;
+
+    input.addEventListener("focus", () => {
+      // Important pour le module S4 : on déclare ce champ comme "dernier édité"
+      // dès le focus (pas seulement après input), pour que computeS4 ne tente pas
+      // d'écrire dedans pendant que l'utilisateur s'apprête à le modifier.
+      // Inversement, on déclenche un computeS4 avant pour que les valeurs adjacentes
+      // soient à jour (en particulier quand on Tab depuis un autre champ S4 modifié).
+      if (input.dataset.s4 && typeof computeS4 === "function") {
+        // L'ancien champ édité doit propager AVANT qu'on change s4LastEdited.
+        computeS4();
+        s4LastEdited = input.dataset.s4;
+      }
+      const v = parseMoney(input.value);
+      if (!isNaN(v)) {
+        input.value = v.toFixed(decimals).replace(".", ",");
+      }
+      input.select();
+    });
+
+    input.addEventListener("blur", () => {
+      const v = parseMoney(input.value);
+      input.value = isNaN(v) ? "" : formatter(v);
+      if (typeof computeAll === "function") computeAll();
+    });
+
+    input.addEventListener("input", () => {
+      if (typeof computeAll === "function") computeAll();
+    });
+  });
+}
+
+// =============================================================
+// SCÉNARIO 4 — MODULE DE CONVERSION (annuel / mensuel / horaire)
+// =============================================================
+let s4Statut = "etam"; // "etam" ou "cadre"
+let s4LastEdited = "annuel"; // pour la conversion bidirectionnelle
+
+function s4SetStatut(statut) {
+  s4Statut = statut;
+  document.querySelectorAll(".s4-statut-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.statut === statut);
+  });
+  document.getElementById("s4-results-etam").style.display  = statut === "etam"  ? "block" : "none";
+  document.getElementById("s4-results-cadre").style.display = statut === "cadre" ? "block" : "none";
+  // Masquer le champ "Taux horaire" pour les cadres
+  document.getElementById("s4-horaire-field").style.display = statut === "etam" ? "block" : "none";
+  s4UpdateFormulaNote();
+  // Recalculer depuis le champ annuel par défaut au changement de statut
+  s4LastEdited = "annuel";
+  computeS4();
+}
+
+function s4UpdateFormulaNote() {
+  const note = document.getElementById("s4-formula-note");
+  if (!note) return;
+  if (s4Statut === "cadre") {
+    note.innerHTML = `
+      <strong>💡 Cadre forfait jours — formule appliquée :</strong><br>
+      <code>Mensuel = Annuel ÷ 12</code> · pas de référence à un volume horaire.
+      Le forfait couvre 218 jours travaillés par an. Le nombre de RTT théoriques se calcule plus bas.
+    `;
+  } else {
+    const h35 = state.h35, h39 = state.h39;
+    const hsParMois = h39 - h35; // ~17.33h
+    const equivHeures = h35 + hsParMois * 1.25; // ~173.33
+    note.innerHTML = `
+      <strong>💡 ETAM 39h — formules appliquées :</strong> chez CYIM, le salaire annuel saisi correspond à un salaire <strong>39h hebdo, HS 25% incluses</strong>.<br>
+      <code>Mensuel 39h total = Annuel ÷ 12</code> (HS majorées incluses)<br>
+      <code>1 mois en 39h = ${fmtNum(h35)} h normales + ${fmtNum(hsParMois)} h × 1,25 (HS majorées) = ${fmtNum(equivHeures)} h équivalentes</code><br>
+      <code>Taux horaire = Mensuel 39h total ÷ ${fmtNum(equivHeures)}</code> · <code>Mensuel 35h = Taux horaire × ${fmtNum(h35)}</code><br>
+      <code>Mensuel 39h hors majo HS = Taux horaire × ${fmtNum(h39)}</code> (= 35h + 4h non majorées)
+    `;
+  }
+}
+
+function fmtNum(n) {
+  return _normalize(n.toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 2 }));
+}
+
+function computeS4() {
+  // Récupérer la valeur du champ qui vient d'être modifié,
+  // puis recalculer les deux autres + tous les résultats.
+  const elAn   = document.getElementById("s4-annuel");
+  const elMens = document.getElementById("s4-mensuel");
+  const elHor  = document.getElementById("s4-horaire");
+  if (!elAn || !elMens || !elHor) return;
+
+  const h35 = state.h35, h39 = state.h39;
+  const hsParMois = h39 - h35;
+  const equivHeures = h35 + hsParMois * 1.25;
+
+  let annuel = parseMoney(elAn.value) || 0;
+  let mensuel = parseMoney(elMens.value) || 0;
+  let horaire = parseMoney(elHor.value) || 0;
+
+  // Recalculer les 2 autres champs depuis celui qui a été édité en dernier
+  if (s4Statut === "cadre") {
+    // Cadre : annuel ↔ mensuel uniquement
+    if (s4LastEdited === "annuel") {
+      mensuel = annuel / 12;
+    } else if (s4LastEdited === "mensuel") {
+      annuel = mensuel * 12;
+    }
+    horaire = 0; // non pertinent en cadre
+  } else {
+    // ETAM 39h : annuel/12 = mensuel39 (HS incluses), mensuel/equivHeures = taux horaire
+    if (s4LastEdited === "annuel") {
+      mensuel = annuel / 12;
+      horaire = mensuel / equivHeures;
+    } else if (s4LastEdited === "mensuel") {
+      annuel = mensuel * 12;
+      horaire = mensuel / equivHeures;
+    } else if (s4LastEdited === "horaire") {
+      mensuel = horaire * equivHeures;
+      annuel = mensuel * 12;
+    }
+  }
+
+  // Mettre à jour les champs synchronisés.
+  // On évite d'écrire dans le champ que l'utilisateur vient juste de modifier
+  // (s4LastEdited), pas celui qui a simplement le focus — ainsi un Tab
+  // depuis annuel vers mensuel met bien à jour mensuel.
+  if (s4LastEdited !== "annuel")  elAn.value   = fmtEur(annuel);
+  if (s4LastEdited !== "mensuel") elMens.value = fmtEur(mensuel);
+  if (s4LastEdited !== "horaire") elHor.value  = fmtEur4(horaire);
+
+  // Affichage des résultats
+  if (s4Statut === "cadre") {
+    document.getElementById("s4-c-annuel").textContent  = fmtEur(annuel);
+    document.getElementById("s4-c-mensuel").textContent = fmtEur(mensuel);
+    computeS4RTT();
+  } else {
+    const mens39Total  = annuel / 12;
+    const mens39NoMaj  = horaire * h39;         // 35h + 4h × 1 (sans majo)
+    const mens35       = horaire * h35;
+    document.getElementById("s4-r-annuel").textContent     = fmtEur(annuel);
+    document.getElementById("s4-r-mens39-tot").textContent = fmtEur(mens39Total);
+    document.getElementById("s4-r-mens39-nomaj").textContent = fmtEur(mens39NoMaj);
+    document.getElementById("s4-r-mens35").textContent     = fmtEur(mens35);
+    document.getElementById("s4-r-horaire").textContent    = fmtEur4(horaire);
+    computeS4HS(horaire);
+  }
+}
+
+// Marque le champ comme "dernier modifié" pour orienter la conversion
+function bindS4Inputs() {
+  document.querySelectorAll("input[data-s4]").forEach(input => {
+    if (input.dataset.s4Bound === "1") return;
+    input.dataset.s4Bound = "1";
+    input.addEventListener("focus", () => { s4LastEdited = input.dataset.s4; });
+    input.addEventListener("input", () => { s4LastEdited = input.dataset.s4; });
+  });
+  // HS et RTT : binds spécifiques
+  ["s4-hs-40-43","s4-hs-44plus","s4-hs-dim","s4-hs-congres"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.dataset.s4HsBound !== "1") {
+      el.addEventListener("input", () => computeS4());
+      el.addEventListener("change", () => computeS4());
+      el.dataset.s4HsBound = "1";
+    }
+  });
+  ["s4-rtt-annee","s4-rtt-forfait","s4-rtt-cp","s4-rtt-anciennete","s4-rtt-date-entree"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.dataset.s4RttBound !== "1") {
+      el.addEventListener("input", () => computeS4RTT());
+      el.addEventListener("change", () => computeS4RTT());
+      el.dataset.s4RttBound = "1";
+    }
+  });
+}
+
+function s4ResetHS() {
+  ["s4-hs-40-43","s4-hs-44plus","s4-hs-dim"].forEach(id => document.getElementById(id).value = 0);
+  computeS4();
+}
+
+function computeS4HS(horaire) {
+  const h4043 = parseFloat(document.getElementById("s4-hs-40-43").value) || 0;
+  const h44p  = parseFloat(document.getElementById("s4-hs-44plus").value) || 0;
+  const hDim  = parseFloat(document.getElementById("s4-hs-dim").value) || 0;
+  const m4043 = h4043 * horaire * 1.25;
+  // Selon l'accord d'entreprise CYIM du 01/08/2023 (art. 2.1.10) :
+  // - HS dimanche/jours fériés ETAM : majoration 50% (et non 100% du Code du travail)
+  // - HS au-delà de 44h : 50% (Code du travail)
+  // Cumul exclusif dimanche/férié avec les autres majorations HS.
+  const m44p  = h44p  * horaire * 1.50;
+  const mDim  = hDim  * horaire * 1.50;
+  document.getElementById("s4-hs-r-40-43").textContent = fmtEur(m4043);
+  document.getElementById("s4-hs-r-44plus").textContent = fmtEur(m44p);
+  document.getElementById("s4-hs-r-dim").textContent = fmtEur(mDim);
+  document.getElementById("s4-hs-r-total").textContent = fmtEur(m4043 + m44p + mDim);
+
+  // ============= ALERTES PLAFONDS =============
+  // Total HS hebdo simulées
+  const totalHS = h4043 + h44p + hDim;
+  const heuresTotalHebdo = 39 + totalHS;
+  const congres = document.getElementById("s4-hs-congres").checked;
+
+  // Plafonds CYIM (accord d'entreprise 01/08/2023) :
+  // - Hors congrès : 48h/semaine max, 44h en moyenne sur 12 semaines, 10h/jour max
+  // - Pendant congrès : 60h/semaine max, 12h/jour max
+  // Contingent annuel : 350 HS/salarié/an
+  const seuilHebdo = congres ? 60 : 48;
+  const alerteEl = document.getElementById("s4-hs-alert");
+  if (!alerteEl) return;
+
+  if (heuresTotalHebdo > seuilHebdo) {
+    alerteEl.className = "note alert";
+    alerteEl.style.cssText = "margin-top:12px; font-size:12px; background:#FEE2E2 !important; border-left:3px solid #FCA5A5 !important; color:#B91C1C !important;";
+    alerteEl.innerHTML = `
+      <strong>⛔ Dépassement du plafond légal/conventionnel !</strong><br>
+      Total heures hebdo simulées : <strong>${heuresTotalHebdo.toFixed(1)} h</strong> > seuil de <strong>${seuilHebdo} h/semaine</strong>
+      (${congres ? "régime congrès, accord CYIM du 01/08/2023" : "hors congrès, Code du travail"}).
+      Au-delà, les HS doivent être remplacées par un repos compensateur majoré 50% (ou compensées selon l'option du salarié : 1h → 1h30 récupérée).
+    `;
+  } else if (heuresTotalHebdo > 44 && !congres) {
+    alerteEl.className = "note warning";
+    alerteEl.style.cssText = "margin-top:12px; font-size:12px; background:#FEF3C7 !important; border-left:3px solid #FCD34D !important; color:#92400E !important;";
+    alerteEl.innerHTML = `
+      <strong>⚠ Attention : 44h en moyenne sur 12 semaines</strong><br>
+      Total heures cette semaine : <strong>${heuresTotalHebdo.toFixed(1)} h</strong>.
+      La moyenne sur 12 semaines consécutives ne doit pas dépasser <strong>44 h/semaine</strong> (hors congrès).
+      Pensez à vérifier le cumul sur les 12 dernières semaines.
+    `;
+  } else if (totalHS > 0) {
+    alerteEl.className = "note info";
+    alerteEl.style.cssText = "margin-top:12px; font-size:12px; background:#EFF6FF !important; border-left:3px solid #BFDBFE !important; color:#1E40AF !important;";
+    alerteEl.innerHTML = `
+      <strong>ℹ️ HS hebdo simulées : ${totalHS.toFixed(1)} h</strong> · total semaine : ${heuresTotalHebdo.toFixed(1)} h
+      ${congres ? " · semaine de congrès (≤ 60h)" : " · hors congrès (≤ 48h)"}.
+      Contingent annuel CYIM : <strong>350 HS/an/salarié</strong> (accord du 01/08/2023, art. 2.3.2).
+    `;
+  } else {
+    alerteEl.innerHTML = "";
+    alerteEl.style.cssText = "";
+  }
+}
+
+// =============================================================
+// CALCUL DES JOURS DE REPOS (RTT) — cadres forfait jours
+// =============================================================
+// Calcul des jours fériés en France (algorithme de Butcher pour Pâques)
+function joursFeriesFR(year) {
+  // Fêtes fixes
+  const fixed = [
+    [1, 1],   // Jour de l'An
+    [5, 1],   // Fête du Travail
+    [5, 8],   // Victoire 1945
+    [7, 14],  // Fête Nationale
+    [8, 15],  // Assomption
+    [11, 1],  // Toussaint
+    [11, 11], // Armistice 1918
+    [12, 25]  // Noël
+  ];
+  // Pâques (Butcher)
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  const easter = new Date(year, month - 1, day);
+  const lundiPaques = new Date(easter);
+  lundiPaques.setDate(easter.getDate() + 1);
+  const ascension = new Date(easter);
+  ascension.setDate(easter.getDate() + 39);
+  const lundiPentecote = new Date(easter);
+  lundiPentecote.setDate(easter.getDate() + 50);
+  const mobile = [
+    [lundiPaques.getMonth() + 1, lundiPaques.getDate()],
+    [ascension.getMonth() + 1, ascension.getDate()],
+    [lundiPentecote.getMonth() + 1, lundiPentecote.getDate()]
+  ];
+  return [...fixed, ...mobile];
+}
+
+function joursFeriesOuvres(year) {
+  const feries = joursFeriesFR(year);
+  let count = 0;
+  feries.forEach(([m, d]) => {
+    const date = new Date(year, m - 1, d);
+    const dow = date.getDay(); // 0 = dim, 6 = sam
+    if (dow !== 0 && dow !== 6) count++;
+  });
+  return count;
+}
+
+function joursWeekend(year) {
+  // Nombre de samedis + dimanches dans l'année
+  let n = 0;
+  const days = isLeap(year) ? 366 : 365;
+  for (let i = 0; i < days; i++) {
+    const date = new Date(year, 0, i + 1);
+    const dow = date.getDay();
+    if (dow === 0 || dow === 6) n++;
+  }
+  return n;
+}
+
+function isLeap(y) {
+  return (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
+}
+
+function populateRTTYearSelect() {
+  const sel = document.getElementById("s4-rtt-annee");
+  if (!sel || sel.options.length > 0) return;
+  const yNow = new Date().getFullYear();
+  for (let y = yNow - 2; y <= yNow + 3; y++) {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = y;
+    if (y === yNow) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+
+function computeS4RTT() {
+  if (s4Statut !== "cadre") return;
+  const sel = document.getElementById("s4-rtt-annee");
+  if (!sel) return;
+  const year = parseInt(sel.value) || new Date().getFullYear();
+  const forfait = parseFloat(document.getElementById("s4-rtt-forfait").value) || 218;
+  const cp = parseFloat(document.getElementById("s4-rtt-cp").value) || 25;
+  const anciennete = parseInt(document.getElementById("s4-rtt-anciennete").value) || 0;
+  const dateEntreeStr = document.getElementById("s4-rtt-date-entree").value;
+
+  const joursAnnee = isLeap(year) ? 366 : 365;
+  const we = joursWeekend(year);
+  const feries = joursFeriesOuvres(year);
+  // Forfait effectif = 218 - jours d'ancienneté SYNTEC.
+  // Les jours d'ancienneté réduisent le nombre de jours travaillés du forfait
+  // (ils ne s'ajoutent ni ne se soustraient aux jours de repos).
+  const forfaitEffectif = forfait - anciennete;
+  // RTT = jours année - forfait effectif - WE - CP - fériés ouvrés
+  let rtt = joursAnnee - forfaitEffectif - we - cp - feries;
+
+  // === Proratisation arrivée en cours d'année ===
+  // Si date d'entrée renseignée ET dans l'année sélectionnée :
+  // RTT × (jours civils restants à courir / jours civils année)
+  // Référence : accord CYIM 2023 — base "annuelle de 47 semaines (52-5 CP)" pour les cadres,
+  // mais pour les jours de repos on prorate au prorata temporis simple.
+  let prorataLabel = null;
+  if (dateEntreeStr) {
+    const dateEntree = new Date(dateEntreeStr + "T00:00:00");
+    if (!isNaN(dateEntree.getTime()) && dateEntree.getFullYear() === year) {
+      const debutAnnee = new Date(year, 0, 1);
+      const finAnnee = new Date(year, 11, 31);
+      const msJour = 24 * 3600 * 1000;
+      const joursRestants = Math.round((finAnnee - dateEntree) / msJour) + 1;
+      const joursTotal = Math.round((finAnnee - debutAnnee) / msJour) + 1;
+      const coef = joursRestants / joursTotal;
+      const rttProrata = rtt * coef;
+      // Arrondi à 0,5
+      rtt = Math.round(rttProrata * 2) / 2;
+      prorataLabel = `${joursRestants}/${joursTotal} jours civils (${(coef*100).toFixed(1)}%)`;
+    }
+  }
+
+  document.getElementById("s4-rtt-jours-annee").textContent = joursAnnee + " jours";
+  document.getElementById("s4-rtt-d-forfait").textContent = "− " + forfaitEffectif + " jours" + (anciennete > 0 ? ` (218 − ${anciennete})` : "");
+  document.getElementById("s4-rtt-d-we").textContent = "− " + we + " jours";
+  document.getElementById("s4-rtt-d-cp").textContent = "− " + cp + " jours";
+  document.getElementById("s4-rtt-d-feries").textContent = "− " + feries + " jours";
+
+  const prorataRow = document.getElementById("s4-rtt-prorata-row");
+  if (prorataLabel && prorataRow) {
+    prorataRow.style.display = "flex";
+    document.getElementById("s4-rtt-d-prorata").textContent = prorataLabel;
+  } else if (prorataRow) {
+    prorataRow.style.display = "none";
+  }
+
+  document.getElementById("s4-rtt-r-total").textContent = Math.max(0, rtt) + " jour" + (Math.max(0, rtt) > 1 ? "s" : "");
+}
+
+function setupS4() {
+  populateRTTYearSelect();
+  bindS4Inputs();
+  s4UpdateFormulaNote();
+  // Affichage initial : ETAM
+  document.getElementById("s4-results-cadre").style.display = "none";
+}
+
+// =============================================================
+// IMPRESSION DU CONVERTISSEUR
+// =============================================================
+function openS4PrintModal() {
+  const content = buildS4PrintContent();
+  document.getElementById("print-content").innerHTML = content;
+  document.getElementById("print-modal").classList.add("visible");
+}
+
+function buildS4PrintContent() {
+  const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+  const annuel  = parseMoney(document.getElementById("s4-annuel").value) || 0;
+  const mensuel = parseMoney(document.getElementById("s4-mensuel").value) || 0;
+  const horaire = parseMoney(document.getElementById("s4-horaire").value) || 0;
+  const statutLabel = s4Statut === "etam" ? "ETAM 39h" : "Cadre forfait jours";
+
+  let detailRows = "";
+  if (s4Statut === "etam") {
+    detailRows = `
+      <div class="ps-row"><span class="ps-label">Salaire annuel brut (39h, HS 25% incluses)</span><span class="ps-val">${fmtEur(annuel)}</span></div>
+      <div class="ps-row ps-highlight"><span class="ps-label">Mensuel 39h (= annuel / 12, HS incluses)</span><span class="ps-val">${fmtEur(annuel/12)}</span></div>
+      <div class="ps-row"><span class="ps-label">Mensuel 39h avant majoration HS</span><span class="ps-val">${fmtEur(horaire * state.h39)}</span></div>
+      <div class="ps-row"><span class="ps-label">Mensuel 35h</span><span class="ps-val">${fmtEur(horaire * state.h35)}</span></div>
+      <div class="ps-row"><span class="ps-label">Taux horaire brut</span><span class="ps-val">${fmtEur4(horaire)}</span></div>
+    `;
+  } else {
+    detailRows = `
+      <div class="ps-row"><span class="ps-label">Salaire annuel brut</span><span class="ps-val">${fmtEur(annuel)}</span></div>
+      <div class="ps-row ps-highlight"><span class="ps-label">Mensuel (= annuel / 12)</span><span class="ps-val">${fmtEur(annuel/12)}</span></div>
+    `;
+  }
+
+  // === HS ETAM ===
+  let hsBlock = "";
+  if (s4Statut === "etam") {
+    const h4043 = parseFloat(document.getElementById("s4-hs-40-43").value) || 0;
+    const h44p  = parseFloat(document.getElementById("s4-hs-44plus").value) || 0;
+    const hDim  = parseFloat(document.getElementById("s4-hs-dim").value) || 0;
+    if (h4043 > 0 || h44p > 0 || hDim > 0) {
+      const m4043 = h4043 * horaire * 1.25;
+      const m44p  = h44p  * horaire * 1.50;
+      const mDim  = hDim  * horaire * 1.50;
+      const totalHS = m4043 + m44p + mDim;
+      const congres = document.getElementById("s4-hs-congres").checked;
+      hsBlock = `
+        <h3 class="ps-section">Heures supplémentaires</h3>
+        <div class="ps-block">
+          ${h4043 > 0 ? `<div class="ps-row"><span class="ps-label">${h4043} h × ${fmtEur4(horaire)} × 1,25 (40–43h)</span><span class="ps-val">${fmtEur(m4043)}</span></div>` : ""}
+          ${h44p > 0 ? `<div class="ps-row"><span class="ps-label">${h44p} h × ${fmtEur4(horaire)} × 1,50 (≥ 44h)</span><span class="ps-val">${fmtEur(m44p)}</span></div>` : ""}
+          ${hDim > 0 ? `<div class="ps-row"><span class="ps-label">${hDim} h × ${fmtEur4(horaire)} × 1,50 (dimanche/férié — CYIM)</span><span class="ps-val">${fmtEur(mDim)}</span></div>` : ""}
+          <div class="ps-row ps-highlight"><span class="ps-label">Total brut HS à ajouter à la paie</span><span class="ps-val">${fmtEur(totalHS)}</span></div>
+          ${congres ? `<div class="ps-row"><span class="ps-label"></span><span class="ps-val" style="font-size:9pt; color:#6B7280;">Régime congrès — accord CYIM du 01/08/2023</span></div>` : ""}
+        </div>
+      `;
+    }
+  }
+
+  // === RTT Cadres ===
+  let rttBlock = "";
+  if (s4Statut === "cadre") {
+    const sel = document.getElementById("s4-rtt-annee");
+    const year = sel ? parseInt(sel.value) : new Date().getFullYear();
+    const forfait = parseFloat(document.getElementById("s4-rtt-forfait").value) || 218;
+    const cp = parseFloat(document.getElementById("s4-rtt-cp").value) || 25;
+    const anciennete = parseInt(document.getElementById("s4-rtt-anciennete").value) || 0;
+    const dateEntreeStr = document.getElementById("s4-rtt-date-entree").value;
+    const joursAnnee = isLeap(year) ? 366 : 365;
+    const we = joursWeekend(year);
+    const feries = joursFeriesOuvres(year);
+    const forfaitEff = forfait - anciennete;
+    let rtt = joursAnnee - forfaitEff - we - cp - feries;
+    let prorataInfo = "";
+    if (dateEntreeStr) {
+      const de = new Date(dateEntreeStr + "T00:00:00");
+      if (!isNaN(de.getTime()) && de.getFullYear() === year) {
+        const debutAnnee = new Date(year, 0, 1);
+        const finAnnee = new Date(year, 11, 31);
+        const msJ = 86400000;
+        const restant = Math.round((finAnnee - de) / msJ) + 1;
+        const total = Math.round((finAnnee - debutAnnee) / msJ) + 1;
+        const coef = restant / total;
+        rtt = Math.round(rtt * coef * 2) / 2;
+        prorataInfo = `<div class="ps-row"><span class="ps-label">Proratisation (date d'entrée ${de.toLocaleDateString("fr-FR")})</span><span class="ps-val">${restant}/${total} jours (${(coef*100).toFixed(1)} %)</span></div>`;
+      }
+    }
+    rttBlock = `
+      <h3 class="ps-section">Jours de repos (RTT) ${year}</h3>
+      <div class="ps-block">
+        <div class="ps-row"><span class="ps-label">Jours dans l'année</span><span class="ps-val">${joursAnnee} jours</span></div>
+        <div class="ps-row"><span class="ps-label">− Jours du forfait${anciennete > 0 ? ` (218 − ${anciennete} ancienneté SYNTEC)` : ""}</span><span class="ps-val">− ${forfaitEff} jours</span></div>
+        <div class="ps-row"><span class="ps-label">− Jours de week-end</span><span class="ps-val">− ${we} jours</span></div>
+        <div class="ps-row"><span class="ps-label">− Congés payés ouvrés</span><span class="ps-val">− ${cp} jours</span></div>
+        <div class="ps-row"><span class="ps-label">− Jours fériés ouvrés (hors WE)</span><span class="ps-val">− ${feries} jours</span></div>
+        ${prorataInfo}
+        <div class="ps-row ps-highlight"><span class="ps-label">= Jours de repos théoriques</span><span class="ps-val">${Math.max(0, rtt)} jour${Math.max(0,rtt)>1?"s":""}</span></div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="ps-header">
+      <div>
+        <h1>Convertisseur salarial — ${statutLabel}</h1>
+        <div class="ps-subtitle">Annuel / mensuel / horaire</div>
+      </div>
+      <div class="ps-meta">
+        <strong>CYIM</strong><br>
+        Édité le ${today}
+      </div>
+    </div>
+
+    <h3 class="ps-section">Décomposition du salaire</h3>
+    <div class="ps-block">
+      ${detailRows}
+    </div>
+
+    ${hsBlock}
+    ${rttBlock}
+
+    <div class="ps-footer">
+      <em>Tous les montants sont exprimés en salaire brut.</em><br>
+      Simulateur salarial CYIM — Convention SYNTEC IDCC 1486 · Accord d'entreprise du 01/08/2023<br>
+      Document à usage interne RH
+    </div>
+  `;
+}
+
+// =============================================================
+// ONGLET ALTERNANTS — apprentissage et professionnalisation
+// =============================================================
+// Sources : service-public.gouv.fr (F2918), OPCO Atlas Bureaux d'études 2026,
+// URSSAF, économie.gouv.fr, décrets cités en bas de fiche.
+//
+// PRINCIPE :
+// - Apprentissage : grille SYNTEC plus favorable que la grille légale,
+//   en % du SMIC (ou SMC si supérieur, pour les 21+ ans)
+// - Professionnalisation : barème légal en % du SMIC, dépendant de l'âge
+//   et du niveau de diplôme déjà obtenu
+// - Les pourcentages s'appliquent à un salaire 35h. CYIM travaillant en 39h,
+//   on calcule un équivalent 39h en multipliant par (h35+4×1.25)/h35 = 173.33/151.67
+
+let altType = "apprentissage";
+
+// ------------------------------------------------------------
+// GRILLE APPRENTISSAGE SYNTEC (Avenant 2024, source OPCO Atlas)
+// Structure : altGrilleAppSyntec[année][tranche-âge][niveau-tranche]
+// Pour 26+ ans, c'est toujours 100% (SMIC ou SMC).
+// Pour les 18-25 ans, il y a 3 sous-niveaux SYNTEC : (3-4), (5-6), (7-8).
+// ------------------------------------------------------------
+const altGrilleAppSyntec = {
+  1: { // 1ère année
+    "<18":     { default: 33 },
+    "18-20":   { "3-4": 43, "5-6": 43, "7-8": 48 },
+    "21-25":   { "3-4": 53, "5-6": 55, "7-8": 65 },
+    ">=26":    { default: 100 }
+  },
+  2: { // 2ème année
+    "<18":     { default: 43 },
+    "18-20":   { "3-4": 51, "5-6": 53, "7-8": 58 },
+    "21-25":   { "3-4": 61, "5-6": 65, "7-8": 75 },
+    ">=26":    { default: 100 }
+  },
+  3: { // 3ème année
+    "<18":     { default: 58 },
+    "18-20":   { "3-4": 67, "5-6": 68, "7-8": 70 },
+    "21-25":   { "3-4": 78, "5-6": 80, "7-8": 80 },
+    ">=26":    { default: 100 }
+  }
+};
+
+// ------------------------------------------------------------
+// GRILLE PROFESSIONNALISATION (Code du travail)
+// % du SMIC selon âge et niveau de diplôme déjà détenu (lt-bac ou gte-bac).
+// ------------------------------------------------------------
+const altGrilleProf = {
+  "<21":    { "lt-bac": 55,  "gte-bac": 65 },
+  "21-25":  { "lt-bac": 70,  "gte-bac": 80 },
+  ">=26":   { "lt-bac": 100, "gte-bac": 100 }
+};
+
+function altAgeTranche(age, isApp) {
+  if (isApp) {
+    if (age < 18) return "<18";
+    if (age <= 20) return "18-20";
+    if (age <= 25) return "21-25";
+    return ">=26";
+  } else {
+    if (age < 21) return "<21";
+    if (age <= 25) return "21-25";
+    return ">=26";
+  }
+}
+
+function altNiveauTranche(niveau) {
+  // niveau 3 ou 4 → tranche "3-4"
+  // niveau 5 ou 6 → tranche "5-6"
+  // niveau 7 ou 8 → tranche "7-8"
+  const n = parseInt(niveau);
+  if (n <= 4) return "3-4";
+  if (n <= 6) return "5-6";
+  return "7-8";
+}
+
+// ------------------------------------------------------------
+// CALCUL DU POURCENTAGE APPLICABLE
+// Retourne { pct: number, note: string, base: "SMIC"|"SMC" }
+// ------------------------------------------------------------
+function altComputePct() {
+  const age = parseInt(document.getElementById("alt-age").value) || 21;
+  const niveau = parseInt(document.getElementById("alt-niveau").value) || 6;
+  const annee = parseInt(document.getElementById("alt-annee").value) || 1;
+  const rqth = document.getElementById("alt-rqth").checked;
+  const succession = altType === "apprentissage" && document.getElementById("alt-succession").checked;
+  const majoration15 = altType === "apprentissage" && document.getElementById("alt-majoration15").checked;
+  const licencepro = altType === "apprentissage" && document.getElementById("alt-licencepro").checked;
+  const niveauDeja = document.getElementById("alt-niveau-deja").value;
+
+  let pct = 0;
+  let note = "";
+  let base = "SMIC";
+
+  if (altType === "apprentissage") {
+    // Licence pro 1 an → rémunération 2ème année
+    const anneeEffective = licencepro ? 2 : annee;
+    const tranche = altAgeTranche(age, true);
+    const niveauT = altNiveauTranche(niveau);
+    const grilleAnnee = altGrilleAppSyntec[anneeEffective] || altGrilleAppSyntec[1];
+    const grilleTranche = grilleAnnee[tranche] || {};
+    pct = grilleTranche.default !== undefined ? grilleTranche.default : (grilleTranche[niveauT] || 0);
+
+    // Majoration succession : minimum = dernière année du précédent contrat
+    // (on prend la valeur de l'année suivante de la même tranche)
+    if (succession && anneeEffective > 1) {
+      note += "Succession de contrats : rémunération ≥ dernière année du précédent. ";
+    }
+
+    // Majoration +15 points (contrat ≤1 an, même niveau, qualification liée)
+    if (majoration15) {
+      pct += 15;
+      note += "Majoration de +15 points appliquée (contrat ≤ 1 an, diplôme de même niveau, qualification liée). ";
+    }
+
+    // Pour les 21+, SMC peut être plus favorable (à apprécier au cas par cas)
+    if (tranche === "21-25" || tranche === ">=26") {
+      base = "SMIC ou SMC (le plus favorable)";
+    }
+
+    if (licencepro) {
+      note += "Licence pro en 1 an : rémunération équivalente à une 2ème année (art. D6222-32). ";
+    }
+  } else {
+    // Professionnalisation
+    const tranche = altAgeTranche(age, false);
+    const niveauTr = niveauDeja || "gte-bac";
+    pct = altGrilleProf[tranche][niveauTr];
+    if (tranche === ">=26") {
+      note += "26 ans et plus : salaire = SMIC mensuel (ou 85% du SMC si supérieur). ";
+      base = "SMIC (ou 85% SMC)";
+    }
+  }
+
+  // RQTH : pas de majoration directe sur le salaire,
+  // mais l'aide à l'embauche est portée à 6 000 € au lieu de 5 000 €
+  if (rqth) {
+    note += "Travailleur handicapé (RQTH) : pas de majoration sur le salaire, mais aide employeur portée à 6 000 €. ";
+  }
+
+  return { pct, note, base, age };
+}
+
+function altSetType(type) {
+  altType = type;
+  document.querySelectorAll(".alt-type-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.type === type);
+  });
+  // Champs visibles selon le type
+  document.getElementById("alt-annee-field").style.display = (type === "apprentissage") ? "block" : "none";
+  document.getElementById("alt-niveau-deja-field").style.display = (type === "professionnalisation") ? "block" : "none";
+  document.getElementById("alt-succession-field").style.display = (type === "apprentissage") ? "block" : "none";
+  document.getElementById("alt-majoration15-field").style.display = (type === "apprentissage") ? "block" : "none";
+  document.getElementById("alt-licencepro-field").style.display = (type === "apprentissage") ? "block" : "none";
+  altUpdate();
+}
+
+function altUpdate() {
+  const result = altComputePct();
+  const pct = result.pct;
+
+  // Base : SMIC mensuel 35h
+  const smicMens = state.smic_mensuel;
+  const salMens35 = smicMens * pct / 100;
+  const salAn35 = salMens35 * 12;
+
+  // Conversion équivalent CYIM 39h : multiplier par (h35 + 4×1.25) / h35
+  const h35 = state.h35, h39 = state.h39;
+  const hsParMois = h39 - h35;
+  const equivHeures = h35 + hsParMois * 1.25; // 173.33
+  const salMens39 = salMens35 * equivHeures / h35;
+  const salAn39 = salMens39 * 12;
+
+  // Affichage
+  document.getElementById("alt-pct").textContent = pct + "%";
+  document.getElementById("alt-base-label").textContent = result.base;
+  document.getElementById("alt-base-val").textContent = fmtEur(smicMens) + " /mois";
+  document.getElementById("alt-sal-mens").textContent = fmtEur(salMens35);
+  document.getElementById("alt-sal-an").textContent = fmtEur(salAn35);
+  document.getElementById("alt-sal-mens39").textContent = fmtEur(salMens39);
+  document.getElementById("alt-sal-an39").textContent = fmtEur(salAn39);
+
+  // Note explicative
+  const formulaNote = document.getElementById("alt-formula-note");
+  const age = result.age;
+  let formulaContent = "";
+  if (altType === "apprentissage") {
+    const annee = document.getElementById("alt-annee").value;
+    const niveau = document.getElementById("alt-niveau").value;
+    const tranche = altAgeTranche(age, true);
+    formulaContent = `
+      <strong>🎓 Apprentissage — calcul appliqué :</strong><br>
+      Âge ${age} ans (tranche <strong>${tranche}</strong>) · Année <strong>${annee}</strong> · Niveau <strong>${niveau}</strong> · Grille SYNTEC (avenant 2024)<br>
+      <code>Salaire mensuel 35h = ${pct}% × SMIC mensuel = ${pct}% × ${fmtEur(smicMens)}</code>
+    `;
+  } else {
+    const tranche = altAgeTranche(age, false);
+    const niv = document.getElementById("alt-niveau-deja").value;
+    formulaContent = `
+      <strong>🎓 Professionnalisation — calcul appliqué :</strong><br>
+      Âge ${age} ans (tranche <strong>${tranche}</strong>) · Diplôme déjà obtenu : <strong>${niv === "gte-bac" ? "≥ Bac" : "< Bac"}</strong> · Barème Code du travail<br>
+      <code>Salaire mensuel 35h = ${pct}% × SMIC mensuel = ${pct}% × ${fmtEur(smicMens)}</code>
+    `;
+  }
+  if (result.note) {
+    formulaContent += `<br><span style="font-size:11.5px;">${result.note}</span>`;
+  }
+  formulaNote.innerHTML = formulaContent;
+
+  // Vérification SMIC : pour les 26+ et apprentis 100%, ne doit pas descendre sous le SMIC
+  const warning = document.getElementById("alt-warning");
+  if (altType === "professionnalisation" && altAgeTranche(age, false) === ">=26") {
+    warning.style.display = "block";
+    warning.innerHTML = `<strong>⚠ Rappel :</strong> à partir de 26 ans en contrat de professionnalisation, le salaire ne peut être inférieur au SMIC (ou à 85% du SMC si supérieur). À adapter selon la convention SYNTEC applicable.`;
+  } else {
+    warning.style.display = "none";
+  }
+
+  // Coût employeur
+  altUpdateCost(salMens35);
+  // Aides
+  altUpdateAides();
+  // Grille de référence
+  altRenderGrille();
+}
+
+function altUpdateCost(salMens) {
+  // CYIM = entreprise < 250 salariés.
+  // Charges patronales — estimation simplifiée :
+  // - Apprentissage : fraction ≤ 79% SMIC quasi exonérée (sauf AT/MP ~0,55%).
+  //   Au-delà : ~22% (régime général avec réduction générale).
+  // - Professionnalisation : ~22% (régime général réduit).
+  let chargesPct = 0;
+  const smicMens = state.smic_mensuel;
+  const seuil79 = 0.79 * smicMens;
+  if (altType === "apprentissage") {
+    if (salMens <= seuil79) {
+      chargesPct = 0.55; // AT/MP minimal
+    } else {
+      const sup = salMens - seuil79;
+      // ~0.55% sur la fraction ≤79% + ~22% au-delà
+      chargesPct = (seuil79 * 0.0055 + sup * 0.22) / salMens * 100;
+    }
+  } else {
+    chargesPct = 22;
+  }
+  const charges = salMens * chargesPct / 100;
+  const total = salMens + charges;
+
+  document.getElementById("alt-cout-brut").textContent = fmtEur(salMens);
+  document.getElementById("alt-cout-charges").textContent = fmtEur(charges) + " (≈ " + chargesPct.toFixed(1) + "%)";
+  document.getElementById("alt-cout-total").textContent = fmtEur(total);
+  document.getElementById("alt-cout-annuel").textContent = fmtEur(total * 12);
+}
+
+function altUpdateAides() {
+  const niveau = parseInt(document.getElementById("alt-niveau").value);
+  const rqth = document.getElementById("alt-rqth").checked;
+  const isApp = altType === "apprentissage";
+  const container = document.getElementById("alt-aides-list");
+
+  // CYIM = entreprise < 250 salariés
+  const aides = [];
+
+  if (isApp) {
+    // Aide unique 2026 : 5 000 € (ou 6 000 € si RQTH) pour les entreprises < 250 salariés.
+    // Niveau ≤ 7 (jusqu'à Bac+5) éligible.
+    const eligible = niveau <= 7;
+    const montant = rqth ? 6000 : 5000;
+    aides.push({
+      eligible,
+      titre: "Aide unique à l'embauche d'apprentis",
+      montant: eligible ? `${montant} €` : "Non éligible",
+      desc: eligible
+        ? `Versée la 1ère année par l'ASP (mensualisée). Conditions : entreprise < 250 salariés (✓ CYIM), niveau jusqu'à Bac+5 (✓ niveau ${niveau}).${rqth ? " Majoration RQTH : +1 000 €." : ""} Référence : Décret n° 2025-1031 du 31/10/2025.`
+        : `Réservée aux contrats préparant un diplôme ≤ niveau 7. Le niveau ${niveau} n'est pas éligible.`
+    });
+
+    // Aide exceptionnelle 2026 — Décret 6 mars 2026
+    aides.push({
+      eligible: true,
+      titre: "Aide exceptionnelle 2026 (cumul exclusif avec l'aide unique)",
+      montant: rqth ? "6 000 €" : "Variable selon niveau",
+      desc: `Pour les contrats conclus entre 8/03/2026 et 31/12/2026 démarrant avant le 1/01/2027. Montant pour CYIM (< 250 salariés) : 5 000 € jusqu'au niveau 4, 4 500 € niveau 5, 2 000 € au-delà. Référence : Décret n° 2026-168 du 06/03/2026. ⚠ Non cumulable avec l'aide unique — c'est l'une OU l'autre.`
+    });
+
+    // Participation forfaitaire : 750 € à payer pour les niveaux 6 et 7
+    if (niveau >= 6 && niveau <= 7) {
+      aides.push({
+        eligible: true,
+        titre: "Participation forfaitaire à verser (à déduire)",
+        montant: "− 750 €",
+        desc: `Pour les contrats conclus à partir du 01/07/2025 visant un diplôme de niveau 6 ou 7 (Bac+3 à Bac+5), l'employeur doit s'acquitter d'une participation forfaitaire de 750 € à la formation. Référence : Art. L6332-14-1 Code du travail.`
+      });
+    }
+  } else {
+    // Pro : aide entre 2 000 et 4 000 € selon public
+    aides.push({
+      eligible: true,
+      titre: "Aide à l'embauche en contrat de professionnalisation",
+      montant: "2 000 à 4 000 €",
+      desc: `Variable selon le public bénéficiaire (demandeur d'emploi de 26 ans et plus, RQTH, jeune en accompagnement, etc.). Vérifier les conditions sur urssaf.fr.`
+    });
+  }
+
+  // Aides AGEFIPH si RQTH (dans les deux cas)
+  if (rqth) {
+    aides.push({
+      eligible: true,
+      titre: "Aides AGEFIPH (RQTH)",
+      montant: "Jusqu'à 3 000 €",
+      desc: `Aides au maintien et à l'embauche d'un alternant en situation de handicap : prime à l'embauche d'apprenti (3 000 €), aides à l'adaptation du poste, accompagnement. À solliciter auprès de l'AGEFIPH (agefiph.fr).`
+    });
+  }
+
+  // Exonération de cotisations apprenti
+  if (isApp) {
+    aides.push({
+      eligible: true,
+      titre: "Exonération de charges sociales (apprenti)",
+      montant: "Variable",
+      desc: `Exonération totale sur la fraction de salaire ≤ 79% SMIC. Au-delà, application du régime général avec réduction générale des cotisations. Référence : Art. L6243-2 Code du travail.`
+    });
+  }
+
+  container.innerHTML = aides.map(a => `
+    <div class="alt-aide-card ${a.eligible ? 'eligible' : 'non-eligible'}">
+      <h4>
+        <span class="alt-aide-status">${a.eligible ? 'Éligible' : 'Non éligible'}</span>
+        ${a.titre}
+        <span class="alt-aide-mt">${a.montant}</span>
+      </h4>
+      <div class="alt-aide-desc">${a.desc}</div>
+    </div>
+  `).join("");
+}
+
+function altBindInputs() {
+  const ids = ["alt-nom","alt-age","alt-date-debut","alt-niveau","alt-annee","alt-niveau-deja","alt-formation",
+               "alt-rqth","alt-succession","alt-majoration15","alt-licencepro"];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.dataset.altBound !== "1") {
+      el.addEventListener("input", altUpdate);
+      el.addEventListener("change", altUpdate);
+      el.dataset.altBound = "1";
+    }
+  });
+}
+
+// =============================================================
+// AFFICHAGE DE LA GRILLE DE RÉMUNÉRATION
+// =============================================================
+function altRenderGrille() {
+  const container = document.getElementById("alt-grille-display");
+  if (!container) return;
+
+  const age = parseInt(document.getElementById("alt-age").value) || 21;
+  const niveau = parseInt(document.getElementById("alt-niveau").value) || 6;
+  const annee = parseInt(document.getElementById("alt-annee").value) || 1;
+  const niveauDeja = document.getElementById("alt-niveau-deja").value;
+  const licencepro = altType === "apprentissage" && document.getElementById("alt-licencepro").checked;
+
+  const trancheAge = altAgeTranche(age, altType === "apprentissage");
+  const trancheNiv = altNiveauTranche(niveau);
+  const anneeEffective = licencepro ? 2 : annee;
+
+  if (altType === "apprentissage") {
+    // Grille SYNTEC apprentissage (avenant 2024)
+    const lignes = [
+      { age: "<18", label: "Avant 18 ans", row1: 33, row2: 43, row3: 58 },
+      { age: "18-20", label: "18 à 20 ans (niv. 3-4 / 5-6 / 7-8)", row1: "43 / 43 / 48", row2: "51 / 53 / 58", row3: "67 / 68 / 70" },
+      { age: "21-25", label: "21 à 25 ans (niv. 3-4 / 5-6 / 7-8)", row1: "53 / 55 / 65", row2: "61 / 65 / 75", row3: "78 / 80 / 80" },
+      { age: ">=26", label: "26 ans et plus", row1: 100, row2: 100, row3: 100 }
+    ];
+
+    let rowsHtml = "";
+    lignes.forEach(l => {
+      const isHighlight = l.age === trancheAge;
+      const a1Match = isHighlight && anneeEffective === 1;
+      const a2Match = isHighlight && anneeEffective === 2;
+      const a3Match = isHighlight && anneeEffective === 3;
+      rowsHtml += `
+        <tr ${isHighlight ? 'style="background:#FEF3C7;"' : ''}>
+          <td><strong>${l.label}</strong></td>
+          <td class="num" ${a1Match ? 'style="background:#10B981; color:white; font-weight:800;"' : ''}>${l.row1} %</td>
+          <td class="num" ${a2Match ? 'style="background:#10B981; color:white; font-weight:800;"' : ''}>${l.row2} %</td>
+          <td class="num" ${a3Match ? 'style="background:#10B981; color:white; font-weight:800;"' : ''}>${l.row3} %</td>
+        </tr>
+      `;
+    });
+
+    container.innerHTML = `
+      <table class="alt-grille-table">
+        <thead>
+          <tr>
+            <th>Âge au début du contrat</th>
+            <th class="num">1ère année</th>
+            <th class="num">2ème année</th>
+            <th class="num">3ème année</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+      <div style="font-size:11.5px; color: var(--text-soft); margin-top:10px; font-style: italic;">
+        Pourcentages exprimés en % du SMIC mensuel applicable.
+        Pour les 21 ans et plus, le SMC (salaire minimum conventionnel SYNTEC lié à la classification visée) peut être plus favorable et doit être retenu.
+        Grille issue de l'avenant SYNTEC 2024 (OPCO Atlas, branche Bureaux d'études).
+        ${licencepro ? "<br>Licence pro en 1 an : rémunération équivalente à une 2ème année." : ""}
+      </div>
+    `;
+  } else {
+    // Grille professionnalisation
+    const lignes = [
+      { age: "<21", label: "Moins de 21 ans", ltBac: 55, gteBac: 65 },
+      { age: "21-25", label: "21 à 25 ans", ltBac: 70, gteBac: 80 },
+      { age: ">=26", label: "26 ans et plus", ltBac: 100, gteBac: 100 }
+    ];
+
+    let rowsHtml = "";
+    lignes.forEach(l => {
+      const isHighlight = l.age === trancheAge;
+      const ltMatch = isHighlight && niveauDeja === "lt-bac";
+      const gteMatch = isHighlight && niveauDeja === "gte-bac";
+      rowsHtml += `
+        <tr ${isHighlight ? 'style="background:#FEF3C7;"' : ''}>
+          <td><strong>${l.label}</strong></td>
+          <td class="num" ${ltMatch ? 'style="background:#10B981; color:white; font-weight:800;"' : ''}>${l.ltBac} %</td>
+          <td class="num" ${gteMatch ? 'style="background:#10B981; color:white; font-weight:800;"' : ''}>${l.gteBac} %</td>
+        </tr>
+      `;
+    });
+
+    container.innerHTML = `
+      <table class="alt-grille-table">
+        <thead>
+          <tr>
+            <th>Âge au début du contrat</th>
+            <th class="num">Diplôme < Bac pro</th>
+            <th class="num">Diplôme ≥ Bac pro / titre équivalent</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+      <div style="font-size:11.5px; color: var(--text-soft); margin-top:10px; font-style: italic;">
+        Pourcentages exprimés en % du SMIC mensuel.
+        À partir de 26 ans, le salaire ne peut être inférieur au SMIC ou à 85 % du salaire minimum conventionnel (SMC) si plus favorable.
+        Source : articles D6325-14 et suivants du Code du travail.
+      </div>
+    `;
+  }
+}
+
+function setupAlternants() {
+  altBindInputs();
+  altUpdate();
+}
+
+// =============================================================
+// IMPRESSION SYNTHÈSE ALTERNANTS
+// =============================================================
+function openAltPrintModal() {
+  const content = buildAltPrintContent();
+  document.getElementById("print-content").innerHTML = content;
+  document.getElementById("print-modal").classList.add("visible");
+}
+
+function buildAltPrintContent() {
+  const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+  const nom = document.getElementById("alt-nom").value || "—";
+  const age = document.getElementById("alt-age").value;
+  const dateDebut = document.getElementById("alt-date-debut").value;
+  const dateDebutFmt = dateDebut
+    ? new Date(dateDebut + "T00:00:00").toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" })
+    : "—";
+  const formation = document.getElementById("alt-formation").value || "—";
+  const niveau = document.getElementById("alt-niveau").value;
+  const annee = document.getElementById("alt-annee").value;
+  const rqth = document.getElementById("alt-rqth").checked;
+
+  const result = altComputePct();
+  const smicMens = state.smic_mensuel;
+  const salMens35 = smicMens * result.pct / 100;
+  const salMens39 = salMens35 * (state.h35 + (state.h39-state.h35)*1.25) / state.h35;
+
+  const typeLabel = altType === "apprentissage" ? "Contrat d'apprentissage" : "Contrat de professionnalisation";
+
+  // Coût employeur (récup depuis l'écran)
+  const coutTotal = document.getElementById("alt-cout-total").textContent;
+  const coutBrut = document.getElementById("alt-cout-brut").textContent;
+  const coutCharges = document.getElementById("alt-cout-charges").textContent;
+  const coutAnnuel = document.getElementById("alt-cout-annuel").textContent;
+
+  // Aides (récup du HTML déjà généré, simplifié)
+  const aides = document.querySelectorAll(".alt-aide-card.eligible");
+  let aidesList = "";
+  aides.forEach(a => {
+    const titre = a.querySelector("h4").childNodes[2]?.textContent.trim() || "";
+    const mt = a.querySelector(".alt-aide-mt").textContent;
+    aidesList += `<div class="ps-row"><span class="ps-label">${titre}</span><span class="ps-val">${mt}</span></div>`;
+  });
+
+  return `
+    <div class="ps-header">
+      <div>
+        <h1>Synthèse — Alternant</h1>
+        <div class="ps-subtitle">${typeLabel}</div>
+      </div>
+      <div class="ps-meta">
+        <strong>CYIM</strong><br>
+        Édité le ${today}
+      </div>
+    </div>
+
+    <h3 class="ps-section">Alternant</h3>
+    <div class="ps-block">
+      <div class="ps-row"><span class="ps-label">Nom</span><span class="ps-val">${nom}</span></div>
+      <div class="ps-row"><span class="ps-label">Date de début du contrat</span><span class="ps-val">${dateDebutFmt}</span></div>
+      <div class="ps-row"><span class="ps-label">Âge au début du contrat</span><span class="ps-val">${age} ans</span></div>
+      <div class="ps-row"><span class="ps-label">Formation préparée</span><span class="ps-val">${formation}</span></div>
+      <div class="ps-row"><span class="ps-label">Niveau de diplôme préparé</span><span class="ps-val">Niveau ${niveau}</span></div>
+      ${altType === "apprentissage" ? `<div class="ps-row"><span class="ps-label">Année d'exécution</span><span class="ps-val">${annee}</span></div>` : ""}
+      ${rqth ? `<div class="ps-row"><span class="ps-label">Statut</span><span class="ps-val">RQTH</span></div>` : ""}
+    </div>
+
+    <h3 class="ps-section">Salaire brut</h3>
+    <div class="ps-block">
+      <div class="ps-row"><span class="ps-label">% applicable</span><span class="ps-val">${result.pct} % du ${result.base}</span></div>
+      <div class="ps-row ps-highlight"><span class="ps-label">Salaire brut mensuel (35h)</span><span class="ps-val">${fmtEur(salMens35)}</span></div>
+      <div class="ps-row ps-highlight"><span class="ps-label">Équivalent mensuel 39h CYIM (HS 25% incluses)</span><span class="ps-val">${fmtEur(salMens39)}</span></div>
+      <div class="ps-row"><span class="ps-label">Salaire brut annuel 35h</span><span class="ps-val">${fmtEur(salMens35*12)}</span></div>
+    </div>
+    ${result.note ? `<div class="ps-block" style="margin-top:6px; font-size:9pt; color: #6B7280;">${result.note}</div>` : ""}
+
+    <h3 class="ps-section">Avantages CYIM applicables</h3>
+    <div class="ps-block">
+      <div class="ps-row"><span class="ps-label">Transport en commun</span><span class="ps-val">Prise en charge 50 % de l'abonnement</span></div>
+      <div class="ps-row"><span class="ps-label">IK vélo (domicile-travail)</span><span class="ps-val">0,25 €/km · plafond 400 €/an</span></div>
+      <div class="ps-row"><span class="ps-label">Titres-restaurant</span><span class="ps-val">Valeur 7,50 € · 60 % employeur</span></div>
+      ${altType === "apprentissage" ? `<div class="ps-row"><span class="ps-label">Jours de révision examens (apprentissage)</span><span class="ps-val">5 jours ouvrables rémunérés</span></div>` : ""}
+    </div>
+
+    <h3 class="ps-section">Coût salarial employeur / mois</h3>
+    <div class="ps-block">
+      <div class="ps-row"><span class="ps-label">Salaire brut</span><span class="ps-val">${coutBrut}</span></div>
+      <div class="ps-row"><span class="ps-label">Charges patronales (estimation)</span><span class="ps-val">${coutCharges}</span></div>
+      <div class="ps-row ps-highlight"><span class="ps-label">Coût salarial mensuel</span><span class="ps-val">${coutTotal}</span></div>
+      <div class="ps-row"><span class="ps-label">Coût salarial annuel estimé</span><span class="ps-val">${coutAnnuel}</span></div>
+    </div>
+    <div class="ps-block" style="font-size:9pt; color:#6B7280; margin-top:4px;">
+      Ne sont pas inclus dans cette estimation : transport, IK vélo, part employeur des TR (variables selon situation).
+    </div>
+
+    <h3 class="ps-section">Aides à l'embauche éligibles (2026)</h3>
+    <div class="ps-block">
+      ${aidesList || '<div class="ps-row"><span class="ps-label">Aucune aide identifiée</span><span class="ps-val">—</span></div>'}
+    </div>
+
+    <div class="ps-footer">
+      <em>Tous les montants sont exprimés en salaire brut.</em><br>
+      Simulateur Alternants CYIM — Convention SYNTEC IDCC 1486 · Accord d'entreprise du 01/08/2023<br>
+      Estimations indicatives — confirmation à effectuer auprès de l'URSSAF, l'OPCO Atlas et l'AGEFIPH selon le cas.<br>
+      Sources : service-public.gouv.fr (F2918), OPCO Atlas (grille SYNTEC 2026), décrets 2025-1031 et 2026-168, Code du travail.
+    </div>
+  `;
+}
 
 // =============================================================
 // CALCULS PLANCHERS
@@ -2286,7 +4106,7 @@ function renderGrilles() {
 // =============================================================
 function computeAll() {
   const position = document.getElementById("emp-position").value;
-  const salaryAct = parseFloat(document.getElementById("emp-salary").value) || 0;
+  const salaryAct = parseMoney(document.getElementById("emp-salary").value) || 0;
   const plancher = getPlancherFor(position);
   const plancherAn = plancher ? plancher.plancherMensuel * 12 : null;
   const seuilCYIMAn = plancher ? plancher.seuilCYIMMensuel * 12 : null;
@@ -2305,12 +4125,23 @@ function computeAll() {
       el.textContent = "Aucune position compatible (salaire sous le minima)";
     }
   };
-  const applyMens39 = (rowId, valId, newSalAnnual) => {
+  // Affiche le nouveau mensuel.
+  // ETAM CYIM = salaire annuel 39h (HS 25% incluses) → mention "base 39h, HS incluses".
+  // Cadre forfait jours = pas de référence horaire → mention plus neutre.
+  const applyMensuel = (rowId, valId, labelId, newSalAnnual) => {
     const row = document.getElementById(rowId);
     const valEl = document.getElementById(valId);
-    if (isETAM && newSalAnnual > 0) {
+    const labelEl = labelId ? document.getElementById(labelId) : null;
+    if (newSalAnnual > 0) {
       row.style.display = "flex";
-      valEl.textContent = fmtEur(newSalAnnual / 12 * ratio39);
+      valEl.textContent = fmtEur(newSalAnnual / 12);
+      if (labelEl) {
+        if (isETAM) {
+          labelEl.innerHTML = 'Nouveau mensuel <span class="hint">— ETAM, base 39h CYIM, HS 25% incluses</span>';
+        } else {
+          labelEl.innerHTML = 'Nouveau mensuel <span class="hint">— cadre forfait jours</span>';
+        }
+      }
     } else {
       row.style.display = "none";
     }
@@ -2326,7 +4157,7 @@ function computeAll() {
   document.getElementById("s1-pct").textContent = fmtPct(s1Pct);
   setVerdictLine("s1", "syntec", s1New, plancherAn);
   setVerdictLine("s1", "cyim",   s1New, seuilCYIMAn);
-  applyMens39("s1-mens39-row", "s1-mens39", s1New);
+  applyMensuel("s1-mens39-row", "s1-mens39", "s1-mens39-label", s1New);
   applySuggestion("s1-suggest", s1New);
 
   // Scénario 2
@@ -2338,7 +4169,7 @@ function computeAll() {
   document.getElementById("s2-aug-mens").textContent = fmtEurSigned(s2Aug / 12);
   setVerdictLine("s2", "syntec", s2New, plancherAn);
   setVerdictLine("s2", "cyim",   s2New, seuilCYIMAn);
-  applyMens39("s2-mens39-row", "s2-mens39", s2New);
+  applyMensuel("s2-mens39-row", "s2-mens39", "s2-mens39-label", s2New);
   applySuggestion("s2-suggest", s2New);
 
   const tbody = document.querySelector("#s2-sensitivity tbody");
@@ -2377,23 +4208,11 @@ function computeAll() {
   document.getElementById("s3-pct").textContent = fmtPct(s3Pct);
   setVerdictLine("s3", "syntec", s3New, plancherAn);
   setVerdictLine("s3", "cyim",   s3New, seuilCYIMAn);
-  applyMens39("s3-mens39-row", "s3-mens39", s3New);
+  applyMensuel("s3-mens39-row", "s3-mens39", "s3-mens39-label", s3New);
   applySuggestion("s3-suggest", s3New);
 
-  // Scénario 4
-  const s4An = parseFloat(document.getElementById("s4-annuel").value) || 0;
-  const s4Mens = parseFloat(document.getElementById("s4-mensuel").value) || 0;
-  const s4Hor = parseFloat(document.getElementById("s4-horaire").value) || 0;
-  const h35 = state.h35, h39 = state.h39;
-  document.getElementById("s4-from-an-mens").textContent = fmtEur(s4An / 12);
-  document.getElementById("s4-from-an-tx35").textContent = fmtEur4(s4An / 12 / h35);
-  document.getElementById("s4-from-an-mens39").textContent = fmtEur(s4An / 12 * h39 / h35);
-  document.getElementById("s4-from-mens-an").textContent = fmtEur(s4Mens * 12);
-  document.getElementById("s4-from-mens-tx35").textContent = fmtEur4(s4Mens / h35);
-  document.getElementById("s4-from-mens-mens39").textContent = fmtEur(s4Mens * h39 / h35);
-  document.getElementById("s4-from-h-mens35").textContent = fmtEur(s4Hor * h35);
-  document.getElementById("s4-from-h-an").textContent = fmtEur(s4Hor * h35 * 12);
-  document.getElementById("s4-from-h-mens39").textContent = fmtEur(s4Hor * h39);
+  // Scénario 4 : géré par sa propre fonction (logique différente)
+  if (typeof computeS4 === "function") computeS4();
 
   // ===== MODE COMPACT =====
   const c1New = parseFloat(document.getElementById("c1-new").value) || 0;
@@ -2638,7 +4457,7 @@ function closePrintModal() {
 // Génère un bloc HTML imprimable pour un scénario (sans en-tête ni section salarié)
 function buildScenarioBlock(scenario) {
   // Données salarié communes
-  const salaryAct = parseFloat(document.getElementById("emp-salary").value) || 0;
+  const salaryAct = parseMoney(document.getElementById("emp-salary").value) || 0;
   const position = document.getElementById("emp-position").value;
   const plancher = getPlancherFor(position);
   const plancherAn = plancher ? plancher.plancherMensuel * 12 : null;
@@ -2685,9 +4504,14 @@ function buildScenarioBlock(scenario) {
   }
 
   let mens39Row = "";
-  if (isETAM && newSal > 0) {
-    const mens39 = newSal / 12 * ratio39;
-    mens39Row = `<div class="ps-row"><span class="ps-label">Nouveau mensuel base 39h (ETAM, hors majo HS)</span><span class="ps-val">${fmtEur(mens39)}</span></div>`;
+  if (newSal > 0) {
+    // Le mensuel se déduit toujours par annuel/12.
+    // ETAM : mention "base 39h, HS 25% incluses". Cadre : mention "forfait jours".
+    const mensuel = newSal / 12;
+    const labelExtra = isETAM
+      ? "ETAM, base 39h CYIM, HS 25% incluses"
+      : "cadre forfait jours";
+    mens39Row = `<div class="ps-row"><span class="ps-label">Nouveau mensuel <span style="color:#9CA3AF;font-weight:normal;font-size:9pt;">— ${labelExtra}</span></span><span class="ps-val">${fmtEur(mensuel)}</span></div>`;
   }
 
   const okSyntec = plancherAn !== null && newSal >= plancherAn;
@@ -2707,29 +4531,27 @@ function buildScenarioBlock(scenario) {
 
   const sugg = plancher ? suggestMinPosition(newSal, plancher.statut) : null;
   const suggText = sugg
-    ? `${sugg.label} <span style="color:#6B7280;font-weight:normal;">(minima ${fmtEur(sugg.minSyntec)}/mois en 35h)</span>`
-    : "Aucune position compatible (salaire sous le minima)";
+    ? `${sugg.label}`
+    : "Aucune (salaire sous le minima)";
 
   return `
     <div class="ps-scenario">
-      <h3 class="ps-section ps-scenario-title">${scenarioName}</h3>
-
-      <h4 class="ps-subsection">Détails de la simulation</h4>
-      <div class="ps-block">
-        ${extraRows}
-        <div class="ps-row ps-highlight"><span class="ps-label">Augmentation annuelle</span><span class="ps-val">${fmtEurSigned(augAn)}</span></div>
-        <div class="ps-row ps-highlight"><span class="ps-label">Augmentation mensuelle</span><span class="ps-val">${fmtEurSigned(augMens)}</span></div>
-        <div class="ps-row ps-highlight"><span class="ps-label">Variation salaire</span><span class="ps-val">${fmtPct(pct)}</span></div>
-        ${mens39Row}
-      </div>
-
-      <h4 class="ps-subsection">Contrôle SYNTEC & interne CYIM</h4>
-      ${syntecVerdict}
-      ${cyimVerdict}
-      <div class="ps-block" style="margin-top:8px;">
-        <div class="ps-row">
-          <span class="ps-label">Position SYNTEC minima possible</span>
-          <span class="ps-val">${suggText}</span>
+      <h3 class="ps-scenario-title">${scenarioName}</h3>
+      <div class="ps-scenario-grid">
+        <div class="ps-block">
+          ${extraRows}
+          <div class="ps-row ps-highlight"><span class="ps-label">Augmentation annuelle</span><span class="ps-val">${fmtEurSigned(augAn)}</span></div>
+          <div class="ps-row ps-highlight"><span class="ps-label">Augmentation mensuelle</span><span class="ps-val">${fmtEurSigned(augMens)}</span></div>
+          <div class="ps-row ps-highlight"><span class="ps-label">Variation salaire</span><span class="ps-val">${fmtPct(pct)}</span></div>
+          ${mens39Row}
+        </div>
+        <div class="ps-verdicts-col">
+          ${syntecVerdict}
+          ${cyimVerdict}
+          <div class="ps-row ps-suggest">
+            <span class="ps-label">Position SYNTEC minima possible</span>
+            <span class="ps-val">${suggText}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -2752,7 +4574,7 @@ function buildPrintContent(scenarios) {
   // Données salarié communes
   const name = document.getElementById("emp-name").value || "—";
   const position = document.getElementById("emp-position").value;
-  const salaryAct = parseFloat(document.getElementById("emp-salary").value) || 0;
+  const salaryAct = parseMoney(document.getElementById("emp-salary").value) || 0;
 
   // Titre adapté au nombre de scénarios
   const titleSub = usable.length === 1
@@ -2785,7 +4607,8 @@ function buildPrintContent(scenarios) {
     ${scenarioBlocks}
 
     <div class="ps-footer">
-      Simulateur d'augmentation salariale CYIM — Convention SYNTEC IDCC 1486<br>
+      <em>Tous les montants sont exprimés en salaire brut.</em><br>
+      Simulateur salarial CYIM — Convention SYNTEC IDCC 1486<br>
       Document à usage interne RH — non transmissible au salarié sans validation managériale
     </div>
   `;
@@ -2864,10 +4687,11 @@ function setupInputMirrors() {
 }
 
 function bindScenarioInputs() {
+  // Note : les champs s4-annuel/mensuel/horaire sont gérés par bindS4Inputs (logique propre)
+  // et setupMoneyInputs (formatage € / parseMoney). Pas besoin de les inscrire ici.
   const detailedInputs = ["emp-position", "emp-salary",
                           "s1-new-salary", "s2-pct",
-                          "s3-mode", "s3-montant",
-                          "s4-annuel", "s4-mensuel", "s4-horaire"];
+                          "s3-mode", "s3-montant"];
   detailedInputs.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -2976,6 +4800,9 @@ async function boot() {
   bindParamInputs();
   bindScenarioInputs();
   setupInputMirrors();
+  setupMoneyInputs();
+  setupS4();
+  setupAlternants();
   updateLegendVisibility("sim");
   applyReadOnlyMode();
 }
@@ -3011,7 +4838,10 @@ function showSourceBadge() {
   if (configSource.type === "gist") {
     const d = new Date(configSource.updatedAt);
     const dStr = d.toLocaleString("fr-FR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
-    badge.innerHTML = `<span style="color:#047857;">✓ Grille SYNTEC à jour (publiée le ${dStr})</span>`;
+    const avenantInfo = state.syntec_avenant_date
+      ? ` · Avenant SYNTEC du ${state.syntec_avenant_date}`
+      : "";
+    badge.innerHTML = `<span style="color:#047857;">✓ Grille à jour (publiée le ${dStr})${avenantInfo}</span>`;
   } else if (configSource.type === "fallback-error") {
     badge.innerHTML = `<span style="color:#B91C1C;">⚠ Impossible de joindre la source partagée — valeurs locales utilisées (${configSource.error || ""}). Contactez l'administrateur RH.</span>`;
   } else if (configSource.type === "fallback-not-configured") {
