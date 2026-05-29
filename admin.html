@@ -198,11 +198,67 @@
 
 <header>
   <h1>🔒 Administration — Grille SYNTEC CYIM</h1>
-  <div class="subtitle">Édition de la source partagée du simulateur de salaires</div>
+  <div class="subtitle">Édition de la source partagée du simulateur salarial</div>
 </header>
 
 <!-- ============================================================
-     ÉCRAN DE LOGIN — demande le token GitHub
+     ÉCRAN 1 — Définition du mot de passe (première utilisation)
+     ============================================================ -->
+<div id="setup-pwd-screen" style="display:none;">
+  <div class="card" style="max-width: 520px; margin: 80px auto;">
+    <h2>Première utilisation</h2>
+    <div class="desc">
+      Bienvenue dans l'administration. Avant d'accéder aux fonctions d'édition,
+      définissez un mot de passe local. Il vous sera demandé à chaque visite, en plus du jeton GitHub.
+    </div>
+
+    <div class="note info">
+      <strong>Pourquoi un mot de passe ici ?</strong>
+      Ce mot de passe n'est pas un mécanisme de sécurité fort
+      (il est stocké en clair dans votre navigateur). Il sert à protéger l'accès
+      contre un regard par-dessus l'épaule ou un partage informel de l'URL.
+      La vraie sécurité de la publication reste assurée par votre jeton GitHub.
+    </div>
+
+    <label for="new-pwd-input">Nouveau mot de passe (min. 4 caractères)</label>
+    <input type="password" id="new-pwd-input" autocomplete="new-password">
+
+    <label for="new-pwd-confirm" style="margin-top: 12px;">Confirmer le mot de passe</label>
+    <input type="password" id="new-pwd-confirm" autocomplete="new-password">
+
+    <div style="margin-top: 16px;">
+      <button class="btn primary" onclick="savePwd()">Définir le mot de passe</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ÉCRAN 2 — Saisie du mot de passe (visites suivantes)
+     ============================================================ -->
+<div id="pwd-screen" style="display:none;">
+  <div class="card" style="max-width: 480px; margin: 80px auto;">
+    <h2>Accès à l'administration</h2>
+    <div class="desc">
+      Saisissez votre mot de passe pour continuer.
+    </div>
+
+    <label for="pwd-input">Mot de passe</label>
+    <input type="password" id="pwd-input" autocomplete="current-password">
+
+    <div style="margin-top: 16px;">
+      <button class="btn primary" onclick="checkPwd()">Continuer</button>
+    </div>
+
+    <div style="margin-top: 24px; font-size: 12px; color: var(--text-soft);">
+      Mot de passe oublié ?
+      <a href="#" onclick="resetPwd(); return false;" style="color: var(--alert-text);">Réinitialiser</a>
+      (cela supprime le mot de passe — vous devrez en définir un nouveau)
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ÉCRAN 3 — Saisie du jeton GitHub
      ============================================================ -->
 <div id="login-screen" style="display:none;">
   <div class="card">
@@ -248,12 +304,32 @@
       <strong id="status-text">Chargement…</strong>
       <span id="status-meta" style="color: var(--text-soft); margin-left: 12px;"></span>
     </div>
-    <button class="btn outline" onclick="logout()">Déconnexion</button>
+    <div>
+      <button class="btn outline" onclick="changePwd()" title="Modifier votre mot de passe local">🔑 Changer mot de passe</button>
+      <button class="btn outline" onclick="logout()">Déconnexion</button>
+    </div>
+  </div>
+
+  <!-- SMIC -->
+  <!-- RÉFÉRENCE SYNTEC -->
+  <div class="card">
+    <h2>1. Référence SYNTEC en vigueur</h2>
+    <div class="desc">Identification de l'avenant SYNTEC dont les grilles ci-dessous sont issues. À mettre à jour à chaque nouvel avenant.</div>
+    <div class="grid-2">
+      <div>
+        <label for="syntec-avenant-date">Date d'application de l'avenant SYNTEC</label>
+        <input type="text" id="syntec-avenant-date" placeholder="JJ/MM/AAAA">
+      </div>
+      <div>
+        <label for="syntec-avenant-ref">Référence de l'avenant (optionnel)</label>
+        <input type="text" id="syntec-avenant-ref" placeholder="ex. Avenant n° 49 du 26/06/2024">
+      </div>
+    </div>
   </div>
 
   <!-- SMIC -->
   <div class="card">
-    <h2>1. SMIC en vigueur</h2>
+    <h2>2. SMIC en vigueur</h2>
     <div class="desc">À mettre à jour à chaque revalorisation officielle du SMIC.</div>
     <div class="grid-3">
       <div>
@@ -265,7 +341,7 @@
         <input type="number" id="smic-mensuel" step="0.01" data-mirror="eur">
       </div>
       <div>
-        <label for="smic-date">Date d'application</label>
+        <label for="smic-date">Date d'application du SMIC</label>
         <input type="text" id="smic-date" placeholder="JJ/MM/AAAA">
       </div>
     </div>
@@ -273,7 +349,7 @@
 
   <!-- BASES HORAIRES & MARGES -->
   <div class="card">
-    <h2>2. Bases horaires et marges internes CYIM</h2>
+    <h2>3. Bases horaires et marges internes CYIM</h2>
     <div class="desc">Ces valeurs changent rarement.</div>
     <details>
       <summary>Cliquer pour afficher / modifier</summary>
@@ -300,7 +376,7 @@
 
   <!-- GRILLE ETAM -->
   <div class="card">
-    <h2>3. Grille SYNTEC — ETAM</h2>
+    <h2>4. Grille SYNTEC — ETAM</h2>
     <div class="desc">
       Modifier la colonne <em>Min. conv. SYNTEC 35h</em> (cellules jaunes) en cas d'avenant.
       Les autres colonnes sont calculées automatiquement.
@@ -311,9 +387,11 @@
           <th class="center">Position</th>
           <th class="center">Coef.</th>
           <th class="num">Min. conv. 35h</th>
-          <th class="num">Min. 35h (MAX SMIC)</th>
+          <th class="num">Min. 35h applicable (MAX SMIC)</th>
           <th class="num col-key">Minima 39h mensuel</th>
+          <th class="num">Minima 39h annuel</th>
           <th class="num col-key">Minima CYIM mensuel</th>
+          <th class="num">Minima CYIM annuel</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -322,7 +400,7 @@
 
   <!-- GRILLE CADRES -->
   <div class="card">
-    <h2>4. Grille SYNTEC — Cadres</h2>
+    <h2>5. Grille SYNTEC — Cadres</h2>
     <div class="desc">
       Modifier la colonne <em>Min. conv. SYNTEC 35h</em> (cellules jaunes) en cas d'avenant.
     </div>
@@ -332,9 +410,11 @@
           <th class="center">Position</th>
           <th class="center">Coef.</th>
           <th class="num">Min. conv. 35h</th>
-          <th class="num">Min. 35h (MAX SMIC)</th>
-          <th class="num col-key">Forfait jours +20 %</th>
+          <th class="num">Min. 35h applicable (MAX SMIC)</th>
+          <th class="num col-key">Forfait jours mensuel +20 %</th>
+          <th class="num">Forfait jours annuel</th>
           <th class="num col-key">Minima CYIM mensuel</th>
+          <th class="num">Minima CYIM annuel</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -343,7 +423,7 @@
 
   <!-- PUBLICATION -->
   <div class="card">
-    <h2>5. Publier les modifications</h2>
+    <h2>6. Publier les modifications</h2>
     <div class="desc">
       Une fois vos modifications terminées, cliquez ci-dessous pour les publier.
       Tous les utilisateurs du simulateur verront les nouvelles valeurs à leur prochain rechargement.
@@ -362,7 +442,7 @@
 
   <!-- HISTORIQUE -->
   <div class="card">
-    <h2>6. Historique des publications</h2>
+    <h2>7. Historique des publications</h2>
     <div class="desc">Les 5 dernières révisions de la configuration partagée.</div>
     <div id="history-list">Chargement…</div>
   </div>
@@ -383,6 +463,42 @@ const TOKEN_KEY = "cyim_admin_gh_token";
 // État courant
 let currentConfig = null;
 let currentGistData = null;
+
+// Valeurs par défaut (fallback si Gist vide ou inaccessible)
+// Permettent à l'admin de démarrer même avec un Gist vide,
+// et d'effectuer la première publication.
+const DEFAULT_CONFIG = {
+  syntec_avenant_date: "01/01/2025",
+  syntec_avenant_ref: "Avenant SYNTEC en vigueur au 01/01/2025",
+  smic_horaire: 12.31,
+  smic_mensuel: 1867.02,
+  smic_date: "01/06/2026",
+  h35: 151.67,
+  h39: 169,
+  marge_etam: 10,
+  marge_cadre: 20,
+  etam: [
+    { pos: "1.1", coef: 240, min: 1815 },
+    { pos: "1.2", coef: 250, min: 1845 },
+    { pos: "2.1", coef: 275, min: 1875 },
+    { pos: "2.2", coef: 310, min: 1905 },
+    { pos: "2.3", coef: 355, min: 2045 },
+    { pos: "3.1", coef: 400, min: 2185 },
+    { pos: "3.2", coef: 450, min: 2340 },
+    { pos: "3.3", coef: 500, min: 2490 }
+  ],
+  cadres: [
+    { pos: "1.1", coef: 95,  min: 2135 },
+    { pos: "1.2", coef: 100, min: 2240 },
+    { pos: "2.1", coef: 105, min: 2315 },
+    { pos: "2.1", coef: 115, min: 2530 },
+    { pos: "2.2", coef: 130, min: 2850 },
+    { pos: "2.3", coef: 150, min: 3275 },
+    { pos: "3.1", coef: 170, min: 3650 },
+    { pos: "3.2", coef: 210, min: 4495 },
+    { pos: "3.3", coef: 270, min: 5755 }
+  ]
+};
 
 // =============================================================
 // FORMATAGE (mini-version)
@@ -426,25 +542,62 @@ function logout() {
 // =============================================================
 // CHARGEMENT / SAUVEGARDE GIST
 // =============================================================
+// Retourne { source: "gist"|"default"|"error", config: {...}, gist: {...}|null, message: "" }
 async function loadConfigFromGist() {
+  // Cas 1 : Gist non configuré dans le code
   if (!GIST_ID || GIST_ID === "f551987088180b51484f6e13c38494db") {
-    flash("Gist ID non configuré dans le code !", "error");
-    return null;
+    return {
+      source: "default",
+      config: JSON.parse(JSON.stringify(DEFAULT_CONFIG)),
+      gist: null,
+      message: "Gist non configuré. Le formulaire est pré-rempli avec les valeurs par défaut — vous pouvez modifier et publier (la publication échouera tant que GIST_ID n'est pas renseigné dans le code)."
+    };
   }
+
   const token = getToken();
   try {
     const r = await fetch(`${GIST_API_URL}?_=${Date.now()}`, {
       headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" }
     });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    if (!r.ok) {
+      throw new Error(`HTTP ${r.status} — vérifier l'ID du Gist et la validité du jeton`);
+    }
     const gist = await r.json();
     currentGistData = gist;
     const file = gist.files[GIST_FILE];
-    if (!file) throw new Error(`Fichier ${GIST_FILE} absent du Gist`);
-    return JSON.parse(file.content);
+
+    // Cas 2 : Gist trouvé mais fichier absent (Gist nouvellement créé sans contenu)
+    if (!file) {
+      return {
+        source: "default",
+        config: JSON.parse(JSON.stringify(DEFAULT_CONFIG)),
+        gist,
+        message: `Le Gist existe mais ne contient pas de fichier ${GIST_FILE}. Le formulaire est pré-rempli avec les valeurs par défaut. Publiez pour créer le fichier.`
+      };
+    }
+
+    // Cas 3 : Gist trouvé mais contenu invalide
+    let parsed;
+    try {
+      parsed = JSON.parse(file.content);
+    } catch (e) {
+      return {
+        source: "default",
+        config: JSON.parse(JSON.stringify(DEFAULT_CONFIG)),
+        gist,
+        message: `Le contenu du Gist n'est pas un JSON valide (${e.message}). Le formulaire est pré-rempli avec les valeurs par défaut.`
+      };
+    }
+
+    // Cas 4 : tout va bien
+    return { source: "gist", config: parsed, gist, message: "" };
   } catch (err) {
-    flash("Erreur chargement : " + err.message, "error");
-    return null;
+    return {
+      source: "error",
+      config: JSON.parse(JSON.stringify(DEFAULT_CONFIG)),
+      gist: null,
+      message: "Erreur de chargement : " + err.message
+    };
   }
 }
 
@@ -543,6 +696,8 @@ function validateConfig(c) {
 // FORMULAIRE
 // =============================================================
 function fillFormFromConfig(c) {
+  document.getElementById("syntec-avenant-date").value = c.syntec_avenant_date || "";
+  document.getElementById("syntec-avenant-ref").value = c.syntec_avenant_ref || "";
   document.getElementById("smic-horaire").value = c.smic_horaire;
   document.getElementById("smic-mensuel").value = c.smic_mensuel;
   document.getElementById("smic-date").value = c.smic_date || "";
@@ -557,6 +712,8 @@ function fillFormFromConfig(c) {
 
 function readFormToConfig() {
   return {
+    syntec_avenant_date: document.getElementById("syntec-avenant-date").value,
+    syntec_avenant_ref: document.getElementById("syntec-avenant-ref").value,
     smic_horaire: parseFloat(document.getElementById("smic-horaire").value) || 0,
     smic_mensuel: parseFloat(document.getElementById("smic-mensuel").value) || 0,
     smic_date: document.getElementById("smic-date").value,
@@ -587,15 +744,19 @@ function renderGrille(type, rows, smic, h35, h39, margeEtam, kind, margeCadre) {
   rows.forEach((row, idx) => {
     const minApplicable = Math.max(row.min, smic);
     const underSmic = row.min < smic;
-    let col5, col6;
+    let col5Mens, col6An, col7CYIMMens, col8CYIMAn;
     if (kind === "etam") {
-      const plancher39 = minApplicable * (h39 / h35);
-      col5 = plancher39;
-      col6 = plancher39 * (1 + margeEtam / 100);
+      const plancher39Mens = minApplicable * (h39 / h35);
+      col5Mens     = plancher39Mens;
+      col6An       = plancher39Mens * 12;
+      col7CYIMMens = plancher39Mens * (1 + margeEtam / 100);
+      col8CYIMAn   = col7CYIMMens * 12;
     } else {
-      const forfait = minApplicable * (1 + margeCadre / 100);
-      col5 = forfait;
-      col6 = forfait * (1 + margeEtam / 100);
+      const forfaitMens = minApplicable * (1 + margeCadre / 100);
+      col5Mens     = forfaitMens;
+      col6An       = forfaitMens * 12;
+      col7CYIMMens = forfaitMens * (1 + margeEtam / 100);
+      col8CYIMAn   = col7CYIMMens * 12;
     }
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -603,8 +764,10 @@ function renderGrille(type, rows, smic, h35, h39, margeEtam, kind, margeCadre) {
       <td class="center" data-field="coef">${row.coef}</td>
       <td class="num ${underSmic ? 'alert-bg' : ''}"><input type="number" data-field="min" value="${row.min}" step="0.01"></td>
       <td class="num readonly">${fmtEur(minApplicable)}</td>
-      <td class="num readonly col-key">${fmtEur(col5)}</td>
-      <td class="num readonly col-key">${fmtEur(col6)}</td>
+      <td class="num readonly col-key">${fmtEur(col5Mens)}</td>
+      <td class="num readonly">${fmtEur(col6An)}</td>
+      <td class="num readonly col-key">${fmtEur(col7CYIMMens)}</td>
+      <td class="num readonly">${fmtEur(col8CYIMAn)}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -690,11 +853,30 @@ async function loadHistory() {
 // =============================================================
 // STATUS
 // =============================================================
-function updateStatus(gist) {
-  const d = new Date(gist.updated_at);
-  const dStr = d.toLocaleString("fr-FR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
-  document.getElementById("status-text").textContent = "✓ Source partagée chargée";
-  document.getElementById("status-meta").textContent = `Dernière publication : ${dStr}`;
+function updateStatus(source, gist, message) {
+  const txt = document.getElementById("status-text");
+  const meta = document.getElementById("status-meta");
+  const line = document.querySelector(".status-line");
+  if (!txt || !meta || !line) return;
+
+  if (source === "gist" && gist) {
+    const d = new Date(gist.updated_at);
+    const dStr = d.toLocaleString("fr-FR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    txt.textContent = "✓ Source partagée chargée";
+    meta.textContent = `Dernière publication : ${dStr}`;
+    line.style.background = "#ECFDF5";
+    line.style.borderLeft = "3px solid #6EE7B7";
+  } else if (source === "default") {
+    txt.textContent = "⚠ Valeurs par défaut affichées";
+    meta.textContent = message || "";
+    line.style.background = "#FEF3C7";
+    line.style.borderLeft = "3px solid #FCD34D";
+  } else {
+    txt.textContent = "✗ Erreur de chargement";
+    meta.textContent = message || "";
+    line.style.background = "#FEE2E2";
+    line.style.borderLeft = "3px solid #FCA5A5";
+  }
 }
 
 // =============================================================
@@ -713,30 +895,164 @@ function flash(msg, type) {
 // BOOT
 // =============================================================
 async function loadAdmin() {
-  const config = await loadConfigFromGist();
-  if (!config) return;
-  currentConfig = config;
-  fillFormFromConfig(config);
-  updateStatus(currentGistData);
-  await loadHistory();
+  // Affichage temporaire
+  document.getElementById("status-text").textContent = "Chargement…";
+  document.getElementById("status-meta").textContent = "";
+
+  const result = await loadConfigFromGist();
+  currentConfig = result.config;
+  fillFormFromConfig(result.config);
+  updateStatus(result.source, result.gist, result.message);
+
+  if (result.source === "gist") {
+    await loadHistory();
+  } else {
+    document.getElementById("history-list").innerHTML =
+      "<em>Historique disponible après la première publication.</em>";
+  }
 }
 
 function showAdminScreen() {
+  document.getElementById("setup-pwd-screen").style.display = "none";
+  document.getElementById("pwd-screen").style.display = "none";
   document.getElementById("login-screen").style.display = "none";
   document.getElementById("admin-screen").style.display = "block";
   loadAdmin();
 }
 
 function showLoginScreen() {
+  document.getElementById("setup-pwd-screen").style.display = "none";
+  document.getElementById("pwd-screen").style.display = "none";
   document.getElementById("login-screen").style.display = "block";
   document.getElementById("admin-screen").style.display = "none";
 }
 
-if (getToken()) {
-  showAdminScreen();
-} else {
-  showLoginScreen();
+function showPwdScreen() {
+  document.getElementById("setup-pwd-screen").style.display = "none";
+  document.getElementById("pwd-screen").style.display = "block";
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("admin-screen").style.display = "none";
+  setTimeout(() => document.getElementById("pwd-input").focus(), 100);
 }
+
+function showSetupPwdScreen() {
+  document.getElementById("setup-pwd-screen").style.display = "block";
+  document.getElementById("pwd-screen").style.display = "none";
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("admin-screen").style.display = "none";
+  setTimeout(() => document.getElementById("new-pwd-input").focus(), 100);
+}
+
+// =============================================================
+// MOT DE PASSE COSMÉTIQUE (protection anti-curieux uniquement)
+// Stocké en clair dans le localStorage — sécurité réelle = jeton GitHub.
+// =============================================================
+const PWD_KEY = "cyim_admin_local_pwd";
+// Marqueur de session : tant que la session est ouverte, on ne redemande pas le pwd
+const PWD_SESSION_KEY = "cyim_admin_pwd_ok";
+
+function getPwd() { return localStorage.getItem(PWD_KEY); }
+function setPwd(p) { localStorage.setItem(PWD_KEY, p); }
+
+function savePwd() {
+  const p1 = document.getElementById("new-pwd-input").value;
+  const p2 = document.getElementById("new-pwd-confirm").value;
+  if (!p1 || p1.length < 4) {
+    flash("Le mot de passe doit faire au moins 4 caractères", "error");
+    return;
+  }
+  if (p1 !== p2) {
+    flash("Les deux mots de passe ne correspondent pas", "error");
+    return;
+  }
+  setPwd(p1);
+  sessionStorage.setItem(PWD_SESSION_KEY, "1");
+  flash("✓ Mot de passe défini");
+  // Passer à l'étape suivante : jeton GitHub
+  routeBoot();
+}
+
+function checkPwd() {
+  const input = document.getElementById("pwd-input").value;
+  if (input === getPwd()) {
+    sessionStorage.setItem(PWD_SESSION_KEY, "1");
+    document.getElementById("pwd-input").value = "";
+    routeBoot();
+  } else {
+    flash("Mot de passe incorrect", "error");
+    document.getElementById("pwd-input").value = "";
+    document.getElementById("pwd-input").focus();
+  }
+}
+
+function resetPwd() {
+  if (!confirm("Réinitialiser le mot de passe ? Vous devrez en définir un nouveau à la prochaine visite.")) return;
+  localStorage.removeItem(PWD_KEY);
+  sessionStorage.removeItem(PWD_SESSION_KEY);
+  flash("Mot de passe supprimé");
+  routeBoot();
+}
+
+function changePwd() {
+  const current = prompt("Mot de passe actuel :");
+  if (current === null) return;
+  if (current !== getPwd()) {
+    flash("Mot de passe actuel incorrect", "error");
+    return;
+  }
+  const newPwd = prompt("Nouveau mot de passe (min. 4 caractères) :");
+  if (newPwd === null) return;
+  if (!newPwd || newPwd.length < 4) {
+    flash("Mot de passe trop court", "error");
+    return;
+  }
+  const confirm2 = prompt("Confirmez le nouveau mot de passe :");
+  if (confirm2 !== newPwd) {
+    flash("Les mots de passe ne correspondent pas", "error");
+    return;
+  }
+  setPwd(newPwd);
+  flash("✓ Mot de passe modifié");
+}
+
+// Permet d'appuyer sur Entrée pour valider les champs mot de passe
+document.addEventListener("DOMContentLoaded", () => {
+  const bind = (id, fn) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("keydown", e => {
+      if (e.key === "Enter") fn();
+    });
+  };
+  bind("pwd-input", checkPwd);
+  bind("new-pwd-input", () => document.getElementById("new-pwd-confirm").focus());
+  bind("new-pwd-confirm", savePwd);
+  bind("token-input", loginWithToken);
+});
+
+// =============================================================
+// ROUTAGE INITIAL — décide quel écran afficher au boot
+// =============================================================
+function routeBoot() {
+  // 1. Pas de mot de passe défini → écran de définition
+  if (!getPwd()) {
+    showSetupPwdScreen();
+    return;
+  }
+  // 2. Mot de passe défini mais session pas validée → écran de saisie
+  if (sessionStorage.getItem(PWD_SESSION_KEY) !== "1") {
+    showPwdScreen();
+    return;
+  }
+  // 3. Mot de passe OK, mais pas de jeton → écran jeton
+  if (!getToken()) {
+    showLoginScreen();
+    return;
+  }
+  // 4. Tout est OK → admin
+  showAdminScreen();
+}
+
+routeBoot();
 </script>
 
 </body>
