@@ -1675,6 +1675,12 @@
               </span>
               <span class="value" id="s1-mens39">—</span>
             </div>
+            <div class="result-row" id="s1-horshs-row" style="display:none;">
+              <span class="label-side">
+                Équivalent annuel hors majoration HS <span class="hint">— base de comparaison SYNTEC / CYIM</span>
+              </span>
+              <span class="value" id="s1-horshs">—</span>
+            </div>
           </div>
         </div>
 
@@ -1738,6 +1744,12 @@
                 Nouveau mensuel <span class="hint">— ETAM, base 39h CYIM, HS 25% incluses</span>
               </span>
               <span class="value" id="s2-mens39">—</span>
+            </div>
+            <div class="result-row" id="s2-horshs-row" style="display:none;">
+              <span class="label-side">
+                Équivalent annuel hors majoration HS <span class="hint">— base de comparaison SYNTEC / CYIM</span>
+              </span>
+              <span class="value" id="s2-horshs">—</span>
             </div>
           </div>
         </div>
@@ -1835,6 +1847,12 @@
                 Nouveau mensuel <span class="hint">— ETAM, base 39h CYIM, HS 25% incluses</span>
               </span>
               <span class="value" id="s3-mens39">—</span>
+            </div>
+            <div class="result-row" id="s3-horshs-row" style="display:none;">
+              <span class="label-side">
+                Équivalent annuel hors majoration HS <span class="hint">— base de comparaison SYNTEC / CYIM</span>
+              </span>
+              <span class="value" id="s3-horshs">—</span>
             </div>
           </div>
         </div>
@@ -2126,7 +2144,7 @@
   <div class="section">
     <h2>Configuration du contrat d'alternance</h2>
     <div class="section-desc">
-      Sélectionnez les paramètres de l'alternant pour calculer son salaire brut, le coût employeur estimé et les aides applicables.
+      Sélectionnez les paramètres de l'alternant pour calculer son salaire brut et identifier les aides applicables.
       <br><strong>Sources :</strong> service-public.gouv.fr, URSSAF, OPCO Atlas (Bureaux d'études — SYNTEC), Code du travail.
     </div>
 
@@ -2251,12 +2269,11 @@
     </div>
   </div>
 
-  <!-- Carte 3 : avantages CYIM + coût employeur + aides -->
+  <!-- Carte 3 : avantages CYIM + aides -->
   <div class="section">
-    <h2>Avantages CYIM et coût employeur</h2>
+    <h2>Avantages CYIM applicables</h2>
 
-    <h3 style="margin: 0 0 10px; font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.06em;">Avantages applicables chez CYIM</h3>
-    <ul style="margin:0 0 14px; padding-left: 20px; font-size:13px; color: var(--text); line-height: 1.7;">
+    <ul style="margin:14px 0 14px; padding-left: 20px; font-size:13px; color: var(--text); line-height: 1.7;">
       <li><strong>Prise en charge transport en commun :</strong> 50 % du coût de l'abonnement souscrit par l'alternant (obligation légale — Code du travail, art. L3261-2).</li>
       <li><strong>Indemnité kilométrique vélo (IK vélo) :</strong> 0,25 €/km pour les déplacements domicile-travail à vélo, dans la limite d'un plafond annuel de 400 €.</li>
       <li><strong>Titres-restaurant :</strong> valeur faciale 7,50 €, dont 60 % pris en charge par l'employeur (soit 4,50 €/TR), pour les jours travaillés en présentiel.</li>
@@ -2265,25 +2282,6 @@
     <h3 style="margin: 20px 0 10px; font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.06em;">Particularité des jours de révision</h3>
     <div class="note info" style="font-size:12.5px;">
       Pour le contrat d'apprentissage, l'apprenti bénéficie d'un <strong>congé supplémentaire de 5 jours ouvrables</strong> pour réviser ses examens, à prendre dans le mois précédant les épreuves (article L6222-35 Code du travail). Ces jours sont <strong>rémunérés intégralement</strong> par l'employeur. Pour la professionnalisation, aucun congé révision spécifique n'est prévu par le Code du travail (sauf disposition conventionnelle).
-    </div>
-
-    <h3 style="margin: 20px 0 10px; font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.06em;">Coût employeur estimé (par mois)</h3>
-    <div class="results">
-      <div class="result-row"><span class="label-side">Salaire brut</span><span class="value" id="alt-cout-brut">—</span></div>
-      <div class="result-row"><span class="label-side">Charges patronales estimées</span><span class="value" id="alt-cout-charges">—</span></div>
-      <div class="result-row ps-highlight" style="background:#FEF3C7; padding:8px 12px; border-radius:4px; margin-top:4px;">
-        <span class="label-side"><strong>Coût salarial mensuel estimé</strong></span>
-        <span class="value" id="alt-cout-total" style="font-size:16px; color: #92400E;">—</span>
-      </div>
-      <div class="result-row"><span class="label-side">→ Coût salarial annuel estimé</span><span class="value" id="alt-cout-annuel">—</span></div>
-    </div>
-    <div class="note info" style="margin-top:12px; font-size:12px;">
-      <strong>Note méthodologique sur les charges patronales :</strong>
-      <ul style="margin: 6px 0 0; padding-left: 18px;">
-        <li><strong>Apprentissage</strong> — exonération totale des cotisations salariales et patronales (sauf AT/MP : ~0,55 % selon votre taux) sur la fraction de rémunération inférieure ou égale à 79 % du SMIC (art. L6243-2 Code du travail, art. L241-13 CSS). Au-delà de ce seuil, le régime général s'applique avec la réduction générale des cotisations.</li>
-        <li><strong>Professionnalisation</strong> — régime général de droit commun avec application de la réduction générale des cotisations (ex-réduction Fillon) jusqu'à 1,6 SMIC. Le taux effectif estimé est de l'ordre de 22 % du brut.</li>
-      </ul>
-      Le coût indiqué <strong>n'inclut pas</strong> le transport, l'IK vélo ni la part employeur des TR (qui dépendent de la situation personnelle de l'alternant). Pour un calcul précis, utilisez le simulateur officiel URSSAF.
     </div>
 
     <h3 style="margin: 20px 0 10px; font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.06em;">Aides à l'embauche en vigueur (2026)</h3>
@@ -3554,41 +3552,10 @@ function altUpdate() {
     warning.style.display = "none";
   }
 
-  // Coût employeur
-  altUpdateCost(salMens35);
   // Aides
   altUpdateAides();
   // Grille de référence
   altRenderGrille();
-}
-
-function altUpdateCost(salMens) {
-  // CYIM = entreprise < 250 salariés.
-  // Charges patronales — estimation simplifiée :
-  // - Apprentissage : fraction ≤ 79% SMIC quasi exonérée (sauf AT/MP ~0,55%).
-  //   Au-delà : ~22% (régime général avec réduction générale).
-  // - Professionnalisation : ~22% (régime général réduit).
-  let chargesPct = 0;
-  const smicMens = state.smic_mensuel;
-  const seuil79 = 0.79 * smicMens;
-  if (altType === "apprentissage") {
-    if (salMens <= seuil79) {
-      chargesPct = 0.55; // AT/MP minimal
-    } else {
-      const sup = salMens - seuil79;
-      // ~0.55% sur la fraction ≤79% + ~22% au-delà
-      chargesPct = (seuil79 * 0.0055 + sup * 0.22) / salMens * 100;
-    }
-  } else {
-    chargesPct = 22;
-  }
-  const charges = salMens * chargesPct / 100;
-  const total = salMens + charges;
-
-  document.getElementById("alt-cout-brut").textContent = fmtEur(salMens);
-  document.getElementById("alt-cout-charges").textContent = fmtEur(charges) + " (≈ " + chargesPct.toFixed(1) + "%)";
-  document.getElementById("alt-cout-total").textContent = fmtEur(total);
-  document.getElementById("alt-cout-annuel").textContent = fmtEur(total * 12);
 }
 
 function altUpdateAides() {
@@ -3823,12 +3790,6 @@ function buildAltPrintContent() {
 
   const typeLabel = altType === "apprentissage" ? "Contrat d'apprentissage" : "Contrat de professionnalisation";
 
-  // Coût employeur (récup depuis l'écran)
-  const coutTotal = document.getElementById("alt-cout-total").textContent;
-  const coutBrut = document.getElementById("alt-cout-brut").textContent;
-  const coutCharges = document.getElementById("alt-cout-charges").textContent;
-  const coutAnnuel = document.getElementById("alt-cout-annuel").textContent;
-
   // Aides (récup du HTML déjà généré, simplifié)
   const aides = document.querySelectorAll(".alt-aide-card.eligible");
   let aidesList = "";
@@ -3876,17 +3837,6 @@ function buildAltPrintContent() {
       <div class="ps-row"><span class="ps-label">IK vélo (domicile-travail)</span><span class="ps-val">0,25 €/km · plafond 400 €/an</span></div>
       <div class="ps-row"><span class="ps-label">Titres-restaurant</span><span class="ps-val">Valeur 7,50 € · 60 % employeur</span></div>
       ${altType === "apprentissage" ? `<div class="ps-row"><span class="ps-label">Jours de révision examens (apprentissage)</span><span class="ps-val">5 jours ouvrables rémunérés</span></div>` : ""}
-    </div>
-
-    <h3 class="ps-section">Coût salarial employeur / mois</h3>
-    <div class="ps-block">
-      <div class="ps-row"><span class="ps-label">Salaire brut</span><span class="ps-val">${coutBrut}</span></div>
-      <div class="ps-row"><span class="ps-label">Charges patronales (estimation)</span><span class="ps-val">${coutCharges}</span></div>
-      <div class="ps-row ps-highlight"><span class="ps-label">Coût salarial mensuel</span><span class="ps-val">${coutTotal}</span></div>
-      <div class="ps-row"><span class="ps-label">Coût salarial annuel estimé</span><span class="ps-val">${coutAnnuel}</span></div>
-    </div>
-    <div class="ps-block" style="font-size:9pt; color:#6B7280; margin-top:4px;">
-      Ne sont pas inclus dans cette estimation : transport, IK vélo, part employeur des TR (variables selon situation).
     </div>
 
     <h3 class="ps-section">Aides à l'embauche éligibles (2026)</h3>
@@ -4113,9 +4063,22 @@ function computeAll() {
   const isETAM = plancher && plancher.statut === "ETAM";
   const ratio39 = state.h39 / state.h35;
 
+  // Pour les ETAM, le salaire annuel saisi inclut les HS majorées 25%.
+  // Or les minima SYNTEC 39h et CYIM sont exprimés en équivalent 39h HORS majoration HS.
+  // Pour comparer apples to apples, on convertit le salaire saisi en équivalent hors majoration HS :
+  //   salaire_hors_HS = salaire_annuel × (heures_39h_brut / heures_39h_avec_majo_HS)
+  //                   = salaire_annuel × (169 / 173,33)
+  // Pour les cadres : pas de notion de HS → inchangé.
+  const equivH39 = state.h35 * 52/12 + (state.h39 - state.h35) * 52/12 * 1.25; // = 173.33
+  const h39Mensuel = state.h39 * 52/12; // = 169
+  const ratioHorsHS = isETAM ? (h39Mensuel / equivH39) : 1;
+  const salHorsHS = (sal) => sal * ratioHorsHS;
+  const salAcHorsHS = salHorsHS(salaryAct);
+
   const applySuggestion = (id, newSal) => {
     const statut = plancher ? plancher.statut : null;
-    const sugg = suggestMinPosition(newSal, statut);
+    // Pour la suggestion de position aussi, on utilise le salaire hors majo HS pour les ETAM
+    const sugg = suggestMinPosition(salHorsHS(newSal), statut);
     const el = document.getElementById(id);
     if (sugg) {
       el.textContent = sugg.label;
@@ -4147,6 +4110,20 @@ function computeAll() {
     }
   };
 
+  // Affiche l'équivalent annuel hors majoration HS (utilisé pour la comparaison aux minima SYNTEC/CYIM).
+  // Ne s'affiche QUE pour les ETAM (pour les cadres, ça n'a pas de sens).
+  const applyHorsHS = (rowId, valId, newSalAnnual, isETAMv, ratio) => {
+    const row = document.getElementById(rowId);
+    const valEl = document.getElementById(valId);
+    if (!row || !valEl) return;
+    if (isETAMv && newSalAnnual > 0) {
+      row.style.display = "flex";
+      valEl.textContent = fmtEur(newSalAnnual * ratio);
+    } else {
+      row.style.display = "none";
+    }
+  };
+
   // ===== MODE DÉTAILLÉ =====
   // Scénario 1
   const s1New = parseFloat(document.getElementById("s1-new-salary").value) || 0;
@@ -4155,9 +4132,11 @@ function computeAll() {
   document.getElementById("s1-aug-an").textContent = fmtEurSigned(s1Aug);
   document.getElementById("s1-aug-mens").textContent = fmtEurSigned(s1Aug / 12);
   document.getElementById("s1-pct").textContent = fmtPct(s1Pct);
-  setVerdictLine("s1", "syntec", s1New, plancherAn);
-  setVerdictLine("s1", "cyim",   s1New, seuilCYIMAn);
+  // Pour les ETAM, on compare le salaire HORS majoration HS aux minima 39h
+  setVerdictLine("s1", "syntec", salHorsHS(s1New), plancherAn);
+  setVerdictLine("s1", "cyim",   salHorsHS(s1New), seuilCYIMAn);
   applyMensuel("s1-mens39-row", "s1-mens39", "s1-mens39-label", s1New);
+  applyHorsHS("s1-horshs-row", "s1-horshs", s1New, isETAM, ratioHorsHS);
   applySuggestion("s1-suggest", s1New);
 
   // Scénario 2
@@ -4167,9 +4146,10 @@ function computeAll() {
   document.getElementById("s2-new-sal").textContent = fmtEur(s2New);
   document.getElementById("s2-aug-an").textContent = fmtEurSigned(s2Aug);
   document.getElementById("s2-aug-mens").textContent = fmtEurSigned(s2Aug / 12);
-  setVerdictLine("s2", "syntec", s2New, plancherAn);
-  setVerdictLine("s2", "cyim",   s2New, seuilCYIMAn);
+  setVerdictLine("s2", "syntec", salHorsHS(s2New), plancherAn);
+  setVerdictLine("s2", "cyim",   salHorsHS(s2New), seuilCYIMAn);
   applyMensuel("s2-mens39-row", "s2-mens39", "s2-mens39-label", s2New);
+  applyHorsHS("s2-horshs-row", "s2-horshs", s2New, isETAM, ratioHorsHS);
   applySuggestion("s2-suggest", s2New);
 
   const tbody = document.querySelector("#s2-sensitivity tbody");
@@ -4178,9 +4158,10 @@ function computeAll() {
   sensPcts.forEach(pct => {
     const newSal = salaryAct * (1 + pct);
     const augAn = salaryAct * pct;
+    const newSalHorsHS = salHorsHS(newSal);
     const tr = document.createElement("tr");
-    const okSyntec = plancherAn !== null && newSal >= plancherAn;
-    const okCyim = seuilCYIMAn !== null && newSal >= seuilCYIMAn;
+    const okSyntec = plancherAn !== null && newSalHorsHS >= plancherAn;
+    const okCyim = seuilCYIMAn !== null && newSalHorsHS >= seuilCYIMAn;
     tr.innerHTML = `
       <td class="center"><strong>${(pct*100).toLocaleString("fr-FR",{minimumFractionDigits:1,maximumFractionDigits:2})} %</strong></td>
       <td class="num">${fmtEur(newSal)}</td>
@@ -4206,9 +4187,10 @@ function computeAll() {
   document.getElementById("s3-new-sal").textContent = fmtEur(s3New);
   document.getElementById("s3-new-sal-mens").textContent = fmtEur(s3New / 12);
   document.getElementById("s3-pct").textContent = fmtPct(s3Pct);
-  setVerdictLine("s3", "syntec", s3New, plancherAn);
-  setVerdictLine("s3", "cyim",   s3New, seuilCYIMAn);
+  setVerdictLine("s3", "syntec", salHorsHS(s3New), plancherAn);
+  setVerdictLine("s3", "cyim",   salHorsHS(s3New), seuilCYIMAn);
   applyMensuel("s3-mens39-row", "s3-mens39", "s3-mens39-label", s3New);
+  applyHorsHS("s3-horshs-row", "s3-horshs", s3New, isETAM, ratioHorsHS);
   applySuggestion("s3-suggest", s3New);
 
   // Scénario 4 : géré par sa propre fonction (logique différente)
@@ -4503,6 +4485,12 @@ function buildScenarioBlock(scenario) {
     return ""; // s4 ou autre : non imprimable
   }
 
+  // Calcul du salaire hors majoration HS (pour ETAM uniquement) — base de comparaison aux minima
+  const equivH39 = state.h35 * 52/12 + (state.h39 - state.h35) * 52/12 * 1.25;
+  const h39Mensuel = state.h39 * 52/12;
+  const ratioHorsHS = isETAM ? (h39Mensuel / equivH39) : 1;
+  const newSalHorsHS = newSal * ratioHorsHS;
+
   let mens39Row = "";
   if (newSal > 0) {
     // Le mensuel se déduit toujours par annuel/12.
@@ -4512,10 +4500,14 @@ function buildScenarioBlock(scenario) {
       ? "ETAM, base 39h CYIM, HS 25% incluses"
       : "cadre forfait jours";
     mens39Row = `<div class="ps-row"><span class="ps-label">Nouveau mensuel <span style="color:#9CA3AF;font-weight:normal;font-size:9pt;">— ${labelExtra}</span></span><span class="ps-val">${fmtEur(mensuel)}</span></div>`;
+    if (isETAM) {
+      mens39Row += `<div class="ps-row"><span class="ps-label">Équivalent annuel hors majoration HS <span style="color:#9CA3AF;font-weight:normal;font-size:9pt;">— base de comparaison SYNTEC / CYIM</span></span><span class="ps-val">${fmtEur(newSalHorsHS)}</span></div>`;
+    }
   }
 
-  const okSyntec = plancherAn !== null && newSal >= plancherAn;
-  const okCyim   = seuilCYIMAn !== null && newSal >= seuilCYIMAn;
+  // Comparaisons : pour les ETAM, on utilise le salaire hors majoration HS
+  const okSyntec = plancherAn !== null && newSalHorsHS >= plancherAn;
+  const okCyim   = seuilCYIMAn !== null && newSalHorsHS >= seuilCYIMAn;
   const syntecVerdict = plancherAn === null
     ? `<div class="ps-verdict"><span>Minima SYNTEC annuel</span><span class="ps-vstatus">—</span></div>`
     : `<div class="ps-verdict ${okSyntec ? 'ok' : 'alert'}">
@@ -4529,7 +4521,7 @@ function buildScenarioBlock(scenario) {
         <span class="ps-vstatus">${okCyim ? "✓ Au-dessus du minima CYIM" : "⚠ Sous le minima interne CYIM"}</span>
        </div>`;
 
-  const sugg = plancher ? suggestMinPosition(newSal, plancher.statut) : null;
+  const sugg = plancher ? suggestMinPosition(newSalHorsHS, plancher.statut) : null;
   const suggText = sugg
     ? `${sugg.label}`
     : "Aucune (salaire sous le minima)";
@@ -4841,7 +4833,10 @@ function showSourceBadge() {
     const avenantInfo = state.syntec_avenant_date
       ? ` · Avenant SYNTEC du ${state.syntec_avenant_date}`
       : "";
-    badge.innerHTML = `<span style="color:#047857;">✓ Grille à jour (publiée le ${dStr})${avenantInfo}</span>`;
+    const smicInfo = state.smic_date
+      ? ` · SMIC en vigueur au ${state.smic_date}`
+      : "";
+    badge.innerHTML = `<span style="color:#047857;">✓ Grille à jour (publiée le ${dStr})${avenantInfo}${smicInfo}</span>`;
   } else if (configSource.type === "fallback-error") {
     badge.innerHTML = `<span style="color:#B91C1C;">⚠ Impossible de joindre la source partagée — valeurs locales utilisées (${configSource.error || ""}). Contactez l'administrateur RH.</span>`;
   } else if (configSource.type === "fallback-not-configured") {
