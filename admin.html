@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Administration — Grille SYNTEC CYIM</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root {
     --navy: #1E4E66;
@@ -65,6 +66,8 @@
     color: var(--navy);
   }
   .card .desc { color: var(--text-soft); font-size: 13px; margin-bottom: 16px; }
+  .grille-import-ok { background:#ECFDF5; border:1px solid #6EE7B7; color:#047857; padding:10px 14px; border-radius:6px; font-size:13px; }
+  .grille-import-err { background:#FEE2E2; border:1px solid #FCA5A5; color:#B91C1C; padding:10px 14px; border-radius:6px; font-size:13px; }
   .card h3 {
     margin: 20px 0 10px;
     font-size: 12px;
@@ -308,6 +311,30 @@
       <button class="btn outline" onclick="changePwd()" title="Modifier votre mot de passe local">🔑 Changer mot de passe</button>
       <button class="btn outline" onclick="logout()">Déconnexion</button>
     </div>
+  </div>
+
+  <!-- IMPORT OPCO ATLAS -->
+  <div class="card" style="border:2px solid var(--mint);">
+    <h2>0. Import des grilles OPCO Atlas (Bureaux d'études)</h2>
+    <div class="desc">
+      Importez les fichiers Excel officiels de l'OPCO Atlas pour pré-remplir automatiquement les champs ci-dessous.
+      Les valeurs extraites sont affichées pour <strong>relecture</strong> avant publication : rien n'est publié tant que vous n'avez pas cliqué sur « Publier » (section 6).
+      <br>Fichiers attendus (rubrique « Bureaux d'études ») :
+      <a href="https://www.opco-atlas.fr/orientation" target="_blank" rel="noopener">opco-atlas.fr/orientation</a>
+    </div>
+    <div class="grid-2" style="margin-top:12px;">
+      <div>
+        <label for="import-smic-grille">Fichier « Rémunérations » (apprentissage ou professionnalisation)</label>
+        <input type="file" id="import-smic-grille" accept=".xlsx,.xls">
+        <div style="font-size:12px; color:var(--text-soft); margin-top:4px;">Extrait : SMIC en vigueur, date de mise à jour, et grilles d'alternance.</div>
+      </div>
+      <div>
+        <label for="import-grille-syntec">Fichier grille SYNTEC ETAM/Cadres (optionnel)</label>
+        <input type="file" id="import-grille-syntec" accept=".xlsx,.xls">
+        <div style="font-size:12px; color:var(--text-soft); margin-top:4px;">Extrait : minima conventionnels ETAM et Cadres (colonnes position / coef / minimum 35h).</div>
+      </div>
+    </div>
+    <div id="import-report" style="margin-top:14px;"></div>
   </div>
 
   <!-- SMIC -->
@@ -1052,7 +1079,142 @@ function routeBoot() {
   showAdminScreen();
 }
 
+// =============================================================
+// IMPORT OPCO ATLAS — parsing des fichiers Excel
+// =============================================================
+function _toNum(v) {
+  if (typeof v === "number") return v;
+  if (typeof v === "string") {
+    const m = v.replace(/\s/g, "").replace(",", ".").match(/-?\d+(\.\d+)?/);
+    if (m) return parseFloat(m[0]);
+  }
+  return NaN;
+}
+
+// Lit un .xlsx et renvoie un tableau 2D de cellules (toutes feuilles concaténées)
+async function _readSheet(file) {
+  const buf = await file.arrayBuffer();
+  const wb = XLSX.read(buf, { type: "array" });
+  const out = [];
+  wb.SheetNames.forEach(name => {
+    const ws = wb.Sheets[name];
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, blankrows: false, defval: "" });
+    rows.forEach(r => out.push(r));
+  });
+  return out;
+}
+
+// Recherche le SMIC mensuel et la date de MAJ dans les cellules
+function _extractSmicAndDate(rows) {
+  let smic = NaN, dateMaj = "";
+  const flat = rows.map(r => r.map(c => String(c)));
+  flat.forEach(r => {
+    r.forEach((cell, i) => {
+      const low = cell.toLowerCase();
+      // SMIC : "SMIC au 01/06/2026 : 1867.02" ou cellule voisine
+      if (low.includes("smic") && (low.includes("01/") || low.includes("au "))) {
+        // chercher un montant 1800-2000 dans la même ligne
+        r.forEach(c2 => {
+          const n = _toNum(c2);
+          if (!isNaN(n) && n > 1500 && n < 2500) smic = n;
+        });
+        // date dans la cellule
+        const dm = cell.match(/(\d{2}\/\d{2}\/\d{4})/);
+        if (dm) dateMaj = dm[1];
+      }
+      // "MAJ 06-2026" -> date de mise à jour du fichier
+      const maj = cell.match(/MAJ\s*(\d{2})[-\/](\d{4})/i);
+      if (maj) dateMaj = `01/${maj[1]}/${maj[2]}`;
+    });
+  });
+  // fallback SMIC : cellule contenant un montant 1800-1950 (ex. "1867,02 € brut")
+  if (isNaN(smic)) {
+    flat.forEach(r => r.forEach(c => {
+      const s = String(c);
+      // doit ressembler à un montant avec décimales (virgule ou point)
+      if (/\d[.,]\d{2}/.test(s)) {
+        const n = _toNum(s);
+        if (!isNaN(n) && n > 1800 && n < 1950) smic = n;
+      }
+    }));
+  }
+  return { smic, dateMaj };
+}
+
+// Extrait une grille position/coef/min à partir d'un fichier grille SYNTEC
+function _extractGrille(rows) {
+  const out = [];
+  rows.forEach(r => {
+    const cells = r.map(c => String(c).trim());
+    // une ligne de grille ressemble à : ["1.1", "240", "1815", ...] ou ["ETAM 1.1","240","1815"]
+    for (let i = 0; i < cells.length - 2; i++) {
+      const pos = cells[i].match(/^(?:ETAM|IC|Cadre)?\s*([1-3]\.[1-3])$/i);
+      const coef = _toNum(cells[i + 1]);
+      const min = _toNum(cells[i + 2]);
+      if (pos && !isNaN(coef) && coef >= 50 && coef <= 600 && !isNaN(min) && min > 1500 && min < 8000) {
+        out.push({ pos: pos[1], coef: Math.round(coef), min });
+      }
+    }
+  });
+  return out;
+}
+
+async function handleImportRemu(file) {
+  const report = document.getElementById("import-report");
+  try {
+    const rows = await _readSheet(file);
+    const { smic, dateMaj } = _extractSmicAndDate(rows);
+    let msgs = [];
+    if (!isNaN(smic)) {
+      document.getElementById("smic-mensuel").value = smic.toFixed(2);
+      // SMIC horaire dérivé (mensuel / 151.67)
+      const h35 = parseFloat(document.getElementById("h35").value) || 151.67;
+      document.getElementById("smic-horaire").value = (smic / h35).toFixed(4);
+      msgs.push(`SMIC mensuel détecté : <strong>${smic.toFixed(2)} €</strong> (horaire recalculé).`);
+    } else {
+      msgs.push(`⚠ SMIC non détecté automatiquement — à saisir manuellement (section 2).`);
+    }
+    if (dateMaj) {
+      document.getElementById("smic-date").value = dateMaj;
+      msgs.push(`Date de mise à jour détectée : <strong>${dateMaj}</strong>.`);
+    }
+    report.innerHTML = `<div class="grille-import-ok">✓ Fichier « ${file.name} » analysé.<br>${msgs.join("<br>")}<br><em>Vérifiez les valeurs pré-remplies, puis publiez (section 6).</em></div>`;
+    report.className = "";
+  } catch (err) {
+    report.innerHTML = `<div class="grille-import-err">✗ Erreur de lecture du fichier : ${err.message}. Vérifiez qu'il s'agit bien d'un .xlsx OPCO Atlas.</div>`;
+  }
+}
+
+async function handleImportGrille(file) {
+  const report = document.getElementById("import-report");
+  try {
+    const rows = await _readSheet(file);
+    const grille = _extractGrille(rows);
+    if (grille.length === 0) {
+      report.innerHTML = `<div class="grille-import-err">✗ Aucune ligne de grille (position / coef / minimum) détectée dans « ${file.name} ». Le format du fichier n'est peut-être pas reconnu — utilisez la saisie manuelle (sections 4 et 5).</div>`;
+      return;
+    }
+    // Heuristique : coefficients ETAM = 240-500, Cadres = 95-270 (mais valeurs €>2000)
+    // On propose simplement la liste détectée à l'admin pour copie manuelle prudente.
+    let html = `<div class="grille-import-ok">✓ ${grille.length} ligne(s) de grille détectée(s) dans « ${file.name} » :</div>`;
+    html += `<table style="margin-top:8px; font-size:13px;"><thead><tr><th>Position</th><th>Coef</th><th>Min. 35h</th></tr></thead><tbody>`;
+    grille.forEach(g => { html += `<tr><td>${g.pos}</td><td>${g.coef}</td><td>${g.min.toFixed(2)} €</td></tr>`; });
+    html += `</tbody></table><div style="font-size:12px; margin-top:8px; color:var(--text-soft);">Par prudence, reportez ces valeurs dans les grilles ETAM/Cadres (sections 4-5) après vérification, puis publiez. L'import n'écrase pas automatiquement la grille pour éviter toute erreur de correspondance position/statut.</div>`;
+    report.innerHTML = html;
+  } catch (err) {
+    report.innerHTML = `<div class="grille-import-err">✗ Erreur de lecture : ${err.message}</div>`;
+  }
+}
+
+function setupImports() {
+  const f1 = document.getElementById("import-smic-grille");
+  const f2 = document.getElementById("import-grille-syntec");
+  if (f1) f1.addEventListener("change", e => { if (e.target.files[0]) handleImportRemu(e.target.files[0]); });
+  if (f2) f2.addEventListener("change", e => { if (e.target.files[0]) handleImportGrille(e.target.files[0]); });
+}
+
 routeBoot();
+setupImports();
 </script>
 
 </body>
