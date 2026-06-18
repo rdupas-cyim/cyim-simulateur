@@ -722,6 +722,49 @@
     padding: 9px 12px;
     border-bottom: 1px solid var(--border);
   }
+  .alt-grille-table .alt-th-sub {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    opacity: 0.8;
+    margin-top: 2px;
+  }
+  .alt-grille-table tr.alt-row-age {
+    background: #FEF3C7;
+  }
+  .alt-grille-table .alt-cell-hit {
+    display: inline-block;
+    background: var(--mint, #30DD92);
+    color: #08321F;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 5px;
+    box-shadow: 0 0 0 2px rgba(48,221,146,0.35);
+  }
+  .alt-grille-legend {
+    font-size: 12px;
+    color: var(--text-soft);
+    background: rgba(30,78,102,0.05);
+    border-left: 3px solid var(--navy);
+    padding: 9px 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    line-height: 1.55;
+  }
+  .alt-grille-badge {
+    display: inline-block;
+    background: var(--navy);
+    color: white;
+    font-weight: 700;
+    font-size: 11px;
+    padding: 2px 9px;
+    border-radius: 20px;
+    margin-right: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
 
   /* Conteneur du scénario actif : seuls les actifs sont visibles */
   .scenario-content { display: none; }
@@ -1303,6 +1346,39 @@
     color: var(--warn-text);
   }
   .note.warning strong { color: var(--warn-text); }
+
+  /* Bandeau d'alerte de péremption des grilles */
+  .grille-alert {
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    border: 1px solid;
+  }
+  .grille-alert.ok {
+    background: var(--ok-bg, #ECFDF5);
+    border-color: var(--ok-border, #6EE7B7);
+    color: var(--ok-text, #047857);
+  }
+  .grille-alert.warn {
+    background: var(--warn-bg);
+    border-color: var(--warn-border);
+    color: var(--warn-text);
+  }
+  .grille-alert.alert {
+    background: var(--alert-bg, #FEE2E2);
+    border-color: var(--alert-border, #FCA5A5);
+    color: var(--alert-text, #B91C1C);
+  }
+  .grille-alert strong { font-weight: 700; }
+  .grille-alert a { color: inherit; font-weight: 700; text-decoration: underline; }
+  .grille-alert .grille-alert-title {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 4px;
+    font-size: 13.5px;
+  }
 
   /* ========================================================
      MODE COMPACT — vue dense
@@ -2140,6 +2216,9 @@
      ============================================================ -->
 <section class="panel" id="panel-alternants">
 
+  <!-- Bandeau d'alerte de péremption des grilles d'alternance -->
+  <div id="alt-grille-alert" class="grille-alert" style="display:none;"></div>
+
   <!-- Carte 1 : configuration du contrat -->
   <div class="section">
     <h2>Configuration du contrat d'alternance</h2>
@@ -2156,7 +2235,7 @@
       </button>
       <button type="button" class="alt-type-btn" data-type="professionnalisation" onclick="altSetType('professionnalisation')">
         <strong>Contrat de professionnalisation</strong>
-        <span style="display:block; font-size:11px; font-weight:normal; opacity:0.85; margin-top:2px;">% du SMIC selon âge × niveau de diplôme</span>
+        <span style="display:block; font-size:11px; font-weight:normal; opacity:0.85; margin-top:2px;">% du SMC SYNTEC selon position × année × public</span>
       </button>
     </div>
 
@@ -2200,11 +2279,28 @@
           <option value="3">3ème année</option>
         </select>
       </div>
-      <div class="field" id="alt-niveau-deja-field" style="display:none;">
-        <label for="alt-niveau-deja">Niveau de diplôme déjà obtenu</label>
-        <select id="alt-niveau-deja">
-          <option value="lt-bac">Inférieur au Bac pro</option>
-          <option value="gte-bac" selected>≥ Bac pro / BAC / titre équivalent</option>
+      <div class="field" id="alt-annee-pro-field" style="display:none;">
+        <label for="alt-annee-pro">Année d'exécution (professionnalisation)</label>
+        <select id="alt-annee-pro">
+          <option value="1" selected>1ère année</option>
+          <option value="2">2ème année</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-grid cols-3" id="alt-pro-extra" style="display:none; margin-top:14px;">
+      <div class="field">
+        <label for="alt-public-pro">Public bénéficiaire</label>
+        <select id="alt-public-pro">
+          <option value="jeune" selected>Jeune de 16 à 25 ans révolus</option>
+          <option value="de">Demandeur d'emploi / 26 ans et plus</option>
+        </select>
+      </div>
+      <div class="field" id="alt-metier5-field" style="display:none;">
+        <label for="alt-metier5">Niveau 5 (Bac+2) — type de métier</label>
+        <select id="alt-metier5">
+          <option value="5-transverse" selected>Métiers transverses (position 1.1)</option>
+          <option value="5-branche">Métiers de la branche (position 2.1)</option>
         </select>
       </div>
     </div>
@@ -2238,6 +2334,11 @@
           <span>Licence professionnelle en 1 an (rémunération = 2ème année)</span>
         </label>
       </div>
+      <div class="field" id="alt-succession-prev-field" style="display:none;">
+        <label for="alt-succession-prev">Salaire mensuel brut de la dernière année du contrat précédent (€)</label>
+        <input type="number" id="alt-succession-prev" value="0" min="0" step="0.01" placeholder="Ex : 1450,00">
+        <div style="font-size:11px; color: var(--text-soft); margin-top:4px;">Saisissez le salaire 35h perçu en fin de contrat précédent. Il sert de plancher : la rémunération du nouveau contrat ne pourra pas être inférieure.</div>
+      </div>
     </div>
   </div>
 
@@ -2264,6 +2365,8 @@
       <div class="result-row"><span class="label-side">→ Équivalent annuel 39h CYIM</span><span class="value" id="alt-sal-an39">—</span></div>
     </div>
 
+    <div id="alt-succession-impact" style="display:none; margin-top:14px;"></div>
+
     <div class="note warning" id="alt-warning" style="display:none; margin-top:14px;">
       <!-- Injecté par JS si attention particulière -->
     </div>
@@ -2287,6 +2390,15 @@
     <h3 style="margin: 20px 0 10px; font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.06em;">Aides à l'embauche en vigueur (2026)</h3>
     <div id="alt-aides-list">
       <!-- Injecté par JS -->
+    </div>
+  </div>
+
+  <!-- Carte tuteur / maître d'apprentissage -->
+  <div class="section">
+    <h2>Le tuteur / maître d'apprentissage</h2>
+    <div class="section-desc">Sa désignation est obligatoire. Son rôle et ses pré-requis diffèrent selon le type de contrat.</div>
+    <div id="alt-tuteur-display">
+      <!-- Injecté par JS selon le type de contrat -->
     </div>
   </div>
 
@@ -2380,6 +2492,114 @@
     <div class="section-desc">Modifier directement les cellules <em>Min. conv. 35h</em> dans les tableaux ci-dessus.
     Toutes les valeurs dérivées se recalculent automatiquement.</div>
     <button class="btn danger" onclick="resetGrille()">🔄 Réinitialiser la grille (valeurs SYNTEC au 01/01/2025)</button>
+  </div>
+
+  <div class="section">
+    <h2>Grille apprentissage SYNTEC (référence OPCO Atlas)</h2>
+    <div class="section-desc">
+      Pourcentages du SMIC (ou du SMC si plus favorable) applicables aux apprentis de la branche.
+      Source : OPCO Atlas — Bureaux d'études techniques, ingénieurs-conseils et sociétés de conseils (IDCC 1486),
+      accord salaire du 26 juin 2024, annexe III, étendu au JO du 27 novembre 2024. Décret 2020-373 et art. L6222-27, L6222-29, D6222-26 du Code du travail. MAJ 06-2026.
+      Cette grille alimente directement l'onglet <em>Alternants</em>.
+    </div>
+    <div class="table-wrapper">
+      <table class="alt-grille-table" style="margin-top:10px;">
+        <thead>
+          <tr>
+            <th rowspan="2" style="vertical-align:bottom;">Année d'exécution</th>
+            <th class="num">&lt; 18 ans</th>
+            <th colspan="3" class="num">18 à 20 ans</th>
+            <th colspan="3" class="num">21 à 25 ans</th>
+            <th class="num">≥ 26 ans</th>
+          </tr>
+          <tr>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">tous niv.</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">Niv 3-4</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">Niv 5-6</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">Niv 7-8</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">Niv 3-4</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">Niv 5-6</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">Niv 7-8</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">tous niv.</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1ère année</strong></td>
+            <td class="num">33 %</td>
+            <td class="num">43 %</td><td class="num">43 %</td><td class="num">48 %</td>
+            <td class="num">53 %</td><td class="num">55 %</td><td class="num">65 %</td>
+            <td class="num">100 %</td>
+          </tr>
+          <tr>
+            <td><strong>2ème année</strong></td>
+            <td class="num">43 %</td>
+            <td class="num">51 %</td><td class="num">53 %</td><td class="num">58 %</td>
+            <td class="num">61 %</td><td class="num">65 %</td><td class="num">75 %</td>
+            <td class="num">100 %</td>
+          </tr>
+          <tr>
+            <td><strong>3ème année</strong></td>
+            <td class="num">58 %</td>
+            <td class="num">67 %</td><td class="num">68 %</td><td class="num">70 %</td>
+            <td class="num">78 %</td><td class="num">80 %</td><td class="num">80 %</td>
+            <td class="num">100 %</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note info" style="font-size:12px; margin-top:12px;">
+      <strong>SMIC de référence (35h) au 01/06/2026 :</strong> 1 867,02 € brut/mois (12,31 €/h).
+      Pour les 21 ans et plus, l'apprenti perçoit le pourcentage du SMC (salaire minimum conventionnel correspondant à l'emploi occupé) s'il est plus favorable.
+      Les coefficients SYNTEC 240 et 250 sont impactés par le niveau du SMIC.
+    </div>
+    <div class="note warning" style="font-size:12px; margin-top:10px;">
+      <strong>Cas particuliers (Code du travail) :</strong>
+      Licence pro en 1 an → rémunération de 2ème année (art. D6222-32).
+      Succession de contrats → rémunération au moins égale à la dernière année du contrat précédent, sauf calcul par âge plus favorable (art. D6222-29).
+      Majoration de +15 points si nouveau contrat ≤ 1 an pour un diplôme de même niveau et une qualification liée (art. D6222-30).
+      Prolongation pour échec à l'examen ou situation de handicap → maintien du salaire de la dernière année (art. D6222-28 / R6222-48).
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Grille professionnalisation SYNTEC (référence OPCO Atlas)</h2>
+    <div class="section-desc">
+      Rémunération en pourcentage du SMC (salaire minimum conventionnel de la position d'entrée), avec plancher SMIC.
+      Source : OPCO Atlas — Bureaux d'études (IDCC 1486), accord du 26 juin 2024 (annexe III), accord formation du 31/10/2019 et avenant n°1 du 15/05/2020. MAJ 06-2026.
+      Cette grille alimente directement l'onglet <em>Alternants</em> (contrat de professionnalisation).
+    </div>
+    <div class="table-wrapper">
+      <table class="alt-grille-table" style="margin-top:10px;">
+        <thead>
+          <tr>
+            <th rowspan="2" style="vertical-align:bottom;">Niveau de formation à l'entrée</th>
+            <th rowspan="2" class="num" style="vertical-align:bottom;">Position / coef</th>
+            <th rowspan="2" class="num" style="vertical-align:bottom;">SMC mensuel</th>
+            <th colspan="2" class="num">Jeune &lt; 26 ans</th>
+            <th colspan="2" class="num">Demandeur emploi / 26 ans +</th>
+          </tr>
+          <tr>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">1ère an.</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">2ème an.</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">1ère an.</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">2ème an.</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Niveaux 3 et 4 (CAP/BEP/Bac)</strong></td><td class="num">ETAM 1.1<br><span class="alt-th-sub" style="opacity:1;">coef 240</span></td><td class="num">1 815,00 €</td><td class="num">80 %</td><td class="num">100 %</td><td class="num">85 %</td><td class="num">100 %</td></tr>
+          <tr><td><strong>Niveau 5 (Bac+2) — métiers transverses</strong></td><td class="num">ETAM 1.1<br><span class="alt-th-sub" style="opacity:1;">coef 240</span></td><td class="num">1 815,00 €</td><td class="num">80 %</td><td class="num">90 %</td><td class="num">85 %</td><td class="num">100 %</td></tr>
+          <tr><td><strong>Niveau 5 (Bac+2) — métiers de la branche</strong></td><td class="num">ETAM 2.1<br><span class="alt-th-sub" style="opacity:1;">coef 275</span></td><td class="num">1 875,00 €</td><td class="num">80 %</td><td class="num">90 %</td><td class="num">85 %</td><td class="num">100 %</td></tr>
+          <tr><td><strong>Niveau 6 (Bac+3/4)</strong></td><td class="num">ETAM 2.2<br><span class="alt-th-sub" style="opacity:1;">coef 310</span></td><td class="num">1 905,00 €</td><td class="num">80 %</td><td class="num">90 %</td><td class="num">85 %</td><td class="num">100 %</td></tr>
+          <tr><td><strong>Niveau 7 (Bac+5 / Master)</strong></td><td class="num">IC 1.1<br><span class="alt-th-sub" style="opacity:1;">coef 95</span></td><td class="num">2 135,00 €</td><td class="num">80 %</td><td class="num">100 %</td><td class="num">85 %</td><td class="num">100 %</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note info" style="font-size:12px; margin-top:12px;">
+      <strong>Base de calcul :</strong> le pourcentage s'applique au SMC, sauf lorsque le SMC est inférieur au SMIC (1 867,02 € au 01/06/2026), auquel cas le calcul se fait sur la base du SMIC.
+      Un plancher SMIC absolu s'applique dans tous les cas : la rémunération ne peut jamais être inférieure au SMIC en vigueur.
+      Pour un demandeur d'emploi de 26 ans et plus, la 1ère année est rémunérée à 85 % du SMC sans pouvoir être inférieure au SMIC, et la 2ème année à 100 % du SMC.
+    </div>
   </div>
 </section>
 
@@ -2593,6 +2813,9 @@ const DEFAULT_DATA = {
   smic_horaire: 12.31,
   smic_mensuel: 1867.02,
   smic_date: "01/06/2026",
+  // Date de dernière mise à jour des grilles d'alternance (OPCO Atlas)
+  alt_grille_date: "01/06/2026",
+  alt_grille_ref: "OPCO Atlas — Bureaux d'études, MAJ 06-2026",
   h35: 151.67,
   h39: 169,
   marge_etam: 10,
@@ -3378,13 +3601,27 @@ const altGrilleAppSyntec = {
 };
 
 // ------------------------------------------------------------
-// GRILLE PROFESSIONNALISATION (Code du travail)
-// % du SMIC selon âge et niveau de diplôme déjà détenu (lt-bac ou gte-bac).
+// GRILLE PROFESSIONNALISATION SYNTEC — branche Bureaux d'études (IDCC 1486)
+// Source : OPCO Atlas, accord du 26 juin 2024 (annexe III) + accord formation
+// du 31/10/2019 et avenant n°1 du 15/05/2020.
+//
+// Le salaire est un POURCENTAGE DU SMC (salaire minimum conventionnel lié à la
+// position/coefficient d'entrée), avec un plancher SMIC.
+//   - Jeunes de moins de 26 ans : 80% du SMC en 1ère année,
+//       puis 90% ou 100% en 2ème année selon la position.
+//   - Demandeurs d'emploi / 26 ans et plus : 85% du SMC en 1ère année
+//       (jamais < SMIC), puis 100% en 2ème année.
+//
+// Chaque entrée donne : la position, le coefficient, le SMC mensuel de référence,
+// et les pourcentages applicables.
 // ------------------------------------------------------------
-const altGrilleProf = {
-  "<21":    { "lt-bac": 55,  "gte-bac": 65 },
-  "21-25":  { "lt-bac": 70,  "gte-bac": 80 },
-  ">=26":   { "lt-bac": 100, "gte-bac": 100 }
+const altGrilleProfSyntec = {
+  // clé = niveau de formation à l'entrée (+ variante métier pour le niveau 5)
+  "3-4":          { label: "Niveaux 3 et 4 (CAP/BEP/Bac)",            cat: "ETAM", pos: "1.1", coef: 240, smc: 1815, jeune1: 80, jeune2: 100, de1: 85, de2: 100 },
+  "5-transverse": { label: "Niveau 5 (Bac+2) — métiers transverses",  cat: "ETAM", pos: "1.1", coef: 240, smc: 1815, jeune1: 80, jeune2: 90,  de1: 85, de2: 100 },
+  "5-branche":    { label: "Niveau 5 (Bac+2) — métiers de la branche", cat: "ETAM", pos: "2.1", coef: 275, smc: 1875, jeune1: 80, jeune2: 90,  de1: 85, de2: 100 },
+  "6":            { label: "Niveau 6 (Bac+3/4)",                       cat: "ETAM", pos: "2.2", coef: 310, smc: 1905, jeune1: 80, jeune2: 90,  de1: 85, de2: 100 },
+  "7":            { label: "Niveau 7 (Bac+5 / Master)",               cat: "IC",   pos: "1.1", coef: 95,  smc: 2135, jeune1: 80, jeune2: 100, de1: 85, de2: 100 }
 };
 
 function altAgeTranche(age, isApp) {
@@ -3420,13 +3657,16 @@ function altComputePct() {
   const annee = parseInt(document.getElementById("alt-annee").value) || 1;
   const rqth = document.getElementById("alt-rqth").checked;
   const succession = altType === "apprentissage" && document.getElementById("alt-succession").checked;
+  const successionPrev = parseFloat(document.getElementById("alt-succession-prev").value) || 0;
   const majoration15 = altType === "apprentissage" && document.getElementById("alt-majoration15").checked;
   const licencepro = altType === "apprentissage" && document.getElementById("alt-licencepro").checked;
-  const niveauDeja = document.getElementById("alt-niveau-deja").value;
 
   let pct = 0;
   let note = "";
   let base = "SMIC";
+  let salMens35 = 0;      // montant mensuel brut base 35h (calculé selon le type)
+  let proInfo = null;     // détail du calcul pro (position, SMC, etc.)
+  let successionInfo = null; // détail de l'effet de la succession de contrats
 
   if (altType === "apprentissage") {
     // Licence pro 1 an → rémunération 2ème année
@@ -3436,12 +3676,6 @@ function altComputePct() {
     const grilleAnnee = altGrilleAppSyntec[anneeEffective] || altGrilleAppSyntec[1];
     const grilleTranche = grilleAnnee[tranche] || {};
     pct = grilleTranche.default !== undefined ? grilleTranche.default : (grilleTranche[niveauT] || 0);
-
-    // Majoration succession : minimum = dernière année du précédent contrat
-    // (on prend la valeur de l'année suivante de la même tranche)
-    if (succession && anneeEffective > 1) {
-      note += "Succession de contrats : rémunération ≥ dernière année du précédent. ";
-    }
 
     // Majoration +15 points (contrat ≤1 an, même niveau, qualification liée)
     if (majoration15) {
@@ -3457,24 +3691,77 @@ function altComputePct() {
     if (licencepro) {
       note += "Licence pro en 1 an : rémunération équivalente à une 2ème année (art. D6222-32). ";
     }
+
+    // Montant mensuel brut base 35h pour l'apprentissage = pct% × SMIC
+    salMens35 = state.smic_mensuel * pct / 100;
+
+    // Succession de contrats (art. D6222-29) : la rémunération du nouveau contrat
+    // ne peut être inférieure à celle de la dernière année du contrat précédent,
+    // sauf si le calcul standard (par âge/année) est plus favorable.
+    // On applique le salaire saisi comme PLANCHER sur le montant calculé.
+    if (succession) {
+      const salStandard = salMens35;
+      if (successionPrev > salStandard) {
+        salMens35 = successionPrev;
+        successionInfo = { actif: true, applique: true, salStandard, salPrev: successionPrev };
+        note += `Succession de contrats : le salaire de la dernière année du contrat précédent (${fmtEur(successionPrev)}) est supérieur au calcul standard (${fmtEur(salStandard)}). C'est lui qui s'applique (art. D6222-29). `;
+      } else if (successionPrev > 0) {
+        successionInfo = { actif: true, applique: false, salStandard, salPrev: successionPrev };
+        note += `Succession de contrats : le calcul standard (${fmtEur(salStandard)}) est supérieur ou égal au salaire du contrat précédent (${fmtEur(successionPrev)}). C'est le calcul standard qui s'applique. `;
+      } else {
+        successionInfo = { actif: true, applique: false, salStandard, salPrev: 0 };
+        note += "Succession de contrats cochée : saisissez le salaire de la dernière année du contrat précédent pour appliquer le plancher (art. D6222-29). ";
+      }
+    }
   } else {
-    // Professionnalisation
-    const tranche = altAgeTranche(age, false);
-    const niveauTr = niveauDeja || "gte-bac";
-    pct = altGrilleProf[tranche][niveauTr];
-    if (tranche === ">=26") {
-      note += "26 ans et plus : salaire = SMIC mensuel (ou 85% du SMC si supérieur). ";
-      base = "SMIC (ou 85% SMC)";
+    // Professionnalisation — grille SYNTEC réelle (% du SMC, plancher SMIC)
+    const anneePro = parseInt(document.getElementById("alt-annee-pro").value) || 1;
+    const publicPro = document.getElementById("alt-public-pro").value || "jeune";
+    const metier5 = document.getElementById("alt-metier5").value || "5-transverse";
+
+    // Déterminer la clé de grille selon le niveau préparé
+    let key;
+    if (niveau <= 4) key = "3-4";
+    else if (niveau === 5) key = metier5;          // 5-transverse ou 5-branche
+    else if (niveau === 6) key = "6";
+    else key = "7";                                 // niveaux 7 et 8
+
+    const g = altGrilleProfSyntec[key];
+    const smc = g.smc;
+    // % applicable selon public et année
+    if (publicPro === "jeune") {
+      pct = (anneePro === 1) ? g.jeune1 : g.jeune2;
+    } else {
+      pct = (anneePro === 1) ? g.de1 : g.de2;
+    }
+    // La base du pourcentage est le SMC, mais lorsque le SMC est inférieur au
+    // SMIC, c'est le SMIC qui sert de base de calcul (cf. fichier OPCO Atlas :
+    // « le SMIC étant plus élevé que ce minima, le calcul est fait sur base SMIC »).
+    const baseCalcul = Math.max(smc, state.smic_mensuel);
+    const baseEstSmic = state.smic_mensuel > smc;
+    salMens35 = baseCalcul * pct / 100;
+    // Sécurité : un plancher SMIC absolu s'applique toujours (ex. DE 26+/an1 à 85%)
+    const plancherSmic = salMens35 < state.smic_mensuel;
+    if (plancherSmic) salMens35 = state.smic_mensuel;
+
+    base = `${pct}% ${baseEstSmic ? "du SMIC (SMC " + fmtEur(smc) + " < SMIC)" : "du SMC"} — position ${g.cat} ${g.pos}, coef ${g.coef}`;
+    proInfo = { key, g, smc, pct, publicPro, anneePro, baseCalcul, baseEstSmic, plancherSmic };
+
+    if (baseEstSmic) {
+      note += `Le SMC de la position (${fmtEur(smc)}) étant inférieur au SMIC, le pourcentage est appliqué sur la base du SMIC. `;
+    }
+    if (plancherSmic) {
+      note += `Le montant obtenu étant inférieur au SMIC, c'est le SMIC qui s'applique. `;
     }
   }
 
   // RQTH : pas de majoration directe sur le salaire,
-  // mais l'aide à l'embauche est portée à 6 000 € au lieu de 5 000 €
+  // mais l'aide exceptionnelle à l'apprentissage est portée à 6 000 €
   if (rqth) {
-    note += "Travailleur handicapé (RQTH) : pas de majoration sur le salaire, mais aide employeur portée à 6 000 €. ";
+    note += "Travailleur handicapé (RQTH) : pas de majoration sur le salaire, mais aide exceptionnelle à l'apprentissage portée à 6 000 €. ";
   }
 
-  return { pct, note, base, age };
+  return { pct, note, base, age, salMens35, proInfo, successionInfo };
 }
 
 function altSetType(type) {
@@ -3482,22 +3769,38 @@ function altSetType(type) {
   document.querySelectorAll(".alt-type-btn").forEach(b => {
     b.classList.toggle("active", b.dataset.type === type);
   });
+  const isApp = (type === "apprentissage");
+  const isPro = (type === "professionnalisation");
   // Champs visibles selon le type
-  document.getElementById("alt-annee-field").style.display = (type === "apprentissage") ? "block" : "none";
-  document.getElementById("alt-niveau-deja-field").style.display = (type === "professionnalisation") ? "block" : "none";
-  document.getElementById("alt-succession-field").style.display = (type === "apprentissage") ? "block" : "none";
-  document.getElementById("alt-majoration15-field").style.display = (type === "apprentissage") ? "block" : "none";
-  document.getElementById("alt-licencepro-field").style.display = (type === "apprentissage") ? "block" : "none";
+  document.getElementById("alt-annee-field").style.display = isApp ? "block" : "none";
+  document.getElementById("alt-annee-pro-field").style.display = isPro ? "block" : "none";
+  document.getElementById("alt-pro-extra").style.display = isPro ? "grid" : "none";
+  document.getElementById("alt-succession-field").style.display = isApp ? "block" : "none";
+  document.getElementById("alt-majoration15-field").style.display = isApp ? "block" : "none";
+  document.getElementById("alt-licencepro-field").style.display = isApp ? "block" : "none";
+  // Variante métier niveau 5 visible seulement si niveau 5 sélectionné
+  altToggleMetier5();
   altUpdate();
 }
 
+function altToggleMetier5() {
+  const niveau = parseInt(document.getElementById("alt-niveau").value);
+  const field = document.getElementById("alt-metier5-field");
+  if (field) field.style.display = (altType === "professionnalisation" && niveau === 5) ? "block" : "none";
+}
+
 function altUpdate() {
+  // Afficher le champ "salaire du contrat précédent" uniquement si succession cochée
+  const succChecked = altType === "apprentissage" && document.getElementById("alt-succession").checked;
+  const succPrevField = document.getElementById("alt-succession-prev-field");
+  if (succPrevField) succPrevField.style.display = succChecked ? "block" : "none";
+
   const result = altComputePct();
   const pct = result.pct;
 
-  // Base : SMIC mensuel 35h
+  // Base : montant mensuel brut 35h calculé selon le type de contrat
   const smicMens = state.smic_mensuel;
-  const salMens35 = smicMens * pct / 100;
+  const salMens35 = result.salMens35;
   const salAn35 = salMens35 * 12;
 
   // Conversion équivalent CYIM 39h : multiplier par (h35 + 4×1.25) / h35
@@ -3510,11 +3813,38 @@ function altUpdate() {
   // Affichage
   document.getElementById("alt-pct").textContent = pct + "%";
   document.getElementById("alt-base-label").textContent = result.base;
-  document.getElementById("alt-base-val").textContent = fmtEur(smicMens) + " /mois";
+  const baseVal = (altType === "professionnalisation" && result.proInfo)
+    ? fmtEur(result.proInfo.smc) + " /mois (SMC)"
+    : fmtEur(smicMens) + " /mois (SMIC)";
+  document.getElementById("alt-base-val").textContent = baseVal;
   document.getElementById("alt-sal-mens").textContent = fmtEur(salMens35);
   document.getElementById("alt-sal-an").textContent = fmtEur(salAn35);
   document.getElementById("alt-sal-mens39").textContent = fmtEur(salMens39);
   document.getElementById("alt-sal-an39").textContent = fmtEur(salAn39);
+
+  // Badge d'impact de la succession de contrats
+  const succImpact = document.getElementById("alt-succession-impact");
+  const sInfo = result.successionInfo;
+  if (succImpact) {
+    if (sInfo && sInfo.actif) {
+      let cls, icon, txt;
+      if (sInfo.applique) {
+        cls = "ok"; icon = "✓";
+        txt = `<strong>Succession de contrats appliquée.</strong> Le salaire de la dernière année du contrat précédent (<strong>${fmtEur(sInfo.salPrev)}</strong>) est retenu car supérieur au calcul standard (${fmtEur(sInfo.salStandard)}). Le salaire mensuel 35h ci-dessus en tient compte.`;
+      } else if (sInfo.salPrev > 0) {
+        cls = "warn"; icon = "ℹ";
+        txt = `<strong>Succession de contrats sans effet ici.</strong> Le calcul standard (<strong>${fmtEur(sInfo.salStandard)}</strong>) est supérieur ou égal au salaire du contrat précédent (${fmtEur(sInfo.salPrev)}). C'est donc le calcul standard qui s'applique.`;
+      } else {
+        cls = "warn"; icon = "✎";
+        txt = `<strong>Succession de contrats : saisie requise.</strong> Renseignez le salaire mensuel brut de la dernière année du contrat précédent (champ ci-dessus) pour comparer et appliquer le plancher (art. D6222-29).`;
+      }
+      succImpact.className = "grille-alert " + cls;
+      succImpact.innerHTML = `<span class="grille-alert-title">${icon} Impact « Succession de contrats »</span>${txt}`;
+      succImpact.style.display = "block";
+    } else {
+      succImpact.style.display = "none";
+    }
+  }
 
   // Note explicative
   const formulaNote = document.getElementById("alt-formula-note");
@@ -3530,12 +3860,13 @@ function altUpdate() {
       <code>Salaire mensuel 35h = ${pct}% × SMIC mensuel = ${pct}% × ${fmtEur(smicMens)}</code>
     `;
   } else {
-    const tranche = altAgeTranche(age, false);
-    const niv = document.getElementById("alt-niveau-deja").value;
+    const pInfo = result.proInfo;
+    const niveau = document.getElementById("alt-niveau").value;
+    const publicLabel = pInfo && pInfo.publicPro === "jeune" ? "Jeune de 16 à 25 ans" : "Demandeur d'emploi / 26 ans et +";
     formulaContent = `
-      <strong>🎓 Professionnalisation — calcul appliqué :</strong><br>
-      Âge ${age} ans (tranche <strong>${tranche}</strong>) · Diplôme déjà obtenu : <strong>${niv === "gte-bac" ? "≥ Bac" : "< Bac"}</strong> · Barème Code du travail<br>
-      <code>Salaire mensuel 35h = ${pct}% × SMIC mensuel = ${pct}% × ${fmtEur(smicMens)}</code>
+      <strong>🎓 Professionnalisation — calcul appliqué (grille SYNTEC) :</strong><br>
+      Niveau préparé <strong>${niveau}</strong> · Position <strong>${pInfo ? pInfo.g.cat + " " + pInfo.g.pos : "—"}</strong> (coef ${pInfo ? pInfo.g.coef : "—"}) · ${publicLabel} · Année <strong>${pInfo ? pInfo.anneePro : "—"}</strong><br>
+      <code>Salaire mensuel 35h = ${pct}% × ${pInfo && pInfo.baseEstSmic ? "SMIC" : "SMC"} (${pInfo ? fmtEur(pInfo.baseCalcul) : "—"}) = ${pInfo ? fmtEur(pInfo.baseCalcul * pct / 100) : "—"}${pInfo && pInfo.plancherSmic ? " → relevé au SMIC " + fmtEur(smicMens) : ""}</code>
     `;
   }
   if (result.note) {
@@ -3545,9 +3876,9 @@ function altUpdate() {
 
   // Vérification SMIC : pour les 26+ et apprentis 100%, ne doit pas descendre sous le SMIC
   const warning = document.getElementById("alt-warning");
-  if (altType === "professionnalisation" && altAgeTranche(age, false) === ">=26") {
+  if (altType === "professionnalisation" && result.proInfo && result.proInfo.publicPro === "de") {
     warning.style.display = "block";
-    warning.innerHTML = `<strong>⚠ Rappel :</strong> à partir de 26 ans en contrat de professionnalisation, le salaire ne peut être inférieur au SMIC (ou à 85% du SMC si supérieur). À adapter selon la convention SYNTEC applicable.`;
+    warning.innerHTML = `<strong>ℹ Demandeur d'emploi / 26 ans et plus :</strong> rémunération de 85% du SMC la 1ère année (jamais inférieure au SMIC), puis 100% du SMC la 2ème année. Le plancher SMIC est appliqué automatiquement.`;
   } else {
     warning.style.display = "none";
   }
@@ -3556,6 +3887,8 @@ function altUpdate() {
   altUpdateAides();
   // Grille de référence
   altRenderGrille();
+  // Tuteur / maître d'apprentissage
+  altRenderTuteur();
 }
 
 function altUpdateAides() {
@@ -3568,25 +3901,77 @@ function altUpdateAides() {
   const aides = [];
 
   if (isApp) {
-    // Aide unique 2026 : 5 000 € (ou 6 000 € si RQTH) pour les entreprises < 250 salariés.
-    // Niveau ≤ 7 (jusqu'à Bac+5) éligible.
-    const eligible = niveau <= 7;
-    const montant = rqth ? 6000 : 5000;
-    aides.push({
-      eligible,
-      titre: "Aide unique à l'embauche d'apprentis",
-      montant: eligible ? `${montant} €` : "Non éligible",
-      desc: eligible
-        ? `Versée la 1ère année par l'ASP (mensualisée). Conditions : entreprise < 250 salariés (✓ CYIM), niveau jusqu'à Bac+5 (✓ niveau ${niveau}).${rqth ? " Majoration RQTH : +1 000 €." : ""} Référence : Décret n° 2025-1031 du 31/10/2025.`
-        : `Réservée aux contrats préparant un diplôme ≤ niveau 7. Le niveau ${niveau} n'est pas éligible.`
-    });
+    // -------------------------------------------------------------------
+    // Régime des aides à l'apprentissage applicable aux contrats conclus
+    // à partir du 8 mars 2026 (décret n° 2026-168 du 06/03/2026).
+    // Deux aides EXISTENT, NON CUMULABLES entre elles (c'est l'une OU l'autre) :
+    //
+    //  1) AIDE EXCEPTIONNELLE 2026 (régime de droit commun depuis le 8/03/2026)
+    //     Pour les contrats conclus du 08/03/2026 au 01/01/2027.
+    //     Versée au titre de la 1ère année uniquement.
+    //     Entreprise < 250 salariés (✓ CYIM) :
+    //        - niveau 5 (Bac+2) ............... 4 500 €
+    //        - niveaux 6 et 7 (Bac+3 à Master)  2 000 €
+    //     RQTH (toutes entreprises, niv. 3 à 7) 6 000 €
+    //
+    //  2) AIDE UNIQUE (ancien dispositif, maintenu)
+    //     Réservée aux < 250 salariés ET aux diplômes JUSQU'AU NIVEAU BAC (niveau 4).
+    //     Montant 5 000 €. Ne concerne donc PAS les niveaux 5 à 8.
+    //
+    // Pour CYIM, les alternants sont quasiment tous en BTS/Licence/Master
+    // (niveaux 5 à 7) : c'est donc l'aide exceptionnelle qui s'applique,
+    // pour un montant de 2 000 € à 4 500 € (ou 6 000 € si RQTH).
+    // -------------------------------------------------------------------
 
-    // Aide exceptionnelle 2026 — Décret 6 mars 2026
+    // 1) Aide exceptionnelle 2026 — montant selon le niveau (et RQTH)
+    let mtExcept, descNiveau;
+    if (rqth) {
+      mtExcept = "6 000 €";
+      descNiveau = "travailleur reconnu handicapé (RQTH), niveaux 3 à 7";
+    } else if (niveau <= 4) {
+      // Niveaux 3-4 : non éligibles à l'aide exceptionnelle pour < 250 salariés
+      // (relèvent de l'aide unique de 5 000 € ci-dessous)
+      mtExcept = null;
+      descNiveau = "";
+    } else if (niveau === 5) {
+      mtExcept = "4 500 €";
+      descNiveau = "niveau 5 (Bac+2 : BTS, DUT)";
+    } else if (niveau <= 7) {
+      mtExcept = "2 000 €";
+      descNiveau = "niveaux 6 et 7 (Bac+3 à Master)";
+    } else {
+      // Niveau 8 (doctorat) : au-delà du niveau 7, pas d'aide exceptionnelle
+      mtExcept = null;
+      descNiveau = "";
+    }
+
+    if (mtExcept) {
+      aides.push({
+        eligible: true,
+        titre: "Aide exceptionnelle à l'apprentissage 2026",
+        montant: mtExcept,
+        desc: `Régime applicable aux contrats conclus entre le 08/03/2026 et le 01/01/2027, débutant avant le 01/01/2027. Versée au titre de la 1ère année uniquement, par l'ASP (mensualisée). Montant pour CYIM (entreprise < 250 salariés) : ${descNiveau} → ${mtExcept}. Référence : décret n° 2026-168 du 06/03/2026. ⚠ Non cumulable avec l'aide unique de 5 000 €.`
+      });
+    } else {
+      aides.push({
+        eligible: false,
+        titre: "Aide exceptionnelle à l'apprentissage 2026",
+        montant: "Non éligible",
+        desc: niveau <= 4
+          ? `Pour une entreprise < 250 salariés et un diplôme jusqu'au niveau Bac (niveau ${niveau}), c'est l'aide unique de 5 000 € qui s'applique (voir ci-dessous), et non l'aide exceptionnelle. Référence : décret n° 2026-168 du 06/03/2026.`
+          : `Le niveau ${niveau} (Bac+8 / doctorat) dépasse le niveau 7 plafond de l'aide exceptionnelle. Référence : décret n° 2026-168 du 06/03/2026.`
+      });
+    }
+
+    // 2) Aide unique — réservée aux diplômes jusqu'au niveau Bac (niveau 4)
+    const eligibleUnique = niveau <= 4;
     aides.push({
-      eligible: true,
-      titre: "Aide exceptionnelle 2026 (cumul exclusif avec l'aide unique)",
-      montant: rqth ? "6 000 €" : "Variable selon niveau",
-      desc: `Pour les contrats conclus entre 8/03/2026 et 31/12/2026 démarrant avant le 1/01/2027. Montant pour CYIM (< 250 salariés) : 5 000 € jusqu'au niveau 4, 4 500 € niveau 5, 2 000 € au-delà. Référence : Décret n° 2026-168 du 06/03/2026. ⚠ Non cumulable avec l'aide unique — c'est l'une OU l'autre.`
+      eligible: eligibleUnique,
+      titre: "Aide unique à l'embauche d'apprentis",
+      montant: eligibleUnique ? "5 000 €" : "Non éligible",
+      desc: eligibleUnique
+        ? `Réservée aux entreprises < 250 salariés (✓ CYIM) recrutant un apprenti préparant un diplôme jusqu'au niveau Bac (niveau ${niveau}). Versée la 1ère année par l'ASP. ⚠ Non cumulable avec l'aide exceptionnelle 2026.`
+        : `Réservée aux diplômes jusqu'au niveau Bac (niveau 4). Le niveau ${niveau} relève de l'aide exceptionnelle 2026 (voir ci-dessus).`
     });
 
     // Participation forfaitaire : 750 € à payer pour les niveaux 6 et 7
@@ -3595,7 +3980,7 @@ function altUpdateAides() {
         eligible: true,
         titre: "Participation forfaitaire à verser (à déduire)",
         montant: "− 750 €",
-        desc: `Pour les contrats conclus à partir du 01/07/2025 visant un diplôme de niveau 6 ou 7 (Bac+3 à Bac+5), l'employeur doit s'acquitter d'une participation forfaitaire de 750 € à la formation. Référence : Art. L6332-14-1 Code du travail.`
+        desc: `Pour les contrats conclus à partir du 01/07/2025 visant un diplôme de niveau 6 ou 7 (Bac+3 à Bac+5), l'employeur doit s'acquitter d'une participation forfaitaire de 750 € à la formation. Référence : art. L6332-14-1 Code du travail.`
       });
     }
   } else {
@@ -3618,16 +4003,6 @@ function altUpdateAides() {
     });
   }
 
-  // Exonération de cotisations apprenti
-  if (isApp) {
-    aides.push({
-      eligible: true,
-      titre: "Exonération de charges sociales (apprenti)",
-      montant: "Variable",
-      desc: `Exonération totale sur la fraction de salaire ≤ 79% SMIC. Au-delà, application du régime général avec réduction générale des cotisations. Référence : Art. L6243-2 Code du travail.`
-    });
-  }
-
   container.innerHTML = aides.map(a => `
     <div class="alt-aide-card ${a.eligible ? 'eligible' : 'non-eligible'}">
       <h4>
@@ -3641,8 +4016,9 @@ function altUpdateAides() {
 }
 
 function altBindInputs() {
-  const ids = ["alt-nom","alt-age","alt-date-debut","alt-niveau","alt-annee","alt-niveau-deja","alt-formation",
-               "alt-rqth","alt-succession","alt-majoration15","alt-licencepro"];
+  const ids = ["alt-nom","alt-age","alt-date-debut","alt-niveau","alt-annee","alt-formation",
+               "alt-annee-pro","alt-public-pro","alt-metier5",
+               "alt-rqth","alt-succession","alt-succession-prev","alt-majoration15","alt-licencepro"];
   ids.forEach(id => {
     const el = document.getElementById(id);
     if (el && el.dataset.altBound !== "1") {
@@ -3651,6 +4027,12 @@ function altBindInputs() {
       el.dataset.altBound = "1";
     }
   });
+  // Le niveau pilote aussi l'affichage de la variante métier niveau 5
+  const nivEl = document.getElementById("alt-niveau");
+  if (nivEl && nivEl.dataset.altBound5 !== "1") {
+    nivEl.addEventListener("change", altToggleMetier5);
+    nivEl.dataset.altBound5 = "1";
+  }
 }
 
 // =============================================================
@@ -3663,7 +4045,6 @@ function altRenderGrille() {
   const age = parseInt(document.getElementById("alt-age").value) || 21;
   const niveau = parseInt(document.getElementById("alt-niveau").value) || 6;
   const annee = parseInt(document.getElementById("alt-annee").value) || 1;
-  const niveauDeja = document.getElementById("alt-niveau-deja").value;
   const licencepro = altType === "apprentissage" && document.getElementById("alt-licencepro").checked;
 
   const trancheAge = altAgeTranche(age, altType === "apprentissage");
@@ -3671,86 +4052,140 @@ function altRenderGrille() {
   const anneeEffective = licencepro ? 2 : annee;
 
   if (altType === "apprentissage") {
-    // Grille SYNTEC apprentissage (avenant 2024)
-    const lignes = [
-      { age: "<18", label: "Avant 18 ans", row1: 33, row2: 43, row3: 58 },
-      { age: "18-20", label: "18 à 20 ans (niv. 3-4 / 5-6 / 7-8)", row1: "43 / 43 / 48", row2: "51 / 53 / 58", row3: "67 / 68 / 70" },
-      { age: "21-25", label: "21 à 25 ans (niv. 3-4 / 5-6 / 7-8)", row1: "53 / 55 / 65", row2: "61 / 65 / 75", row3: "78 / 80 / 80" },
-      { age: ">=26", label: "26 ans et plus", row1: 100, row2: 100, row3: 100 }
+    // Grille SYNTEC apprentissage — branche Bureaux d'études (IDCC 1486)
+    // Accord salaire du 26 juin 2024, annexe III (OPCO Atlas).
+    // Format développé : une colonne par tranche d'âge × niveau (comme l'onglet Grilles SYNTEC).
+    // Données par année : [<18, 18-20(3-4), 18-20(5-6), 18-20(7-8), 21-25(3-4), 21-25(5-6), 21-25(7-8), >=26]
+    const lignesAnnees = [
+      { label: "1ère année", annNum: 1, vals: [33, 43, 43, 48, 53, 55, 65, 100] },
+      { label: "2ème année", annNum: 2, vals: [43, 51, 53, 58, 61, 65, 75, 100] },
+      { label: "3ème année", annNum: 3, vals: [58, 67, 68, 70, 78, 80, 80, 100] }
     ];
 
+    // Index de la colonne correspondant exactement à la situation simulée
+    // Colonnes : 0=<18, 1=18-20/3-4, 2=18-20/5-6, 3=18-20/7-8, 4=21-25/3-4, 5=21-25/5-6, 6=21-25/7-8, 7=>=26
+    function colIndexFor(trAge, trNiv) {
+      if (trAge === "<18") return 0;
+      if (trAge === ">=26") return 7;
+      const base = (trAge === "18-20") ? 1 : 4;
+      const offset = trNiv === "3-4" ? 0 : (trNiv === "5-6" ? 1 : 2);
+      return base + offset;
+    }
+    const colActive = colIndexFor(trancheAge, trancheNiv);
+
     let rowsHtml = "";
-    lignes.forEach(l => {
-      const isHighlight = l.age === trancheAge;
-      const a1Match = isHighlight && anneeEffective === 1;
-      const a2Match = isHighlight && anneeEffective === 2;
-      const a3Match = isHighlight && anneeEffective === 3;
-      rowsHtml += `
-        <tr ${isHighlight ? 'style="background:#FEF3C7;"' : ''}>
-          <td><strong>${l.label}</strong></td>
-          <td class="num" ${a1Match ? 'style="background:#10B981; color:white; font-weight:800;"' : ''}>${l.row1} %</td>
-          <td class="num" ${a2Match ? 'style="background:#10B981; color:white; font-weight:800;"' : ''}>${l.row2} %</td>
-          <td class="num" ${a3Match ? 'style="background:#10B981; color:white; font-weight:800;"' : ''}>${l.row3} %</td>
-        </tr>
-      `;
+    lignesAnnees.forEach(l => {
+      const isAnneeMatch = l.annNum === anneeEffective;
+      const cells = l.vals.map((v, idx) => {
+        const exact = isAnneeMatch && idx === colActive;
+        return `<td class="num">${exact ? `<span class="alt-cell-hit">${v}%</span>` : v + ' %'}</td>`;
+      }).join("");
+      rowsHtml += `<tr ${isAnneeMatch ? 'class="alt-row-age"' : ''}><td><strong>${l.label}</strong></td>${cells}</tr>`;
     });
 
     container.innerHTML = `
+      <div class="alt-grille-legend">
+        <span class="alt-grille-badge">Convention collective SYNTEC — IDCC 1486</span>
+        Branche des bureaux d'études techniques, cabinets d'ingénieurs-conseils et sociétés de conseils.
+        Accord salaire du 26 juin 2024 (annexe III). Source : OPCO Atlas.
+      </div>
+      <div class="table-wrapper">
       <table class="alt-grille-table">
         <thead>
           <tr>
-            <th>Âge au début du contrat</th>
-            <th class="num">1ère année</th>
-            <th class="num">2ème année</th>
-            <th class="num">3ème année</th>
+            <th rowspan="2" style="vertical-align:bottom;">Année d'exécution</th>
+            <th class="num">&lt; 18 ans</th>
+            <th colspan="3" class="num">18 à 20 ans</th>
+            <th colspan="3" class="num">21 à 25 ans</th>
+            <th class="num">≥ 26 ans</th>
+          </tr>
+          <tr>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">tous niv.</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">Niv 3-4</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">Niv 5-6</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">Niv 7-8</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">Niv 3-4</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">Niv 5-6</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">Niv 7-8</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">tous niv.</span></th>
           </tr>
         </thead>
         <tbody>${rowsHtml}</tbody>
       </table>
-      <div style="font-size:11.5px; color: var(--text-soft); margin-top:10px; font-style: italic;">
-        Pourcentages exprimés en % du SMIC mensuel applicable.
-        Pour les 21 ans et plus, le SMC (salaire minimum conventionnel SYNTEC lié à la classification visée) peut être plus favorable et doit être retenu.
-        Grille issue de l'avenant SYNTEC 2024 (OPCO Atlas, branche Bureaux d'études).
-        ${licencepro ? "<br>Licence pro en 1 an : rémunération équivalente à une 2ème année." : ""}
+      </div>
+      <div style="font-size:11.5px; color: var(--text-soft); margin-top:10px; line-height:1.6;">
+        <strong>Lecture :</strong> les colonnes correspondent aux tranches d'âge et, pour les 18-25 ans, aux trois groupes de niveau de diplôme préparé&nbsp;:
+        <strong>Niv. 3-4</strong> (CAP/BEP/Bac), <strong>Niv. 5-6</strong> (Bac+2/Bac+3) et <strong>Niv. 7-8</strong> (Master/Doctorat).
+        La ligne sur fond jaune correspond à l'année d'exécution saisie&nbsp;; le pourcentage encadré en vert correspond exactement à la situation simulée (âge × année × niveau).
+        <br>Pour les 21 ans et plus, le SMC (salaire minimum conventionnel SYNTEC lié à la classification visée) s'applique s'il est plus favorable que le pourcentage du SMIC.
+        ${licencepro ? "<br>Licence pro en 1 an : rémunération équivalente à une 2ème année (art. D6222-32)." : ""}
       </div>
     `;
   } else {
-    // Grille professionnalisation
-    const lignes = [
-      { age: "<21", label: "Moins de 21 ans", ltBac: 55, gteBac: 65 },
-      { age: "21-25", label: "21 à 25 ans", ltBac: 70, gteBac: 80 },
-      { age: ">=26", label: "26 ans et plus", ltBac: 100, gteBac: 100 }
-    ];
+    // Grille professionnalisation SYNTEC réelle (% du SMC par position)
+    // Déterminer la clé active pour mise en évidence
+    const metier5 = document.getElementById("alt-metier5").value || "5-transverse";
+    const publicPro = document.getElementById("alt-public-pro").value || "jeune";
+    const anneePro = parseInt(document.getElementById("alt-annee-pro").value) || 1;
+    let keyActive;
+    if (niveau <= 4) keyActive = "3-4";
+    else if (niveau === 5) keyActive = metier5;
+    else if (niveau === 6) keyActive = "6";
+    else keyActive = "7";
 
+    const ordre = ["3-4", "5-transverse", "5-branche", "6", "7"];
     let rowsHtml = "";
-    lignes.forEach(l => {
-      const isHighlight = l.age === trancheAge;
-      const ltMatch = isHighlight && niveauDeja === "lt-bac";
-      const gteMatch = isHighlight && niveauDeja === "gte-bac";
+    ordre.forEach(k => {
+      const g = altGrilleProfSyntec[k];
+      const isActive = (k === keyActive);
+      const j1 = g.jeune1, j2 = g.jeune2, d1 = g.de1, d2 = g.de2;
+      const hit = (val, cond) => cond ? `<span class="alt-cell-hit">${val}%</span>` : val + ' %';
+      const isJ1 = isActive && publicPro === "jeune" && anneePro === 1;
+      const isJ2 = isActive && publicPro === "jeune" && anneePro === 2;
+      const isD1 = isActive && publicPro === "de" && anneePro === 1;
+      const isD2 = isActive && publicPro === "de" && anneePro === 2;
       rowsHtml += `
-        <tr ${isHighlight ? 'style="background:#FEF3C7;"' : ''}>
-          <td><strong>${l.label}</strong></td>
-          <td class="num" ${ltMatch ? 'style="background:#10B981; color:white; font-weight:800;"' : ''}>${l.ltBac} %</td>
-          <td class="num" ${gteMatch ? 'style="background:#10B981; color:white; font-weight:800;"' : ''}>${l.gteBac} %</td>
+        <tr ${isActive ? 'class="alt-row-age"' : ''}>
+          <td><strong>${g.label}</strong></td>
+          <td class="num">${g.cat} ${g.pos}<br><span class="alt-th-sub" style="opacity:1;">coef ${g.coef}</span></td>
+          <td class="num">${fmtEur(g.smc)}</td>
+          <td class="num">${hit(j1, isJ1)}</td>
+          <td class="num">${hit(j2, isJ2)}</td>
+          <td class="num">${hit(d1, isD1)}</td>
+          <td class="num">${hit(d2, isD2)}</td>
         </tr>
       `;
     });
 
     container.innerHTML = `
+      <div class="alt-grille-legend">
+        <span class="alt-grille-badge">Convention collective SYNTEC — IDCC 1486</span>
+        Grille professionnalisation de la branche Bureaux d'études. Source : OPCO Atlas, accord du 26 juin 2024 (annexe III), accord formation du 31/10/2019 et avenant n°1 du 15/05/2020.
+      </div>
+      <div class="table-wrapper">
       <table class="alt-grille-table">
         <thead>
           <tr>
-            <th>Âge au début du contrat</th>
-            <th class="num">Diplôme < Bac pro</th>
-            <th class="num">Diplôme ≥ Bac pro / titre équivalent</th>
+            <th rowspan="2" style="vertical-align:bottom;">Niveau de formation à l'entrée</th>
+            <th rowspan="2" class="num" style="vertical-align:bottom;">Position<br>coef</th>
+            <th rowspan="2" class="num" style="vertical-align:bottom;">SMC<br>mensuel</th>
+            <th colspan="2" class="num">Jeune &lt; 26 ans</th>
+            <th colspan="2" class="num">Demandeur emploi / 26 ans +</th>
+          </tr>
+          <tr>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">1ère an.</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">2ème an.</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">1ère an.</span></th>
+            <th class="num"><span class="alt-th-sub" style="opacity:1;">2ème an.</span></th>
           </tr>
         </thead>
         <tbody>${rowsHtml}</tbody>
       </table>
-      <div style="font-size:11.5px; color: var(--text-soft); margin-top:10px; font-style: italic;">
-        Pourcentages exprimés en % du SMIC mensuel.
-        À partir de 26 ans, le salaire ne peut être inférieur au SMIC ou à 85 % du salaire minimum conventionnel (SMC) si plus favorable.
-        Source : articles D6325-14 et suivants du Code du travail.
+      </div>
+      <div style="font-size:11.5px; color: var(--text-soft); margin-top:10px; line-height:1.6;">
+        Pourcentages exprimés en <strong>% du SMC</strong> (salaire minimum conventionnel de la position d'entrée), avec plancher SMIC.
+        La ligne sur fond jaune correspond au niveau de formation saisi&nbsp;; le pourcentage encadré en vert correspond à la situation simulée (public × année).
+        <br>Pour un demandeur d'emploi de 26 ans et plus, le salaire de 1ère année (85% du SMC) n'est jamais inférieur au SMIC en vigueur.
       </div>
     `;
   }
@@ -3759,6 +4194,70 @@ function altRenderGrille() {
 function setupAlternants() {
   altBindInputs();
   altUpdate();
+}
+
+// =============================================================
+// TUTEUR / MAÎTRE D'APPRENTISSAGE
+// Rôle et pré-requis, différenciés apprentissage / professionnalisation.
+// =============================================================
+function altRenderTuteur() {
+  const container = document.getElementById("alt-tuteur-display");
+  if (!container) return;
+
+  if (altType === "apprentissage") {
+    container.innerHTML = `
+      <div class="alt-grille-legend">
+        <span class="alt-grille-badge">Maître d'apprentissage</span>
+        Désignation obligatoire (art. L6223-5 et suivants du Code du travail). C'est le maître d'apprentissage qui accompagne l'apprenti, et non un simple « tuteur ».
+      </div>
+      <div style="font-size:13px; color: var(--text); line-height:1.7;">
+        <strong>Rôle</strong>
+        <ul style="margin:6px 0 14px; padding-left:20px;">
+          <li>Accueillir, aider, informer et guider l'apprenti pendant toute la durée du contrat.</li>
+          <li>Lui transmettre les compétences du métier en lien avec la qualification visée.</li>
+          <li>Assurer la liaison avec le CFA et participer au suivi de la formation (livret d'apprentissage, évaluations).</li>
+          <li>Contribuer à l'acquisition des compétences nécessaires à l'obtention du diplôme ou titre préparé.</li>
+        </ul>
+        <strong>Pré-requis (l'une des deux conditions, art. R6223-22 et suivants)</strong>
+        <ul style="margin:6px 0 14px; padding-left:20px;">
+          <li>Être titulaire d'un diplôme ou titre relevant du domaine professionnel correspondant, d'un niveau au moins équivalent à celui visé par l'apprenti, <strong>et</strong> justifier d'<strong>un an</strong> d'exercice d'une activité professionnelle en rapport avec la qualification préparée ; <strong>ou</strong></li>
+          <li>Justifier de <strong>deux ans</strong> d'exercice d'une activité professionnelle en rapport avec la qualification préparée, sans condition de diplôme.</li>
+        </ul>
+        <strong>Conditions d'exercice</strong>
+        <ul style="margin:6px 0 4px; padding-left:20px;">
+          <li>Être salarié volontaire, majeur et offrant des garanties de moralité.</li>
+          <li>Suivre au maximum <strong>2 apprentis</strong> simultanément (+ 1 apprenti en cas de redoublement), sauf dérogation conventionnelle.</li>
+          <li>L'employeur lui-même peut être maître d'apprentissage s'il remplit les conditions.</li>
+          <li>L'employeur doit lui laisser le temps nécessaire à l'accompagnement et aux relations avec le CFA.</li>
+        </ul>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div class="alt-grille-legend">
+        <span class="alt-grille-badge">Tuteur</span>
+        Désignation par l'employeur parmi les salariés qualifiés (art. L6325-3-1 et D6325-6 du Code du travail). Fortement recommandée et de fait obligatoire dans la plupart des branches.
+      </div>
+      <div style="font-size:13px; color: var(--text); line-height:1.7;">
+        <strong>Rôle</strong>
+        <ul style="margin:6px 0 14px; padding-left:20px;">
+          <li>Accueillir, aider, informer et guider le salarié en contrat de professionnalisation.</li>
+          <li>Organiser son activité dans l'entreprise et contribuer à l'acquisition des savoir-faire professionnels.</li>
+          <li>Assurer la liaison avec l'organisme de formation et participer à l'évaluation du suivi.</li>
+        </ul>
+        <strong>Pré-requis (art. D6325-6)</strong>
+        <ul style="margin:6px 0 14px; padding-left:20px;">
+          <li>Être salarié qualifié, volontaire, justifiant d'<strong>au moins 2 ans</strong> d'expérience professionnelle en rapport avec la qualification visée.</li>
+          <li>L'employeur peut assurer lui-même le tutorat s'il remplit ces conditions.</li>
+        </ul>
+        <strong>Conditions d'exercice</strong>
+        <ul style="margin:6px 0 4px; padding-left:20px;">
+          <li>Suivre au maximum <strong>3 salariés</strong> en alternance (apprentissage et/ou professionnalisation) simultanément, ou <strong>2</strong> si l'employeur est lui-même tuteur.</li>
+          <li>Disposer du temps nécessaire à l'accompagnement et aux relations avec l'organisme de formation.</li>
+        </ul>
+      </div>
+    `;
+  }
 }
 
 // =============================================================
@@ -3785,10 +4284,28 @@ function buildAltPrintContent() {
 
   const result = altComputePct();
   const smicMens = state.smic_mensuel;
-  const salMens35 = smicMens * result.pct / 100;
+  const salMens35 = result.salMens35;
   const salMens39 = salMens35 * (state.h35 + (state.h39-state.h35)*1.25) / state.h35;
+  const pInfo = result.proInfo;
 
   const typeLabel = altType === "apprentissage" ? "Contrat d'apprentissage" : "Contrat de professionnalisation";
+
+  // Bloc tuteur / maître d'apprentissage pour la synthèse
+  const tuteurPrint = altType === "apprentissage"
+    ? `<h3 class="ps-section">Maître d'apprentissage</h3>
+       <div class="ps-block" style="font-size:9.5pt; line-height:1.55;">
+         <p style="margin:0 0 6px;"><strong>Désignation obligatoire</strong> (art. L6223-5 et s. du Code du travail).</p>
+         <p style="margin:0 0 6px;"><strong>Rôle :</strong> accueillir et guider l'apprenti, lui transmettre les compétences du métier, assurer la liaison avec le CFA et le suivi de la formation, contribuer à l'obtention du diplôme ou titre visé.</p>
+         <p style="margin:0 0 6px;"><strong>Pré-requis (au choix) :</strong> diplôme/titre du domaine au moins de niveau équivalent à celui visé + 1 an d'activité professionnelle en rapport ; OU 2 ans d'activité professionnelle en rapport, sans condition de diplôme.</p>
+         <p style="margin:0;"><strong>Conditions :</strong> salarié volontaire et majeur ; au maximum 2 apprentis simultanés (+1 en cas de redoublement) ; temps dédié à l'accompagnement laissé par l'employeur.</p>
+       </div>`
+    : `<h3 class="ps-section">Tuteur</h3>
+       <div class="ps-block" style="font-size:9.5pt; line-height:1.55;">
+         <p style="margin:0 0 6px;"><strong>Désignation par l'employeur</strong> parmi les salariés qualifiés (art. L6325-3-1 et D6325-6 du Code du travail).</p>
+         <p style="margin:0 0 6px;"><strong>Rôle :</strong> accueillir et guider le salarié, organiser son activité, contribuer à l'acquisition des savoir-faire, assurer la liaison avec l'organisme de formation et le suivi de l'évaluation.</p>
+         <p style="margin:0 0 6px;"><strong>Pré-requis :</strong> salarié qualifié justifiant d'au moins 2 ans d'expérience professionnelle en rapport avec la qualification visée.</p>
+         <p style="margin:0;"><strong>Conditions :</strong> au maximum 3 salariés en alternance simultanés (2 si l'employeur est lui-même tuteur) ; temps dédié laissé par l'employeur.</p>
+       </div>`;
 
   // Aides (récup du HTML déjà généré, simplifié)
   const aides = document.querySelectorAll(".alt-aide-card.eligible");
@@ -3819,15 +4336,21 @@ function buildAltPrintContent() {
       <div class="ps-row"><span class="ps-label">Formation préparée</span><span class="ps-val">${formation}</span></div>
       <div class="ps-row"><span class="ps-label">Niveau de diplôme préparé</span><span class="ps-val">Niveau ${niveau}</span></div>
       ${altType === "apprentissage" ? `<div class="ps-row"><span class="ps-label">Année d'exécution</span><span class="ps-val">${annee}</span></div>` : ""}
+      ${altType === "professionnalisation" && pInfo ? `<div class="ps-row"><span class="ps-label">Année d'exécution</span><span class="ps-val">${pInfo.anneePro}</span></div>
+      <div class="ps-row"><span class="ps-label">Public bénéficiaire</span><span class="ps-val">${pInfo.publicPro === "jeune" ? "Jeune de 16 à 25 ans" : "Demandeur d'emploi / 26 ans et +"}</span></div>
+      <div class="ps-row"><span class="ps-label">Position SYNTEC d'entrée</span><span class="ps-val">${pInfo.g.cat} ${pInfo.g.pos} (coef ${pInfo.g.coef})</span></div>` : ""}
       ${rqth ? `<div class="ps-row"><span class="ps-label">Statut</span><span class="ps-val">RQTH</span></div>` : ""}
     </div>
 
     <h3 class="ps-section">Salaire brut</h3>
     <div class="ps-block">
-      <div class="ps-row"><span class="ps-label">% applicable</span><span class="ps-val">${result.pct} % du ${result.base}</span></div>
-      <div class="ps-row ps-highlight"><span class="ps-label">Salaire brut mensuel (35h)</span><span class="ps-val">${fmtEur(salMens35)}</span></div>
-      <div class="ps-row ps-highlight"><span class="ps-label">Équivalent mensuel 39h CYIM (HS 25% incluses)</span><span class="ps-val">${fmtEur(salMens39)}</span></div>
-      <div class="ps-row"><span class="ps-label">Salaire brut annuel 35h</span><span class="ps-val">${fmtEur(salMens35*12)}</span></div>
+      ${altType === "apprentissage"
+        ? `<div class="ps-row"><span class="ps-label">% applicable</span><span class="ps-val">${result.pct} % du ${result.base}</span></div>`
+        : `<div class="ps-row"><span class="ps-label">Base conventionnelle</span><span class="ps-val">${result.base}</span></div>
+           <div class="ps-row"><span class="ps-label">SMC mensuel de référence</span><span class="ps-val">${pInfo ? fmtEur(pInfo.smc) : "—"}</span></div>`}
+      <div class="ps-row"><span class="ps-label">Salaire brut mensuel (35h)</span><span class="ps-val">${fmtEur(salMens35)}</span></div>
+      <div class="ps-row ps-highlight"><span class="ps-label">Équivalent mensuel 39h CYIM brut (HS 25% incluses)</span><span class="ps-val">${fmtEur(salMens39)}</span></div>
+      <div class="ps-row"><span class="ps-label">Salaire brut annuel 39h CYIM (HS 25% incluses)</span><span class="ps-val">${fmtEur(salMens39*12)}</span></div>
     </div>
     ${result.note ? `<div class="ps-block" style="margin-top:6px; font-size:9pt; color: #6B7280;">${result.note}</div>` : ""}
 
@@ -3843,6 +4366,8 @@ function buildAltPrintContent() {
     <div class="ps-block">
       ${aidesList || '<div class="ps-row"><span class="ps-label">Aucune aide identifiée</span><span class="ps-val">—</span></div>'}
     </div>
+
+    ${tuteurPrint}
 
     <div class="ps-footer">
       <em>Tous les montants sont exprimés en salaire brut.</em><br>
@@ -4048,6 +4573,77 @@ function renderGrilles() {
         computeAll();
       }
     });
+  });
+
+  renderGrilleAlerts();
+}
+
+// =============================================================
+// ALERTE DE PÉREMPTION DES GRILLES
+// Compare les dates des grilles à la date du jour et affiche un bandeau :
+//   - vert (OK) si < 9 mois
+//   - orange (à vérifier) si entre 9 et 14 mois
+//   - rouge (à mettre à jour) si > 14 mois
+// Les grilles SYNTEC sont renégociées chaque année (CPPNI, au plus tard 30 juin).
+// =============================================================
+const OPCO_ATLAS_URL = "https://www.opco-atlas.fr/orientation";
+
+function _parseFrDate(str) {
+  // "JJ/MM/AAAA" -> Date
+  if (!str) return null;
+  const m = String(str).match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (!m) return null;
+  return new Date(parseInt(m[3]), parseInt(m[2]) - 1, parseInt(m[1]));
+}
+
+function _moisEcoules(date) {
+  if (!date) return null;
+  const now = new Date();
+  return (now.getFullYear() - date.getFullYear()) * 12 + (now.getMonth() - date.getMonth());
+}
+
+function renderGrilleAlerts() {
+  // L'alerte porte UNIQUEMENT sur les grilles d'alternance (OPCO Atlas),
+  // qui sont les seules à dépendre directement du SMIC et de la grille SYNTEC
+  // alternance. La grille SYNTEC ETAM/Cadres n'est PAS prise en compte ici :
+  // la branche ne révise pas nécessairement ses minima chaque année.
+  // Le ton reste informatif (rappel), jamais alarmiste : l'outil reste valable
+  // tant que les valeurs n'ont pas changé officiellement.
+  const dAlt = _parseFrDate(state.alt_grille_date);
+  const moisAlt = _moisEcoules(dAlt);
+
+  let niveau, titre, corps;
+  if (moisAlt !== null && moisAlt >= 18) {
+    // Au-delà de 18 mois : simple rappel de vérification (ton neutre, pas rouge)
+    niveau = "warn";
+    titre = "🔔 Pensez à vérifier les grilles d'alternance";
+    corps = `Les grilles d'alternance chargées datent de plus de 18 mois. Une vérification ponctuelle est conseillée, sans urgence : elles restent valables tant qu'aucune revalorisation du SMIC ni nouvel accord de branche n'est intervenu.`;
+  } else {
+    niveau = "ok";
+    titre = "✓ Grilles d'alternance à jour";
+    corps = `Les grilles d'alternance chargées sont considérées à jour. Pensez simplement à les revérifier en cas de revalorisation du SMIC.`;
+  }
+
+  const detail = `Référence chargée : grille alternance <strong>${state.alt_grille_ref || state.alt_grille_date || "?"}</strong>, calculée sur le SMIC en vigueur au <strong>${state.smic_date || "?"}</strong> (${fmtEur(state.smic_mensuel)}/mois).`;
+
+  const html = `
+    <span class="grille-alert-title">${titre}</span>
+    ${corps}
+    <div style="margin-top:8px; font-size:12px;">${detail}</div>
+    <div style="margin-top:10px; font-size:12.5px;">
+      Grilles officielles OPCO Atlas (rubrique « Bureaux d'études ») :
+      <a href="${OPCO_ATLAS_URL}" target="_blank" rel="noopener">${OPCO_ATLAS_URL}</a>
+      <br>Pour mettre à jour : onglet <strong>Paramètres</strong> (SMIC) ou module <strong>Administration</strong> (import des fichiers OPCO Atlas).
+    </div>
+  `;
+
+  ["alt-grille-alert"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.className = "grille-alert " + niveau;
+      el.innerHTML = html;
+      el.style.display = "block";
+    }
   });
 }
 
