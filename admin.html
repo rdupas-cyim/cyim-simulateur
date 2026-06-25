@@ -337,6 +337,31 @@
     <div id="import-report" style="margin-top:14px;"></div>
   </div>
 
+  <!-- IMPORT RNCP -->
+  <div class="card" style="border:2px solid var(--mint);">
+    <h2>0 bis. Mettre à jour le référentiel RNCP</h2>
+    <div class="desc">
+      Le référentiel RNCP (codes des certifications) est utilisé par la recherche de formation dans l'onglet Alternants.
+      Pour le rafraîchir, téléchargez le fichier XML officiel sur
+      <a href="https://www.data.gouv.fr/datasets/repertoire-national-des-certifications-professionnelles-et-repertoire-specifique" target="_blank" rel="noopener">data.gouv.fr (rubrique Fichier Principal)</a>,
+      puis déposez-le ci-dessous. L'outil en extrait les certifications actives et génère un fichier <strong>rncp.json</strong> à déposer sur GitHub à côté de index.html.
+    </div>
+    <div style="margin-top:12px;">
+      <label for="import-rncp">Fichier XML du RNCP (export France Compétences)</label>
+      <input type="file" id="import-rncp" accept=".xml">
+      <div style="font-size:12px; color:var(--text-soft); margin-top:4px;">
+        Le fichier est volumineux (plusieurs centaines de Mo). Le traitement se fait dans votre navigateur, sans rien envoyer sur internet. Patientez pendant l'analyse.
+      </div>
+    </div>
+    <div id="rncp-progress" style="display:none; margin-top:12px;">
+      <div style="font-size:13px; color:var(--text); margin-bottom:6px;" id="rncp-progress-text">Analyse en cours...</div>
+      <div style="height:10px; background:#E5E7EB; border-radius:5px; overflow:hidden;">
+        <div id="rncp-progress-bar" style="height:100%; width:0%; background:var(--mint); transition:width 0.2s;"></div>
+      </div>
+    </div>
+    <div id="rncp-import-report" style="margin-top:14px;"></div>
+  </div>
+
   <!-- SMIC -->
   <!-- RÉFÉRENCE SYNTEC -->
   <div class="card">
@@ -1211,6 +1236,107 @@ function setupImports() {
   const f2 = document.getElementById("import-grille-syntec");
   if (f1) f1.addEventListener("change", e => { if (e.target.files[0]) handleImportRemu(e.target.files[0]); });
   if (f2) f2.addEventListener("change", e => { if (e.target.files[0]) handleImportGrille(e.target.files[0]); });
+  const f3 = document.getElementById("import-rncp");
+  if (f3) f3.addEventListener("change", e => { if (e.target.files[0]) handleImportRncp(e.target.files[0]); });
+}
+
+// =============================================================
+// IMPORT RNCP — lecture en streaming du gros fichier XML
+// Le fichier (plusieurs centaines de Mo) est lu par tranches pour
+// ne pas saturer la mémoire. On extrait les blocs <FICHE>...</FICHE>,
+// on ne garde que les fiches "Publiée", et on génère un rncp.json compact.
+// =============================================================
+function _extractTag(block, tag) {
+  const m = block.match(new RegExp("<" + tag + ">([\\s\\S]*?)</" + tag + ">"));
+  return m ? m[1].trim() : "";
+}
+
+async function handleImportRncp(file) {
+  const report = document.getElementById("rncp-import-report");
+  const prog = document.getElementById("rncp-progress");
+  const bar = document.getElementById("rncp-progress-bar");
+  const ptxt = document.getElementById("rncp-progress-text");
+  report.innerHTML = "";
+  prog.style.display = "block";
+
+  const CHUNK = 4 * 1024 * 1024; // 4 Mo par tranche
+  const total = file.size;
+  let offset = 0;
+  let carry = "";              // texte non encore traité (fin de tranche)
+  const fiches = [];
+  let totalFiches = 0;
+
+  try {
+    while (offset < total) {
+      const slice = file.slice(offset, offset + CHUNK);
+      const text = await slice.text();
+      carry += text;
+      offset += CHUNK;
+
+      // Extraire toutes les fiches complètes présentes dans "carry"
+      let idx;
+      while ((idx = carry.indexOf("</FICHE>")) !== -1) {
+        const start = carry.indexOf("<FICHE>");
+        if (start === -1 || start > idx) {
+          // pas de balise ouvrante avant la fermante : on coupe le bruit
+          carry = carry.slice(idx + 8);
+          continue;
+        }
+        const block = carry.slice(start, idx + 8);
+        carry = carry.slice(idx + 8);
+        totalFiches++;
+        // ne garder que les fiches actives
+        if (block.indexOf("<ETAT_FICHE>Publiée</ETAT_FICHE>") !== -1) {
+          const code = _extractTag(block, "NUMERO_FICHE");
+          const intitule = _extractTag(block, "INTITULE")
+            .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#039;/g, "'");
+          let niveau = "";
+          const ne = block.match(/<NOMENCLATURE_EUROPE>[\s\S]*?<NIVEAU>(NIV\d)<\/NIVEAU>/);
+          if (ne) niveau = ne[1].replace("NIV", "");
+          if (code && intitule) fiches.push([code, intitule, niveau]);
+        }
+      }
+
+      const pct = Math.min(100, Math.round(offset / total * 100));
+      bar.style.width = pct + "%";
+      ptxt.textContent = `Analyse en cours... ${pct}% (${fiches.length} certifications actives trouvées)`;
+      // laisser respirer l'interface
+      await new Promise(r => setTimeout(r, 0));
+    }
+
+    if (fiches.length === 0) {
+      report.innerHTML = `<div class="grille-import-err">✗ Aucune certification active détectée. Vérifiez qu'il s'agit bien du fichier XML d'export du RNCP (France Compétences).</div>`;
+      prog.style.display = "none";
+      return;
+    }
+
+    // Tri par code et génération du JSON compact
+    fiches.sort((a, b) => a[0].localeCompare(b[0]));
+    const json = JSON.stringify(fiches);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const sizeMo = (blob.size / 1024 / 1024).toFixed(2);
+
+    ptxt.textContent = `Analyse terminée : ${fiches.length} certifications actives sur ${totalFiches} fiches.`;
+    bar.style.width = "100%";
+
+    report.innerHTML = `
+      <div class="grille-import-ok">
+        ✓ ${fiches.length} certifications actives extraites (sur ${totalFiches} fiches au total).
+        Fichier rncp.json prêt : <strong>${sizeMo} Mo</strong>.
+      </div>
+      <div style="margin-top:12px;">
+        <a id="rncp-download" href="${url}" download="rncp.json" class="btn" style="display:inline-block; background:var(--navy); color:#fff; padding:10px 18px; border-radius:6px; text-decoration:none; font-weight:700;">⬇ Télécharger rncp.json</a>
+      </div>
+      <div style="font-size:12.5px; color:var(--text-soft); margin-top:10px; line-height:1.6;">
+        Étape suivante : déposez ce fichier <strong>rncp.json</strong> sur GitHub, dans le même dossier que index.html (en remplacement de l'ancien).
+        Conservez exactement ce nom de fichier. Voir le guide de mise à jour, partie « Mettre à jour le référentiel RNCP ».
+      </div>
+    `;
+  } catch (err) {
+    report.innerHTML = `<div class="grille-import-err">✗ Erreur pendant l'analyse : ${err.message}. Le fichier est peut-être trop volumineux pour votre navigateur ; réessayez avec un autre navigateur (Chrome ou Edge récents).</div>`;
+    prog.style.display = "none";
+  }
 }
 
 routeBoot();
