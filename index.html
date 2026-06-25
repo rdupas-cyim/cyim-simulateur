@@ -1380,6 +1380,73 @@
     font-size: 13.5px;
   }
 
+  /* Autocomplétion RNCP */
+  .rncp-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: var(--surface);
+    border: 1px solid var(--border-strong, #D1D5DB);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    max-height: 280px;
+    overflow-y: auto;
+    margin-top: 4px;
+  }
+  .rncp-suggestion {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .rncp-suggestion:last-child { border-bottom: none; }
+  .rncp-suggestion:hover, .rncp-suggestion.active {
+    background: var(--mint-soft, #D6F8E8);
+  }
+  .rncp-suggestion .rncp-code {
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 12px;
+  }
+  .rncp-suggestion .rncp-niv {
+    display: inline-block;
+    background: var(--navy);
+    color: #fff;
+    border-radius: 10px;
+    padding: 0 7px;
+    font-size: 11px;
+    margin-left: 6px;
+  }
+  .rncp-suggestion .rncp-int {
+    color: var(--text);
+    display: block;
+    margin-top: 2px;
+  }
+  .rncp-suggestions .rncp-info {
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text-soft);
+    font-style: italic;
+  }
+  .rncp-badge-selected {
+    background: var(--mint-soft, #D6F8E8);
+    border: 1px solid var(--mint, #30DD92);
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: var(--navy);
+  }
+  .rncp-badge-selected strong { font-weight: 700; }
+  .rncp-clear {
+    cursor: pointer;
+    color: #B91C1C;
+    margin-left: 8px;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
   /* ========================================================
      MODE COMPACT — vue dense
      ======================================================== */
@@ -2256,9 +2323,11 @@
     </div>
 
     <div class="input-grid cols-3" style="margin-top:14px;">
-      <div class="field">
-        <label for="alt-formation">Formation préparée</label>
-        <input type="text" id="alt-formation" placeholder="Ex : Master Communication digitale">
+      <div class="field" style="position:relative;">
+        <label for="alt-formation">Formation préparée (recherche RNCP)</label>
+        <input type="text" id="alt-formation" placeholder="Mots-clés de l'intitulé (ex : développeur web) ou code RNCP" autocomplete="off">
+        <div id="rncp-suggestions" class="rncp-suggestions" style="display:none;"></div>
+        <div id="rncp-selected" style="display:none; margin-top:6px; font-size:12px;"></div>
       </div>
       <div class="field">
         <label for="alt-niveau">Niveau de diplôme préparé</label>
@@ -4194,6 +4263,152 @@ function altRenderGrille() {
 function setupAlternants() {
   altBindInputs();
   altUpdate();
+  setupRncpSearch();
+}
+
+// =============================================================
+// RECHERCHE RNCP (autocomplétion par intitulé ou code)
+// Les données sont chargées depuis un fichier séparé rncp.json
+// (référentiel France Compétences, fiches actives) pour ne pas
+// alourdir le simulateur. Le code sélectionné est purement informatif
+// (traçabilité dans la synthèse) et n'influe pas sur le calcul du salaire.
+// =============================================================
+let rncpData = null;          // tableau [[code, intitulé, niveau], ...]
+let rncpLoading = false;
+let rncpSelected = null;      // { code, intitule, niveau } ou null
+let rncpActiveIdx = -1;
+
+function loadRncpData() {
+  if (rncpData || rncpLoading) return;
+  rncpLoading = true;
+  fetch("rncp.json")
+    .then(r => { if (!r.ok) throw new Error("introuvable"); return r.json(); })
+    .then(data => { rncpData = data; rncpLoading = false; })
+    .catch(() => {
+      rncpLoading = false;
+      rncpData = []; // marqueur "indisponible"
+    });
+}
+
+function rncpNormalize(s) {
+  return (s || "").toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // sans accents
+}
+
+function rncpSearch(query, limit = 30) {
+  if (!rncpData || rncpData.length === 0) return [];
+  const q = rncpNormalize(query.trim());
+  if (q.length < 2) return [];
+  // Recherche par code (RNCPxxxx) ou par mots de l'intitulé
+  const isCode = /^rncp/.test(q) || /^\d/.test(q);
+  const mots = q.split(/\s+/).filter(Boolean);
+  const res = [];
+  for (let i = 0; i < rncpData.length && res.length < limit; i++) {
+    const [code, intitule] = rncpData[i];
+    if (isCode) {
+      if (rncpNormalize(code).includes(q.replace(/\s/g, ""))) res.push(rncpData[i]);
+    } else {
+      const ni = rncpNormalize(intitule);
+      if (mots.every(m => ni.includes(m))) res.push(rncpData[i]);
+    }
+  }
+  return res;
+}
+
+function renderRncpSuggestions(list) {
+  const box = document.getElementById("rncp-suggestions");
+  if (!box) return;
+  if (rncpData && rncpData.length === 0) {
+    box.innerHTML = `<div class="rncp-info">Référentiel RNCP non chargé (fichier rncp.json absent). La saisie reste possible en texte libre.</div>`;
+    box.style.display = "block";
+    return;
+  }
+  if (list.length === 0) {
+    box.style.display = "none";
+    return;
+  }
+  rncpActiveIdx = -1;
+  box.innerHTML = list.map((f, i) => `
+    <div class="rncp-suggestion" data-idx="${i}">
+      <span class="rncp-code">${f[0]}</span><span class="rncp-niv">Niv ${f[2] || "?"}</span>
+      <span class="rncp-int">${f[1]}</span>
+    </div>
+  `).join("");
+  box.style.display = "block";
+  // clic sur une suggestion
+  box.querySelectorAll(".rncp-suggestion").forEach(el => {
+    el.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      const idx = parseInt(el.dataset.idx);
+      selectRncp(list[idx]);
+    });
+  });
+  box._currentList = list;
+}
+
+function selectRncp(fiche) {
+  rncpSelected = { code: fiche[0], intitule: fiche[1], niveau: fiche[2] };
+  const input = document.getElementById("alt-formation");
+  input.value = fiche[1];
+  document.getElementById("rncp-suggestions").style.display = "none";
+  // Synchroniser le niveau de diplôme si disponible
+  if (fiche[2] && ["3","4","5","6","7","8"].includes(fiche[2])) {
+    const sel = document.getElementById("alt-niveau");
+    sel.value = fiche[2];
+    sel.dispatchEvent(new Event("change"));
+  }
+  // Afficher le badge du code sélectionné
+  const badge = document.getElementById("rncp-selected");
+  badge.innerHTML = `<span class="rncp-badge-selected">Certification : <strong>${fiche[0]}</strong> (niveau ${fiche[2] || "?"})</span><span class="rncp-clear" id="rncp-clear">retirer</span>`;
+  badge.style.display = "block";
+  document.getElementById("rncp-clear").addEventListener("click", clearRncp);
+  altUpdate();
+}
+
+function clearRncp() {
+  rncpSelected = null;
+  document.getElementById("rncp-selected").style.display = "none";
+  document.getElementById("alt-formation").value = "";
+  altUpdate();
+}
+
+function setupRncpSearch() {
+  const input = document.getElementById("alt-formation");
+  const box = document.getElementById("rncp-suggestions");
+  if (!input || input.dataset.rncpBound === "1") return;
+  input.dataset.rncpBound = "1";
+
+  loadRncpData(); // démarre le chargement en arrière-plan
+
+  input.addEventListener("input", () => {
+    rncpSelected = null;
+    document.getElementById("rncp-selected").style.display = "none";
+    const q = input.value;
+    if (q.trim().length < 2) { box.style.display = "none"; return; }
+    if (!rncpData && !rncpLoading) loadRncpData();
+    renderRncpSuggestions(rncpSearch(q));
+  });
+
+  input.addEventListener("focus", () => {
+    if (input.value.trim().length >= 2) renderRncpSuggestions(rncpSearch(input.value));
+  });
+
+  // Navigation clavier
+  input.addEventListener("keydown", (e) => {
+    const items = box.querySelectorAll(".rncp-suggestion");
+    if (!items.length || box.style.display === "none") return;
+    if (e.key === "ArrowDown") { e.preventDefault(); rncpActiveIdx = Math.min(rncpActiveIdx + 1, items.length - 1); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); rncpActiveIdx = Math.max(rncpActiveIdx - 1, 0); }
+    else if (e.key === "Enter" && rncpActiveIdx >= 0) { e.preventDefault(); selectRncp(box._currentList[rncpActiveIdx]); return; }
+    else if (e.key === "Escape") { box.style.display = "none"; return; }
+    items.forEach((el, i) => el.classList.toggle("active", i === rncpActiveIdx));
+    if (rncpActiveIdx >= 0) items[rncpActiveIdx].scrollIntoView({ block: "nearest" });
+  });
+
+  // Fermer en cliquant ailleurs
+  document.addEventListener("click", (e) => {
+    if (!input.contains(e.target) && !box.contains(e.target)) box.style.display = "none";
+  });
 }
 
 // =============================================================
@@ -4334,6 +4549,7 @@ function buildAltPrintContent() {
       <div class="ps-row"><span class="ps-label">Date de début du contrat</span><span class="ps-val">${dateDebutFmt}</span></div>
       <div class="ps-row"><span class="ps-label">Âge au début du contrat</span><span class="ps-val">${age} ans</span></div>
       <div class="ps-row"><span class="ps-label">Formation préparée</span><span class="ps-val">${formation}</span></div>
+      ${rncpSelected ? `<div class="ps-row"><span class="ps-label">Code RNCP</span><span class="ps-val">${rncpSelected.code}</span></div>` : ""}
       <div class="ps-row"><span class="ps-label">Niveau de diplôme préparé</span><span class="ps-val">Niveau ${niveau}</span></div>
       ${altType === "apprentissage" ? `<div class="ps-row"><span class="ps-label">Année d'exécution</span><span class="ps-val">${annee}</span></div>` : ""}
       ${altType === "professionnalisation" && pInfo ? `<div class="ps-row"><span class="ps-label">Année d'exécution</span><span class="ps-val">${pInfo.anneePro}</span></div>
