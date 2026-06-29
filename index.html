@@ -360,6 +360,66 @@
     font-weight: normal;
     margin-top: 2px;
   }
+
+  /* ========================================================
+     INFOBULLE (icône ⓘ + tooltip au survol / focus clavier)
+     ======================================================== */
+  .info-tip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-left: 6px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #fff;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 1;
+    cursor: help;
+    vertical-align: middle;
+    user-select: none;
+  }
+  .info-tip:focus { outline: 2px solid var(--mint); outline-offset: 2px; }
+  .info-tip .info-bubble {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    max-width: 78vw;
+    background: var(--navy-deep);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.45;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease;
+    z-index: 50;
+  }
+  .info-tip .info-bubble::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--navy-deep);
+  }
+  .info-tip:hover .info-bubble,
+  .info-tip:focus .info-bubble {
+    opacity: 1;
+    visibility: visible;
+  }
+  .info-tip .info-bubble strong { color: var(--mint); }
   .result-row .value {
     font-weight: 700;
     color: var(--text);
@@ -1533,6 +1593,7 @@
   <button class="tab-btn" data-tab="enveloppe">Enveloppe équipe</button>
   <button class="tab-btn" data-tab="alternants">Alternants</button>
   <button class="tab-btn" data-tab="grilles">Grilles SYNTEC</button>
+  <button class="tab-btn" data-tab="classif">Classification</button>
   <button class="tab-btn" data-tab="params">Paramètres</button>
   <button class="tab-btn" data-tab="doc">Documentation</button>
 </nav>
@@ -2601,6 +2662,185 @@
       Pour un demandeur d'emploi de 26 ans et plus, la 1ère année est rémunérée à 85 % du SMC sans pouvoir être inférieure au SMIC, et la 2ème année à 100 % du SMC.
     </div>
   </div>
+</section>
+
+
+<!-- ============================================================
+     ONGLET CLASSIFICATION
+     ============================================================ -->
+<section class="panel" id="panel-classif">
+
+  <div class="note">
+    <strong>Avertissement :</strong> la classification SYNTEC reste une décision de l'employeur, fondée
+    sur les critères réels du poste (autonomie, responsabilité, complexité, encadrement) et non sur une
+    déduction automatique du diplôme ou du salaire. Cet onglet produit une <strong>proposition d'aide à la décision</strong>,
+    à confronter aux définitions de fonctions de la CCN (IDCC 1486). Le salaire ne détermine jamais une
+    position : il sert uniquement de contrôle de cohérence vis-à-vis du minima conventionnel.
+  </div>
+
+  <!-- ===== MODULE A : critères -> position ===== -->
+  <div class="section">
+    <h2>Module A - Proposer une position et un coefficient</h2>
+    <div class="section-desc">À partir du profil du poste, l'outil propose une classification de référence et son minima conventionnel.</div>
+
+    <div class="field">
+      <label for="cl-statut">Statut envisagé</label>
+      <select id="cl-statut">
+        <option value="auto">Déterminer automatiquement (ETAM ou Cadre)</option>
+        <option value="ETAM">ETAM (imposer)</option>
+        <option value="Cadre">Cadre (imposer)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="cl-diplome-poste">Niveau de formation requis pour le poste <span class="hint">- critère structurant de la classification</span></label>
+      <select id="cl-diplome-poste">
+        <option value="3">Niveau 3-4 - CAP, BEP, Bac</option>
+        <option value="5">Niveau 5 - Bac+2 (BTS, DUT)</option>
+        <option value="6">Niveau 6 - Bac+3 / Bac+4 (Licence, Bachelor)</option>
+        <option value="7">Niveau 7 - Bac+5 / Master, diplôme d'ingénieur</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="cl-diplome-cand">Niveau de formation du candidat <span class="hint">- indicatif, sans effet sur la position</span></label>
+      <select id="cl-diplome-cand">
+        <option value="0">Non renseigné</option>
+        <option value="3">Niveau 3-4 - CAP, BEP, Bac</option>
+        <option value="5">Niveau 5 - Bac+2 (BTS, DUT)</option>
+        <option value="6">Niveau 6 - Bac+3 / Bac+4 (Licence, Bachelor)</option>
+        <option value="7">Niveau 7 - Bac+5 / Master, diplôme d'ingénieur</option>
+      </select>
+    </div>
+
+    <div class="field" id="cl-metier-field">
+      <label for="cl-metier">Nature du poste <span class="info-tip" tabindex="0" role="button" aria-label="Aide sur ce critère">i<span class="info-bubble">Ce critère ne joue que pour un poste de niveau Bac+2 (ETAM). Il distingue : <strong>Métier de la branche</strong> = compétence technique propre à l'activité CYIM (production technique congrès, développement, plateformes, e-learning, édition scientifique, chefferie de projet événementiel). <strong>Fonction transverse</strong> = fonction support présente dans toute entreprise (compta, RH, paie, assistanat, communication interne). À diplôme égal, un métier de la branche est classé une position au-dessus.</span></span></label>
+      <select id="cl-metier">
+        <option value="transverse">Fonction transverse (support, admin, RH, compta, communication interne...)</option>
+        <option value="branche">Métier de la branche (production technique, développement, e-learning, projet événementiel...)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="cl-exp">Expérience professionnelle dans la fonction</label>
+      <select id="cl-exp">
+        <option value="0">Débutant (moins de 2 ans)</option>
+        <option value="1">Confirmé (2 à 5 ans)</option>
+        <option value="2">Expérimenté (5 à 10 ans)</option>
+        <option value="3">Expert / senior (plus de 10 ans)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="cl-autonomie">Autonomie dans le poste</label>
+      <select id="cl-autonomie">
+        <option value="0">Exécution de tâches programmées, sous contrôle</option>
+        <option value="1">Autonomie relative sur un programme de travail défini</option>
+        <option value="2">Forte autonomie, choix des moyens</option>
+        <option value="3">Autonomie complète, fixe ses propres objectifs</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="cl-complexite">Complexité des problèmes traités</label>
+      <select id="cl-complexite">
+        <option value="0">Tâches simples et répétitives</option>
+        <option value="1">Problèmes classiques de la technique</option>
+        <option value="2">Problèmes complets et variés</option>
+        <option value="3">Problèmes complexes, à forte dimension d'analyse</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="cl-encadrement">Encadrement / responsabilité</label>
+      <select id="cl-encadrement">
+        <option value="0">Aucun encadrement</option>
+        <option value="1">Coordination ponctuelle, référent technique</option>
+        <option value="2">Encadrement d'une équipe ou pilotage de projets</option>
+        <option value="3">Responsabilité stratégique, large périmètre</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="cl-salaire-prevu">Salaire brut annuel envisagé (€) - facultatif, pour le contrôle de cohérence</label>
+      <input type="number" id="cl-salaire-prevu" placeholder="ex : 32000" step="100">
+    </div>
+
+    <div style="margin-top:18px;">
+      <h3 style="font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 10px;">Proposition</h3>
+
+      <div class="result-row highlight">
+        <span class="label-side">Statut retenu</span>
+        <span class="value" id="cl-r-statut">-</span>
+      </div>
+      <div class="result-row suggestion">
+        <span class="label-side">Position et coefficient proposés</span>
+        <span class="value" id="cl-r-position">-</span>
+      </div>
+      <div class="result-row">
+        <span class="label-side">Minima conventionnel SYNTEC 35h <span class="hint">- plancher légal (MAX SMIC)</span></span>
+        <span class="value" id="cl-r-min35">-</span>
+      </div>
+      <div class="result-row" id="cl-r-min39-row">
+        <span class="label-side">Minima équivalent 39h CYIM <span class="hint">- ETAM uniquement</span></span>
+        <span class="value" id="cl-r-min39">-</span>
+      </div>
+      <div class="result-row">
+        <span class="label-side">Seuil interne CYIM <span class="hint">- avec marge de sûreté</span></span>
+        <span class="value" id="cl-r-cyim">-</span>
+      </div>
+      <div class="result-row">
+        <span class="label-side">Minima annuel <span class="hint">- base de comparaison, hors HS majorées</span></span>
+        <span class="value" id="cl-r-annuel">-</span>
+      </div>
+      <div class="result-row" id="cl-r-coherence-row" style="display:none;">
+        <span class="label-side">Contrôle de cohérence du salaire envisagé</span>
+        <span class="value"><span class="pill" id="cl-r-coherence">-</span></span>
+      </div>
+
+      <div class="note" id="cl-r-explain" style="margin-top:14px; display:none;"></div>
+      <div class="note" id="cl-r-ecart" style="margin-top:10px; display:none;"></div>
+    </div>
+  </div>
+
+  <!-- ===== MODULE B : salaire -> positions plausibles ===== -->
+  <div class="section">
+    <h2>Module B - Positions plausibles à partir d'un salaire</h2>
+    <div class="section-desc">À partir d'un brut annuel, l'outil liste les positions dont le minima conventionnel est respecté. Sert à vérifier qu'une classification envisagée est compatible avec la rémunération, jamais à fixer la position.</div>
+
+    <div class="field">
+      <label for="cl-b-statut">Statut</label>
+      <select id="cl-b-statut">
+        <option value="ETAM">ETAM</option>
+        <option value="Cadre">Cadre</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="cl-b-salaire">Salaire brut annuel (€)</label>
+      <input type="number" id="cl-b-salaire" placeholder="ex : 30000" step="100">
+    </div>
+
+    <div style="margin-top:18px;">
+      <h3 style="font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 10px;">Positions compatibles</h3>
+      <div class="table-wrapper">
+        <table id="cl-b-table">
+          <thead>
+            <tr>
+              <th class="center">Position</th>
+              <th class="center">Coef.</th>
+              <th class="num">Minima SYNTEC 35h</th>
+              <th class="num">Minima retenu (MAX SMIC)</th>
+              <th class="center">Compatible ?</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="note" id="cl-b-explain" style="margin-top:12px; display:none;"></div>
+    </div>
+  </div>
+
 </section>
 
 
@@ -4998,6 +5238,225 @@ function removeTeamRow(idx) {
 }
 
 // =============================================================
+// ONGLET CLASSIFICATION
+// =============================================================
+
+// --- Détermination automatique du statut (ETAM vs Cadre) ---
+// Logique conventionnelle : l'accès cadre suppose un diplôme de niveau 7 (Bac+5)
+// OU un niveau de responsabilité/autonomie/complexité élevé acquis par l'expérience.
+function clDetermineStatut(d) {
+  if (d.statut !== "auto") return d.statut;
+  // Score "cadre" : combine autonomie, complexité, encadrement
+  const scoreResp = d.autonomie + d.complexite + d.encadrement; // 0 à 9
+  // Bac+5 requis pour le poste -> cadre dès l'entrée
+  if (d.diplomePoste >= 7) return "Cadre";
+  // Sinon, accès cadre par les responsabilités réelles (seuil élevé)
+  if (scoreResp >= 7 && d.exp >= 2) return "Cadre";
+  return "ETAM";
+}
+
+// --- Sélection de la position ETAM selon le profil ---
+// On s'appuie sur la grille de correspondance diplôme/fonction de la branche,
+// modulée par l'expérience et les critères de responsabilité.
+function clPositionETAM(d) {
+  // Indice de base par niveau requis pour le poste + lien métier (aligné sur la grille alternance de l'outil)
+  // 0 = pos basse (1.1) ... vers le haut
+  let base;
+  if (d.diplomePoste <= 3)      base = 0;  // 1.1
+  else if (d.diplomePoste === 5) base = (d.metier === "branche") ? 2 : 0; // 2.1 si métier branche, sinon 1.1
+  else if (d.diplomePoste === 6) base = 3; // 2.2
+  else                      base = 4; // 2.3 (niveau 7 resté ETAM par choix explicite)
+
+  // Modulation par responsabilité/autonomie/expérience
+  const scoreResp = d.autonomie + d.complexite + d.encadrement; // 0 à 9
+  let bonus = 0;
+  if (d.exp >= 1) bonus += 1;
+  if (d.exp >= 3) bonus += 1;
+  if (scoreResp >= 4) bonus += 1;
+  if (scoreResp >= 7) bonus += 1;
+
+  let idx = Math.min(base + bonus, state.etam.length - 1);
+  return state.etam[idx];
+}
+
+// --- Sélection de la position Cadre selon le profil ---
+function clPositionCadre(d) {
+  // Positions cadres : 1.1 (débutant) ... 3.3 (dirigeant)
+  // base par expérience
+  let idx;
+  if (d.exp === 0)      idx = 0; // 1.1
+  else if (d.exp === 1) idx = 1; // 1.2
+  else if (d.exp === 2) idx = 4; // 2.2 (en sautant les deux 2.1)
+  else                  idx = 5; // 2.3
+
+  const scoreResp = d.autonomie + d.complexite + d.encadrement; // 0 à 9
+  if (scoreResp >= 6) idx += 1;
+  if (scoreResp >= 8) idx += 1;
+  if (d.encadrement >= 3) idx += 1; // responsabilité stratégique -> position 3.x
+
+  idx = Math.min(idx, state.cadres.length - 1);
+  return state.cadres[idx];
+}
+
+function clRunModuleA() {
+  const d = {
+    statut: document.getElementById("cl-statut").value,
+    diplomePoste: parseInt(document.getElementById("cl-diplome-poste").value),
+    diplomeCand: parseInt(document.getElementById("cl-diplome-cand").value),
+    metier: document.getElementById("cl-metier").value,
+    exp: parseInt(document.getElementById("cl-exp").value),
+    autonomie: parseInt(document.getElementById("cl-autonomie").value),
+    complexite: parseInt(document.getElementById("cl-complexite").value),
+    encadrement: parseInt(document.getElementById("cl-encadrement").value)
+  };
+
+  const statut = clDetermineStatut(d);
+  const row = (statut === "Cadre") ? clPositionCadre(d) : clPositionETAM(d);
+  const label = `${statut} ${row.pos} (coef ${row.coef})`;
+
+  // Le critère "Nature du poste" n'a d'effet que pour un poste ETAM à Bac+2.
+  // On l'affiche uniquement dans ce cas pour éviter de faire croire qu'il joue ailleurs.
+  const metierField = document.getElementById("cl-metier-field");
+  const metierActif = (statut === "ETAM" && d.diplomePoste === 5);
+  metierField.style.display = metierActif ? "block" : "none";
+
+  // Minima via la fonction existante (gère SMIC, ratio 39h, marges CYIM)
+  const plancher = getPlancherFor(label);
+  const smic = state.smic_mensuel;
+  const min35 = Math.max(row.min, smic);
+
+  document.getElementById("cl-r-statut").textContent = statut + (d.statut === "auto" ? " (déterminé automatiquement)" : " (imposé)");
+  document.getElementById("cl-r-position").textContent = `${statut} ${row.pos} - coefficient ${row.coef}`;
+  document.getElementById("cl-r-min35").textContent = fmtEur(min35) + " / mois";
+
+  const min39Row = document.getElementById("cl-r-min39-row");
+  if (statut === "ETAM" && plancher) {
+    min39Row.style.display = "flex";
+    document.getElementById("cl-r-min39").textContent = fmtEur(plancher.plancherMensuel) + " / mois";
+  } else {
+    min39Row.style.display = "none";
+  }
+
+  document.getElementById("cl-r-cyim").textContent = plancher ? fmtEur(plancher.seuilCYIMMensuel) + " / mois" : "-";
+
+  // Minima annuel (base de comparaison, hors HS majorées) :
+  //  - ETAM : plancher 39h hors majoration HS × 12 (base de comparaison de l'outil)
+  //  - Cadre : minima conventionnel 35h × 12 (le forfait +20 % est un repère interne, pas un minima)
+  let annuelBase = null;
+  if (plancher) {
+    annuelBase = (statut === "ETAM") ? plancher.plancherMensuel * 12 : min35 * 12;
+  }
+  document.getElementById("cl-r-annuel").textContent = (annuelBase !== null) ? fmtEur(annuelBase) + " / an" : "-";
+
+  // Contrôle de cohérence salaire (facultatif)
+  const salPrevu = parseMoney(document.getElementById("cl-salaire-prevu").value) || 0;
+  const cohRow = document.getElementById("cl-r-coherence-row");
+  const cohPill = document.getElementById("cl-r-coherence");
+  if (salPrevu > 0 && plancher) {
+    cohRow.style.display = "flex";
+    const salMens = salPrevu / 12;
+    // Plancher LÉGAL de conformité :
+    //  - ETAM : minima équivalent 39h (le contrat CYIM est en 39h) = plancher.plancherMensuel
+    //  - Cadre : minima conventionnel 35h (MAX SMIC) ; le forfait +20 % est un repère interne, pas un plancher légal
+    const plancherLegal = (statut === "ETAM") ? plancher.plancherMensuel : min35;
+    const seuilCYIM = plancher.seuilCYIMMensuel;
+    if (salMens < plancherLegal) {
+      cohPill.className = "pill alert";
+      cohPill.textContent = "Sous le minima conventionnel - non conforme";
+    } else if (salMens < seuilCYIM) {
+      cohPill.className = "pill warn";
+      cohPill.textContent = "Conforme SYNTEC, sous le repère interne CYIM";
+    } else {
+      cohPill.className = "pill ok";
+      cohPill.textContent = "Conforme et au-dessus du repère CYIM";
+    }
+  } else {
+    cohRow.style.display = "none";
+  }
+
+  // Explication contextuelle
+  const explain = document.getElementById("cl-r-explain");
+  explain.style.display = "block";
+  const niveauLabel = { 3: "niveau 3-4 (CAP/BEP/Bac)", 5: "niveau 5 (Bac+2)", 6: "niveau 6 (Bac+3/4)", 7: "niveau 7 (Bac+5)" };
+  let txt = `Proposition fondée sur : niveau requis pour le poste = ${niveauLabel[d.diplomePoste]}, `;
+  txt += (d.metier === "branche" ? "métier de la branche, " : "fonction transverse, ");
+  txt += `${["débutant","confirmé","expérimenté","expert"][d.exp]}, autonomie/complexité/encadrement = ${d.autonomie}/${d.complexite}/${d.encadrement}. `;
+  txt += `Cette proposition doit être validée au regard des définitions de fonctions de la CCN SYNTEC. `;
+  txt += `La position effective relève d'une appréciation de l'employeur sur le poste réel.`;
+  explain.innerHTML = txt;
+
+  // Note d'écart entre le niveau requis pour le poste et le niveau du candidat (purement indicative)
+  const ecart = document.getElementById("cl-r-ecart");
+  if (d.diplomeCand > 0 && d.diplomeCand !== d.diplomePoste) {
+    ecart.style.display = "block";
+    if (d.diplomeCand > d.diplomePoste) {
+      ecart.innerHTML = `<strong>Note d'écart :</strong> le candidat (${niveauLabel[d.diplomeCand]}) est plus diplômé que le niveau requis par le poste (${niveauLabel[d.diplomePoste]}). Cela ne modifie pas la classification, qui dépend du poste et non du diplôme du candidat. Cet écart peut toutefois nourrir une discussion sur la rémunération ou les perspectives d'évolution.`;
+    } else {
+      ecart.innerHTML = `<strong>Note d'écart :</strong> le candidat (${niveauLabel[d.diplomeCand]}) a un niveau de formation inférieur au niveau requis par le poste (${niveauLabel[d.diplomePoste]}). Cela ne modifie pas la classification : l'expérience et les compétences acquises peuvent compenser le diplôme. Point à apprécier au cas par cas.`;
+    }
+  } else {
+    ecart.style.display = "none";
+  }
+}
+
+function clRunModuleB() {
+  const statut = document.getElementById("cl-b-statut").value;
+  const sal = parseMoney(document.getElementById("cl-b-salaire").value) || 0;
+  const smic = state.smic_mensuel;
+  const ratio39 = state.h39 / state.h35;
+
+  const tbody = document.querySelector("#cl-b-table tbody");
+  tbody.innerHTML = "";
+  const explain = document.getElementById("cl-b-explain");
+
+  if (sal <= 0) {
+    explain.style.display = "none";
+    return;
+  }
+
+  // Salaire mensuel ramené en équivalent 35h pour comparer aux minima conventionnels
+  let salMens35;
+  if (statut === "ETAM") {
+    salMens35 = (sal / 12) / ratio39; // ETAM CYIM payé en 39h -> retour équivalent 35h
+  } else {
+    salMens35 = sal / 12;
+  }
+
+  const grille = (statut === "ETAM") ? state.etam : state.cadres;
+  let nbCompat = 0;
+  grille.forEach(r => {
+    const minRetenu = Math.max(r.min, smic);
+    const compatible = minRetenu <= salMens35;
+    if (compatible) nbCompat++;
+    const tr = document.createElement("tr");
+    tr.innerHTML =
+      `<td class="center">${r.pos}</td>` +
+      `<td class="center">${r.coef}</td>` +
+      `<td class="num">${fmtEur(r.min)}</td>` +
+      `<td class="num">${fmtEur(minRetenu)}</td>` +
+      `<td class="center"><span class="pill ${compatible ? "ok" : "alert"}">${compatible ? "Oui" : "Non"}</span></td>`;
+    tbody.appendChild(tr);
+  });
+
+  explain.style.display = "block";
+  if (nbCompat === 0) {
+    explain.innerHTML = `Le salaire saisi est <strong>inférieur au minima de toutes les positions ${statut}</strong> (équivalent 35h : ${fmtEur(salMens35)}/mois). Aucune classification ${statut} ne serait conforme à ce niveau de rémunération.`;
+  } else {
+    explain.innerHTML = `${nbCompat} position(s) ${statut} compatibles avec ce salaire (équivalent 35h : ${fmtEur(salMens35)}/mois). La position la plus haute compatible est le plafond conventionnel cohérent ; le choix réel dépend des critères du poste, pas du salaire seul.`;
+  }
+}
+
+function initClassif() {
+  ["cl-statut","cl-diplome-poste","cl-diplome-cand","cl-metier","cl-exp","cl-autonomie","cl-complexite","cl-encadrement"].forEach(id => {
+    document.getElementById(id).addEventListener("change", clRunModuleA);
+  });
+  document.getElementById("cl-salaire-prevu").addEventListener("input", clRunModuleA);
+  document.getElementById("cl-b-statut").addEventListener("change", clRunModuleB);
+  document.getElementById("cl-b-salaire").addEventListener("input", clRunModuleB);
+  clRunModuleA();
+}
+
+// =============================================================
 // MASQUER LA LÉGENDE SUR LES ONGLETS NON CALCULATOIRES
 // =============================================================
 function updateLegendVisibility(tabName) {
@@ -5222,6 +5681,7 @@ function initAll() {
   renderTeam();
   switchMode(currentMode);
   computeAll();
+  if (document.getElementById("cl-statut")) clRunModuleA();
 }
 
 function bindParamInputs() {
@@ -5393,6 +5853,7 @@ async function boot() {
   setupMoneyInputs();
   setupS4();
   setupAlternants();
+  initClassif();
   updateLegendVisibility("sim");
   applyReadOnlyMode();
 }
