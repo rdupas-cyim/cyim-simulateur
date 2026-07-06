@@ -1555,7 +1555,22 @@
     border: 1px solid var(--border);
     padding: 3px 9px;
     border-radius: 12px;
-    white-space: nowrap;
+    white-space: normal;
+    max-width: 100%;
+    min-width: 0;
+    flex-shrink: 1;
+    word-break: break-word;
+    line-height: 1.45;
+  }
+  .fact-chip:nth-child(2) {
+    background: var(--mint-soft);
+    border-color: var(--mint);
+    color: var(--navy-deep);
+    font-weight: 800;
+  }
+  .info-card dd strong {
+    color: var(--mint);
+    font-weight: 800;
   }
   .fam-card-links {
     margin-top: 12px;
@@ -5854,7 +5869,7 @@ const FAM_EVENTS = {
     syntec: "4 jours ouvrés",
     apply: "4 jours ouvrés",
     justificatifs: "Copie de l'acte de mariage ou du récépissé d'enregistrement du PACS.",
-    modalites: "À prendre au moment de l'évènement (jours entourant la date, en pratique). Rémunération maintenue intégralement, assimilé à du temps de travail effectif pour les congés payés, aucune imputation sur le solde de CP."
+    modalites: "À prendre au moment de l'évènement (jours entourant la date, en pratique). <strong>Rémunération maintenue intégralement</strong>, assimilé à du temps de travail effectif pour les congés payés, <strong>aucune imputation sur le solde de CP</strong>."
   },
   mariageEnfant: {
     label: "Mariage d'un enfant",
@@ -5863,7 +5878,7 @@ const FAM_EVENTS = {
     syntec: "1 jour ouvré",
     apply: "1 jour ouvré",
     justificatifs: "Copie de l'acte de mariage de l'enfant.",
-    modalites: "À prendre au moment de l'évènement. Rémunération maintenue, sans impact sur les CP."
+    modalites: "À prendre au moment de l'évènement. <strong>Rémunération maintenue</strong>, sans impact sur les CP."
   },
   naissance: {
     label: "Naissance (congé de 3 jours, hors congé paternité)",
@@ -5872,7 +5887,7 @@ const FAM_EVENTS = {
     syntec: "3 jours ouvrés consécutifs",
     apply: "3 jours ouvrés consécutifs",
     justificatifs: "Copie de l'acte de naissance ou du livret de famille mis à jour.",
-    modalites: "Congé OBLIGATOIRE : le salarié ne peut pas y renoncer, et l'employeur ne peut pas le faire travailler pendant cette période (interdiction d'emploi). Le salarié choisit son point de départ entre le jour de la naissance ou le 1er jour ouvrable suivant. Si le salarié est en CP ou en congé pour évènement familial au moment de la naissance, le congé de naissance débute à l'issue de cette période. Entièrement à la charge de l'employeur (pas d'IJSS, puisqu'il ne s'agit pas encore du congé paternité). Se cumule avec le congé de paternité et d'accueil de l'enfant (25 jours calendaires, voir « Autres absences »)."
+    modalites: "Congé <strong>OBLIGATOIRE</strong> : le salarié ne peut pas y renoncer, et l'employeur ne peut pas le faire travailler pendant cette période (<strong>interdiction d'emploi</strong>). Le salarié choisit son point de départ entre le jour de la naissance ou le 1er jour ouvrable suivant. Si le salarié est en CP ou en congé pour évènement familial au moment de la naissance, le congé de naissance débute à l'issue de cette période. Entièrement à la charge de l'employeur (pas d'IJSS, puisqu'il ne s'agit pas encore du congé paternité). Se cumule avec le congé de paternité et d'accueil de l'enfant (<strong>25 jours calendaires</strong>, voir « Autres absences »)."
   },
   adoption: {
     label: "Adoption / arrivée d'un enfant placé (congé de 3 jours)",
@@ -5881,7 +5896,7 @@ const FAM_EVENTS = {
     syntec: "3 jours ouvrés consécutifs",
     apply: "3 jours ouvrés consécutifs",
     justificatifs: "Attestation de l'aide sociale à l'enfance ou de l'organisme autorisé pour l'adoption, jugement d'adoption.",
-    modalites: "Peut être pris dans les 7 jours précédant l'arrivée de l'enfant, ou à compter du jour d'arrivée / 1er jour ouvré suivant. Rémunération maintenue, entièrement à la charge de l'employeur. À distinguer du congé d'adoption de 16 à 22 semaines (voir « Autres absences »)."
+    modalites: "Peut être pris dans les <strong>7 jours précédant</strong> l'arrivée de l'enfant, ou à compter du jour d'arrivée / 1er jour ouvré suivant. <strong>Rémunération maintenue</strong>, entièrement à la charge de l'employeur. À distinguer du congé d'adoption de <strong>16 à 22 semaines</strong> (voir « Autres absences »)."
   },
   enfantMalade: {
     label: "Maladie / accident d'un enfant",
@@ -5890,7 +5905,7 @@ const FAM_EVENTS = {
     syntec: "3 jours ouvrables (5 jours si &lt; 1 an ou ≥ 3 enfants &lt; 16 ans) - non rémunérés",
     apply: "3 j. (5 j. sous conditions) - non rémunérés",
     justificatifs: "Certificat médical attestant l'état de santé de l'enfant ou justifiant la nécessité de la présence d'un parent.",
-    modalites: "Jours ouvrables. Congé de droit (L1225-61), non rémunéré par l'employeur (sauf accord ou usage interne plus favorable, non prévu par SYNTEC), sans condition d'ancienneté. Retenue sur salaire pour absence justifiée. À distinguer du congé de présence parentale (jusqu'à 310 jours) pour les pathologies graves durables (voir « Autres absences »)."
+    modalites: "Jours ouvrables. Congé de droit (L1225-61), <strong>non rémunéré par l'employeur</strong> (sauf accord ou usage interne plus favorable, non prévu par SYNTEC), sans condition d'ancienneté. Retenue sur salaire pour absence justifiée. À distinguer du congé de présence parentale (jusqu'à <strong>310 jours</strong>) pour les pathologies graves durables (voir « Autres absences »)."
   },
   handicapCancer: {
     label: "Annonce d'un handicap, d'une pathologie chronique ou d'un cancer chez un enfant",
@@ -5899,7 +5914,7 @@ const FAM_EVENTS = {
     syntec: "5 jours ouvrables",
     apply: "5 jours ouvrables",
     justificatifs: "Certificat médical détaillé établissant le diagnostic.",
-    modalites: "Jours ouvrables. À prendre au moment de l'annonce ou dans un délai raisonnable suivant celle-ci. Rémunération maintenue, sans impact sur les CP."
+    modalites: "Jours ouvrables. À prendre au moment de l'annonce ou dans un délai raisonnable suivant celle-ci. <strong>Rémunération maintenue</strong>, sans impact sur les CP."
   },
   decesConjoint: {
     label: "Décès du conjoint / partenaire PACS / concubin",
@@ -5908,7 +5923,7 @@ const FAM_EVENTS = {
     syntec: "3 jours ouvrés",
     apply: "3 jours ouvrés",
     justificatifs: "Copie de l'acte de décès et justificatif du lien (acte de mariage, PACS, ou justificatif de vie commune pour le concubinage).",
-    modalites: "À prendre au moment du décès, en pratique. Rémunération maintenue intégralement."
+    modalites: "À prendre au moment du décès, en pratique. <strong>Rémunération maintenue intégralement</strong>."
   },
   decesParent: {
     label: "Décès du père / de la mère",
@@ -5917,7 +5932,7 @@ const FAM_EVENTS = {
     syntec: "3 jours ouvrés",
     apply: "3 jours ouvrés",
     justificatifs: "Copie de l'acte de décès.",
-    modalites: "À prendre au moment du décès, en pratique. Rémunération maintenue."
+    modalites: "À prendre au moment du décès, en pratique. <strong>Rémunération maintenue</strong>."
   },
   decesFratrie: {
     label: "Décès d'un frère / d'une sœur",
@@ -5926,7 +5941,7 @@ const FAM_EVENTS = {
     syntec: "3 jours ouvrés",
     apply: "3 jours ouvrés",
     justificatifs: "Copie de l'acte de décès et justificatif du lien de fratrie.",
-    modalites: "À prendre au moment du décès, en pratique. Rémunération maintenue."
+    modalites: "À prendre au moment du décès, en pratique. <strong>Rémunération maintenue</strong>."
   },
   decesBeauParent: {
     label: "Décès d'un beau-parent (père/mère de l'époux ou du partenaire de PACS)",
@@ -5935,7 +5950,7 @@ const FAM_EVENTS = {
     syntec: "3 jours ouvrés",
     apply: "3 jours ouvrés",
     justificatifs: "Copie de l'acte de décès et justificatif du lien (acte de mariage ou PACS).",
-    modalites: "À prendre au moment du décès, en pratique. Rémunération maintenue."
+    modalites: "À prendre au moment du décès, en pratique. <strong>Rémunération maintenue</strong>."
   },
   decesAscendant: {
     label: "Décès d'un grand-parent ou autre ascendant",
@@ -5944,7 +5959,7 @@ const FAM_EVENTS = {
     syntec: "2 jours ouvrés",
     apply: "2 jours ouvrés",
     justificatifs: "Copie de l'acte de décès et justificatif du lien de parenté.",
-    modalites: "Avantage propre à la convention SYNTEC (sans équivalent légal). À prendre au moment du décès, en pratique. Rémunération maintenue."
+    modalites: "<strong>Avantage propre à la convention SYNTEC</strong> (sans équivalent légal). À prendre au moment du décès, en pratique. <strong>Rémunération maintenue</strong>."
   },
   decesEnfant: {
     label: "Décès d'un enfant",
@@ -5958,7 +5973,7 @@ const FAM_EVENTS = {
     syntec: "Prise en charge des frais de retour (art. 11.4 de la convention SYNTEC)",
     apply: "Prise en charge des frais de retour (art. 11.4 CCN SYNTEC)",
     justificatifs: "Justificatifs de déplacement professionnel et de frais de retour engagés, copie de l'acte de décès.",
-    modalites: "Avantage propre à la convention SYNTEC (sans équivalent légal) : le salarié en mission ou déplacement professionnel au moment du décès voit ses frais de retour anticipé pris en charge par l'employeur."
+    modalites: "<strong>Avantage propre à la convention SYNTEC</strong> (sans équivalent légal) : le salarié en mission ou déplacement professionnel au moment du décès voit ses <strong>frais de retour anticipé pris en charge par l'employeur</strong>."
   }
 };
 
@@ -5970,7 +5985,7 @@ function famDecesEnfantDetail(cas) {
       legal: "14 jours ouvrables (congé pour décès) + 8 jours ouvrables de congé de deuil (art. L3142-1-1), soit 22 jours au total",
       syntec: "14 jours ouvrés (congé pour décès) + 8 jours ouvrables de congé de deuil (fractionnable, formalisé à l'avenant n°49)",
       apply: "14 j. ouvrés + 8 j. de deuil = 22 jours",
-      modalites: "Le congé pour décès (14 jours) se prend au moment du décès. Le congé de deuil (8 jours) peut être fractionné en 2 périodes d'au moins 1 jour chacune et pris dans le délai d'un an suivant le décès (préavis de 24h avant chaque période). Rémunération maintenue ; le congé de deuil est indemnisé par la Sécurité sociale (IJSS sur le modèle maternité/paternité, avec subrogation possible par l'employeur : voir « Autres absences » pour le mécanisme). Protection contre le licenciement pendant les 13 semaines suivant le décès."
+      modalites: "Le congé pour décès (<strong>14 jours</strong>) se prend au moment du décès. Le congé de deuil (<strong>8 jours</strong>) peut être fractionné en 2 périodes d'au moins 1 jour chacune et pris dans le <strong>délai d'un an</strong> suivant le décès (préavis de 24h avant chaque période). Rémunération maintenue ; le congé de deuil est indemnisé par la Sécurité sociale (IJSS sur le modèle maternité/paternité, avec subrogation possible par l'employeur : voir « Autres absences » pour le mécanisme). <strong>Protection contre le licenciement</strong> pendant les <strong>13 semaines</strong> suivant le décès."
     };
   }
   if (cas === "plus25-parent") {
@@ -5978,7 +5993,7 @@ function famDecesEnfantDetail(cas) {
       legal: "14 jours ouvrables (pas de congé de deuil : condition d'âge/charge non remplie)",
       syntec: "14 jours ouvrés",
       apply: "14 jours ouvrés",
-      modalites: "Le congé pour décès (14 jours) se prend au moment du décès. Le congé de deuil de 8 jours ne s'applique pas ici : il est réservé aux enfants de moins de 25 ans ou aux personnes à charge de moins de 25 ans, et l'enfant décédé étant lui-même parent n'ouvre ce droit supplémentaire que via la condition d'âge ou de charge, non remplie dans ce cas. Rémunération maintenue."
+      modalites: "Le congé pour décès (<strong>14 jours</strong>) se prend au moment du décès. Le congé de deuil de 8 jours <strong>ne s'applique pas ici</strong> : il est réservé aux enfants de moins de 25 ans ou aux personnes à charge de moins de 25 ans, et l'enfant décédé étant lui-même parent n'ouvre ce droit supplémentaire que via la condition d'âge ou de charge, non remplie dans ce cas. Rémunération maintenue."
     };
   }
   // plus25 (non parent)
@@ -5986,7 +6001,7 @@ function famDecesEnfantDetail(cas) {
     legal: "12 jours ouvrables (pas de congé de deuil)",
     syntec: "12 jours ouvrés",
     apply: "12 jours ouvrés",
-    modalites: "Le congé pour décès (12 jours) se prend au moment du décès. Aucun congé de deuil complémentaire dans ce cas (condition d'âge/charge non remplie). Rémunération maintenue."
+    modalites: "Le congé pour décès (<strong>12 jours</strong>) se prend au moment du décès. <strong>Aucun congé de deuil complémentaire</strong> dans ce cas (condition d'âge/charge non remplie). Rémunération maintenue."
   };
 }
 
@@ -6009,11 +6024,11 @@ const OTHER_EVENTS = {
     category: "autre",
     duree: "16 à 46 semaines selon la situation",
     typeJours: "Semaines calendaires",
-    remuneration: "IJSS + maintien intégral SYNTEC (dès 1 an d'ancienneté)",
-    anciennete: "Aucune pour le congé - 1 an SYNTEC pour le maintien de salaire",
+    remuneration: "IJSS + maintien SYNTEC dès 1 an",
+    anciennete: "Aucune (congé) / 1 an (maintien SYNTEC)",
     apply: "16 à 46 semaines - voir le mini-simulateur ci-dessus pour votre situation précise",
     justificatifs: "Déclaration de grossesse avant la fin de la 14e semaine ; certificat médical du médecin ou de la sage-femme attestant la date présumée d'accouchement.<br><br>Le calendrier de grossesse remis par la CPAM au moment de la déclaration peut également être fourni comme justificatif des dates.",
-    modalites: "Congé obligatoire : la salariée ne peut y renoncer que partiellement (arrêt minimum incompressible de 8 semaines, dont 6 après l'accouchement - interdiction légale de travailler). Elle peut reporter une partie de son congé prénatal sur le postnatal.<br><br>En cas d'accouchement prématuré, la durée totale reste inchangée (le prénatal écourté est reporté sur le postnatal) ; en cas d'accouchement tardif, le congé prénatal est simplement prolongé jusqu'à la naissance. Un congé pathologique prénatal de 14 jours (consécutifs ou non) peut s'ajouter avant le congé mat en cas d'état pathologique attesté médicalement.<br><br>Indemnisée par la CPAM (IJSS, plafond PMSS, jusqu'à 104,02 €/jour en 2026).<br><br><strong>Subrogation - obligation conventionnelle chez CYIM :</strong> le Code du travail n'impose que le versement des IJSS, mais la convention SYNTEC va plus loin et impose le maintien intégral du salaire pour toute salariée ayant plus d'1 an d'ancienneté à la date de début du congé maternité (déduction faite des IJSS et, le cas échéant, des prestations de prévoyance). CYIM, relevant de la SYNTEC, doit donc pratiquer la subrogation dans ce cas : l'employeur continue de verser le salaire habituel et perçoit directement les IJSS de la CPAM à sa place. Si l'ancienneté d'1 an est atteinte en cours de congé, le maintien s'applique à partir de cette date pour les jours restants. En deçà d'1 an d'ancienneté, seules les IJSS sont dues (pas de complément employeur), sauf usage plus favorable chez CYIM.<br><br>Protection absolue contre le licenciement pendant le congé et les 10 semaines suivant le retour, sauf faute grave étrangère à la grossesse. Peut être suivi du congé parental d'éducation et, depuis le 01/07/2026, du congé supplémentaire de naissance.",
+    modalites: "Congé obligatoire : la salariée ne peut y renoncer que partiellement (arrêt minimum incompressible de <strong>8 semaines</strong>, dont <strong>6 après l'accouchement</strong> - interdiction légale de travailler). Elle peut reporter une partie de son congé prénatal sur le postnatal.<br><br>En cas d'accouchement prématuré, la durée totale reste inchangée (le prénatal écourté est reporté sur le postnatal) ; en cas d'accouchement tardif, le congé prénatal est simplement prolongé jusqu'à la naissance. Un congé pathologique prénatal de 14 jours (consécutifs ou non) peut s'ajouter avant le congé mat en cas d'état pathologique attesté médicalement.<br><br>Indemnisée par la CPAM (IJSS, plafond PMSS, jusqu'à <strong>104,02 €/jour</strong> en 2026).<br><br><strong>Subrogation - obligation conventionnelle chez CYIM :</strong> le Code du travail n'impose que le versement des IJSS, mais la convention SYNTEC va plus loin et impose le maintien intégral du salaire pour toute salariée ayant plus <strong>d'1 an d'ancienneté</strong> à la date de début du congé maternité (déduction faite des IJSS et, le cas échéant, des prestations de prévoyance). CYIM, relevant de la SYNTEC, doit donc pratiquer la subrogation dans ce cas : l'employeur continue de verser le salaire habituel et perçoit directement les IJSS de la CPAM à sa place. Si l'ancienneté d'1 an est atteinte en cours de congé, le maintien s'applique à partir de cette date pour les jours restants. En deçà d'1 an d'ancienneté, seules les IJSS sont dues (pas de complément employeur), sauf usage plus favorable chez CYIM.<br><br><strong>Protection absolue contre le licenciement</strong> pendant le congé et les <strong>10 semaines</strong> suivant le retour, sauf faute grave étrangère à la grossesse. Peut être suivi du congé parental d'éducation et, depuis le 01/07/2026, du congé supplémentaire de naissance.",
     reference: "Art. L1225-17 et s. du Code du travail ; art. L331-3 à L331-7 du Code de la sécurité sociale ; convention SYNTEC (IDCC 1486), avenant n°49 du 22/10/2025 relatif à la parentalité (maintien de salaire dès 1 an d'ancienneté, en vigueur au 01/05/2026)",
     links: ["paternite", "reductionHoraireGrossesse", "allaitement", "naissanceSupp", "parentalEducation", "fausseCouche", "enfantSansVie"]
   },
@@ -6023,11 +6038,11 @@ const OTHER_EVENTS = {
     category: "autre",
     duree: "3 jours + 25 jours calendaires (32 si naissances multiples)",
     typeJours: "Ouvrables (3j) puis calendaires (25j)",
-    remuneration: "Employeur (3j) puis IJSS + maintien intégral SYNTEC dès 1 an d'ancienneté (25j)",
-    anciennete: "Aucune pour le congé - 1 an SYNTEC pour le maintien de salaire",
+    remuneration: "Employeur (3j) + IJSS/maintien SYNTEC dès 1 an (25j)",
+    anciennete: "Aucune (congé) / 1 an (maintien SYNTEC)",
     apply: "3 j. ouvrables (naissance) + 25 j. calendaires (paternité), dont 4 j. obligatoires",
     justificatifs: "Copie de l'acte de naissance, du livret de famille mis à jour ou de l'acte de reconnaissance ; justificatif du lien avec la mère si le salarié n'est pas le père.",
-    modalites: "Le congé de naissance (3 jours ouvrables) est OBLIGATOIRE : le salarié ne peut pas y renoncer et l'employeur ne peut pas le faire travailler pendant cette période (interdiction d'emploi), il doit débuter dès la naissance ou le lendemain (au choix du salarié). Il est entièrement à la charge de l'employeur (pas d'IJSS à ce stade).<br><br>Les 4 jours suivants du congé paternité sont également obligatoires. Les 21 jours restants (28 en cas de naissances multiples) sont fractionnables en 2 périodes d'au moins 5 jours, à prendre dans les 6 mois suivant la naissance, indemnisés par la CPAM (IJSS).<br><br><strong>Subrogation - obligation conventionnelle chez CYIM :</strong> le Code du travail n'impose que le versement des IJSS pendant les 25 jours de congé paternité. Mais depuis l'avenant n°49 du 22/10/2025 (en vigueur au 01/05/2026), la convention SYNTEC aligne le paternité sur le maternité : le salarié ayant plus d'1 an d'ancienneté à la date de début du congé (contre 2 ans auparavant) bénéficie du maintien intégral de son salaire. CYIM, relevant de la SYNTEC, doit donc pratiquer la subrogation dans ce cas : l'employeur continue de verser le salaire habituel et perçoit directement les IJSS de la CPAM à sa place, dans la limite du plafond de la Sécurité sociale. Si l'ancienneté d'1 an est atteinte en cours de congé, le maintien s'applique à partir de cette date pour les jours restants. En deçà d'1 an d'ancienneté, seules les IJSS sont dues (pas de complément employeur), sauf usage plus favorable chez CYIM.<br><br>Préavis d'1 mois avant le congé de paternité. Se cumule avec le congé de naissance de 3 jours (voir tableau « Évènements familiaux » ci-dessus).",
+    modalites: "Le congé de naissance (3 jours ouvrables) est OBLIGATOIRE : le salarié ne peut pas y renoncer et l'employeur ne peut pas le faire travailler pendant cette période (interdiction d'emploi), il doit débuter dès la naissance ou le lendemain (au choix du salarié). Il est entièrement à la charge de l'employeur (pas d'IJSS à ce stade).<br><br>Les <strong>4 jours suivants</strong> du congé paternité sont également obligatoires. Les <strong>21 jours restants</strong> (28 en cas de naissances multiples) sont fractionnables en 2 périodes d'au moins 5 jours, à prendre dans les <strong>6 mois suivant la naissance</strong>, indemnisés par la CPAM (IJSS).<br><br><strong>Subrogation - obligation conventionnelle chez CYIM :</strong> le Code du travail n'impose que le versement des IJSS pendant les 25 jours de congé paternité. Mais depuis l'avenant n°49 du 22/10/2025 (en vigueur au 01/05/2026), la convention SYNTEC aligne le paternité sur le maternité : le salarié ayant plus <strong>d'1 an d'ancienneté</strong> à la date de début du congé (<strong>contre 2 ans auparavant</strong>) bénéficie du maintien intégral de son salaire. CYIM, relevant de la SYNTEC, doit donc pratiquer la subrogation dans ce cas : l'employeur continue de verser le salaire habituel et perçoit directement les IJSS de la CPAM à sa place, dans la limite du plafond de la Sécurité sociale. Si l'ancienneté d'1 an est atteinte en cours de congé, le maintien s'applique à partir de cette date pour les jours restants. En deçà d'1 an d'ancienneté, seules les IJSS sont dues (pas de complément employeur), sauf usage plus favorable chez CYIM.<br><br><strong>Préavis d'1 mois</strong> avant le congé de paternité. Se cumule avec le congé de naissance de 3 jours (voir tableau « Évènements familiaux » ci-dessus).",
     reference: "Art. L1225-35 et s. du Code du travail ; art. L331-8 du Code de la sécurité sociale ; art. L3142-1 (congé naissance) ; convention SYNTEC (IDCC 1486), avenant n°49 du 22/10/2025 relatif à la parentalité (maintien de salaire dès 1 an d'ancienneté, en vigueur au 01/05/2026)",
     links: ["maternite", "naissanceSupp", "amp", "amlExamens"]
   },
@@ -6041,7 +6056,7 @@ const OTHER_EVENTS = {
     anciennete: "Aucune",
     apply: "20 min/jour dès le 3e mois de grossesse, 30 min/jour dès le 5e mois",
     justificatifs: "Déclaration de grossesse à l'employeur (même justificatif que pour le congé maternité).",
-    modalites: "Avantage propre à la convention SYNTEC, sans équivalent général dans le Code du travail : la salariée ayant déclaré sa grossesse bénéficie d'une réduction rémunérée du temps de travail de 20 minutes par jour à partir du 3e mois de grossesse, puis 30 minutes par jour à partir du 5e mois, jusqu'à son départ en congé maternité.<br><br>Pour une salariée au forfait annuel en jours, l'employeur doit veiller à ce que l'amplitude de travail lui permette de concilier vie professionnelle et vie personnelle, formalisé par écrit, avec adaptation de la charge de travail en conséquence.<br><br>Cette période est assimilée à du temps de travail effectif pour les congés payés et pour les droits liés à l'ancienneté.",
+    modalites: "<strong>Avantage propre à la convention SYNTEC</strong>, sans équivalent général dans le Code du travail : la salariée ayant déclaré sa grossesse bénéficie d'une réduction rémunérée du temps de travail de <strong>20 minutes par jour</strong> à partir du 3e mois de grossesse, puis <strong>30 minutes par jour</strong> à partir du 5e mois, jusqu'à son départ en congé maternité.<br><br>Pour une salariée au forfait annuel en jours, l'employeur doit veiller à ce que l'amplitude de travail lui permette de concilier vie professionnelle et vie personnelle, formalisé par écrit, avec adaptation de la charge de travail en conséquence.<br><br>Cette période est assimilée à du temps de travail effectif pour les congés payés et pour les droits liés à l'ancienneté.",
     reference: "Convention SYNTEC (IDCC 1486), art. 9.3, tel que modifié par l'avenant n°49 du 22/10/2025 (en vigueur au 01/05/2026)",
     links: ["maternite", "amlExamens"]
   },
@@ -6069,7 +6084,7 @@ const OTHER_EVENTS = {
     anciennete: "6 mois d'affiliation Sécu",
     apply: "1 ou 2 mois de congé indemnisé, pris simultanément ou en alternance",
     justificatifs: "Demande écrite à l'employeur (LRAR ou remise contre récépissé), précisant la durée retenue et le calendrier de fractionnement éventuel.",
-    modalites: "Nouveau droit créé par la LFSS 2026, ouvert à chaque parent d'un enfant né ou adopté à compter du 01/01/2026, après épuisement des congés de maternité, paternité ou adoption (voir ces cartes).<br><br>Doit débuter dans les 9 mois suivant la naissance. Préavis d'1 mois (15 jours si le congé suit immédiatement le congé de paternité/adoption).<br><br>Indemnisé par la CPAM à 70 % du salaire net le 1er mois, 60 % le 2e mois (plafond PMSS) - pas de maintien de salaire légal, subrogation possible si accord CYIM.<br><br>Non ouvert en cas d'enfant né sans vie. Ne se substitue pas au congé parental d'éducation.",
+    modalites: "Nouveau droit créé par la LFSS 2026, ouvert à chaque parent d'un enfant né ou adopté à compter du 01/01/2026, après épuisement des congés de maternité, paternité ou adoption (voir ces cartes).<br><br>Doit débuter dans les <strong>9 mois</strong> suivant la naissance. <strong>Préavis d'1 mois</strong> (15 jours si le congé suit immédiatement le congé de paternité/adoption).<br><br>Indemnisé par la CPAM à <strong>70 % du salaire net</strong> le 1er mois, <strong>60 %</strong> le 2e mois (plafond PMSS) - pas de maintien de salaire légal, subrogation possible si accord CYIM.<br><br>Non ouvert en cas d'enfant né sans vie. Ne se substitue pas au congé parental d'éducation.",
     reference: "LFSS pour 2026 (art. 99) ; décrets d'application à paraître",
     links: ["maternite", "paternite", "adoptionConge", "parentalEducation"]
   },
@@ -6079,11 +6094,11 @@ const OTHER_EVENTS = {
     category: "autre",
     duree: "16 à 22 semaines selon la situation",
     typeJours: "Semaines + jours calendaires (partage)",
-    remuneration: "IJSS + maintien intégral SYNTEC (dès 1 an d'ancienneté, comme la maternité)",
-    anciennete: "Aucune pour le congé - 1 an SYNTEC pour le maintien de salaire",
+    remuneration: "IJSS + maintien SYNTEC dès 1 an (comme maternité)",
+    anciennete: "Aucune (congé) / 1 an (maintien SYNTEC)",
     apply: "16 à 22 semaines, +25 ou 32 jours calendaires si partagé entre les 2 parents",
     justificatifs: "Décision de placement en vue d'adoption (ASE, OAA ou AFA) ou jugement d'adoption pour une adoption internationale.",
-    modalites: "16 semaines (0 ou 1 enfant à charge), 18 semaines (3 enfants ou plus à charge), 22 semaines (adoptions multiples simultanées).<br><br>Peut débuter jusqu'à 7 jours avant l'arrivée de l'enfant, à prendre au plus tard dans les 8 mois suivant l'arrivée. Fractionnable en 2 périodes d'au moins 25 jours calendaires (31 jours pour une adoption multiple) si partagé entre les 2 parents salariés, qui peuvent le prendre simultanément.<br><br>Indemnisé par la CPAM (IJSS, même mode de calcul que le congé maternité).<br><br><strong>Subrogation - obligation conventionnelle chez CYIM :</strong> l'avenant n°49 du 22/10/2025 (en vigueur au 01/05/2026) précise explicitement que les avantages liés à la naissance prévus pour le congé maternité s'appliquent également au congé d'adoption. CYIM doit donc pratiquer la même subrogation avec maintien intégral du salaire pour tout salarié ayant plus d'1 an d'ancienneté à la date de début du congé d'adoption (déduction faite des IJSS). En deçà d'1 an d'ancienneté, seules les IJSS sont dues.<br><br>Les entretiens obligatoires préalables à l'agrément (démarche d'adoption) sont également des absences autorisées, sans perte de salaire, assimilées à du temps de travail effectif.<br><br>Un congé non rémunéré de 6 semaines maximum est ouvert pour un déplacement outre-mer ou à l'étranger en vue de l'adoption.<br><br>Peut être suivi, comme les congés maternité et paternité, du congé supplémentaire de naissance.",
+    modalites: "<strong>16 semaines</strong> (0 ou 1 enfant à charge), <strong>18 semaines</strong> (3 enfants ou plus à charge), <strong>22 semaines</strong> (adoptions multiples simultanées).<br><br>Peut débuter jusqu'à 7 jours avant l'arrivée de l'enfant, à prendre au plus tard dans les 8 mois suivant l'arrivée. Fractionnable en 2 périodes d'au moins 25 jours calendaires (31 jours pour une adoption multiple) si partagé entre les 2 parents salariés, qui peuvent le prendre simultanément.<br><br>Indemnisé par la CPAM (IJSS, même mode de calcul que le congé maternité).<br><br><strong>Subrogation - obligation conventionnelle chez CYIM :</strong> l'avenant n°49 du 22/10/2025 (en vigueur au 01/05/2026) précise explicitement que les avantages liés à la naissance prévus pour le congé maternité s'appliquent également au congé d'adoption. CYIM doit donc pratiquer la même subrogation avec maintien intégral du salaire pour tout salarié ayant plus <strong>d'1 an d'ancienneté</strong> à la date de début du congé d'adoption (déduction faite des IJSS). En deçà d'1 an d'ancienneté, seules les IJSS sont dues.<br><br>Les entretiens obligatoires préalables à l'agrément (démarche d'adoption) sont également des absences autorisées, sans perte de salaire, assimilées à du temps de travail effectif.<br><br>Un congé non rémunéré de 6 semaines maximum est ouvert pour un déplacement outre-mer ou à l'étranger en vue de l'adoption.<br><br>Peut être suivi, comme les congés maternité et paternité, du congé supplémentaire de naissance.",
     reference: "Art. L1225-37 à L1225-46 du Code du travail ; convention SYNTEC (IDCC 1486), avenant n°49 du 22/10/2025 relatif à la parentalité (maintien de salaire dès 1 an d'ancienneté, en vigueur au 01/05/2026)",
     links: ["naissanceSupp", "parentalEducation", "amp"]
   },
@@ -6097,7 +6112,7 @@ const OTHER_EVENTS = {
     anciennete: "1 an à la date de la demande",
     apply: "1 an maximum, renouvelable deux fois, à temps plein (contrat suspendu) OU à temps partiel (16h/semaine minimum)",
     justificatifs: "Lettre recommandée ou remise en main propre contre récépissé à l'employeur : 1 mois avant la fin du congé maternité/adoption si le congé parental suit immédiatement, ou 2 mois avant le début dans les autres cas.",
-    modalites: "Ouvert au salarié (père ou mère) justifiant d'1 an d'ancienneté <strong>à la date de la demande</strong> (et non plus à la date de naissance/adoption depuis mars 2023 - un salarié sans emploi à la naissance peut donc y avoir droit chez un nouvel employeur dès qu'il atteint 1 an d'ancienneté). L'employeur ne peut pas refuser une demande conforme (sous peine d'une indemnité pouvant atteindre 6 mois de salaire).<br><br><strong>① Congé parental total (à temps complet) :</strong> le contrat est suspendu, plus de rémunération par l'employeur (le CET peut être mobilisé), l'ancienneté est comptée pour moitié de la durée du congé, aucune autre activité professionnelle sauf assistant maternel, aucun avenant nécessaire (le contrat est déjà suspendu).<br><br><strong>② Congé parental à temps partiel :</strong> minimum 16h/semaine, nécessite un avenant au contrat de travail formalisant le passage à temps partiel (mentions obligatoires), la rémunération est proportionnelle au temps travaillé.<br><br>Le passage d'une forme à l'autre (total ↔ partiel) est possible en cours de congé. Non rémunéré par l'employeur dans les 2 cas, mais la CAF/MSA peut verser la PreParE (jusqu'à 459,69 €/mois en 2026 à temps plein, montant réduit à temps partiel, sous conditions de trimestres cotisés).<br><br>Retour garanti au poste ou à un poste similaire, avec rémunération au moins équivalente.",
+    modalites: "Ouvert au salarié (père ou mère) justifiant d'1 an d'ancienneté <strong>à la date de la demande</strong> (et non plus à la date de naissance/adoption depuis mars 2023 - un salarié sans emploi à la naissance peut donc y avoir droit chez un nouvel employeur dès qu'il atteint 1 an d'ancienneté). L'employeur <strong>ne peut pas refuser</strong> une demande conforme (sous peine d'une indemnité pouvant atteindre <strong>6 mois de salaire</strong>).<br><br><strong>① Congé parental total (à temps complet) :</strong> le contrat est suspendu, plus de rémunération par l'employeur (le CET peut être mobilisé), l'ancienneté est comptée pour moitié de la durée du congé, aucune autre activité professionnelle sauf assistant maternel, aucun avenant nécessaire (le contrat est déjà suspendu).<br><br><strong>② Congé parental à temps partiel :</strong> minimum <strong>16h/semaine</strong>, nécessite un avenant au contrat de travail formalisant le passage à temps partiel (mentions obligatoires), la rémunération est proportionnelle au temps travaillé.<br><br>Le passage d'une forme à l'autre (total ↔ partiel) est possible en cours de congé. Non rémunéré par l'employeur dans les 2 cas, mais la CAF/MSA peut verser la PreParE (jusqu'à <strong>459,69 €/mois</strong> en 2026 à temps plein, montant réduit à temps partiel, sous conditions de trimestres cotisés).<br><br>Retour garanti au poste ou à un poste similaire, avec rémunération au moins équivalente.",
     reference: "Art. L1225-47 à L1225-60 du Code du travail",
     links: ["maternite", "naissanceSupp", "presenceParentale"]
   },
@@ -6111,7 +6126,7 @@ const OTHER_EVENTS = {
     anciennete: "Conditions IJSS classiques",
     apply: "Arrêt de travail prescrit par le médecin, indemnisé dès le 1er jour sans délai de carence",
     justificatifs: "Arrêt de travail établi par le médecin ou la sage-femme.",
-    modalites: "À distinguer de l'IVG (interruption volontaire) et de l'IMG (interruption médicale) : l'ISG (interruption spontanée de grossesse, ou « fausse couche ») est une interruption naturelle ou accidentelle de la grossesse.<br><br>Depuis la loi n°2023-567 du 07/07/2023 (application au 01/01/2024), la salariée est indemnisée en IJSS dès le 1er jour, sans délai de carence de 3 jours. Si elle le souhaite, elle peut demander à son médecin un arrêt classique avec délai de carence (rare en pratique).<br><br><strong>Point de vigilance subrogation :</strong> en cas de subrogation, l'employeur peut remarquer l'absence de délai de carence et en déduire la nature de l'arrêt - un sujet de confidentialité à garder à l'esprit (le même cas de figure existe pour un arrêt lié à une affection longue durée, donc ce n'est pas un signal certain).<br><br>Le conjoint/partenaire ne bénéficie d'aucun congé spécifique légal (peut mobiliser des CP, RTT, ou un don de jours).<br><br><strong>Si la fausse couche intervient à partir de 22 semaines d'aménorrhée (SA)</strong>, la salariée a droit à un congé maternité complet (voir la carte « Enfant né sans vie »).",
+    modalites: "À distinguer de l'IVG (interruption volontaire) et de l'IMG (interruption médicale) : l'ISG (interruption spontanée de grossesse, ou « fausse couche ») est une interruption naturelle ou accidentelle de la grossesse.<br><br>Depuis la loi n°2023-567 du 07/07/2023 (application au 01/01/2024), la salariée est indemnisée en IJSS <strong>dès le 1er jour</strong>, <strong>sans délai de carence de 3 jours</strong>. Si elle le souhaite, elle peut demander à son médecin un arrêt classique avec délai de carence (rare en pratique).<br><br><strong>Point de vigilance subrogation :</strong> en cas de subrogation, l'employeur peut remarquer l'absence de délai de carence et en déduire la nature de l'arrêt - un sujet de confidentialité à garder à l'esprit (le même cas de figure existe pour un arrêt lié à une affection longue durée, donc ce n'est pas un signal certain).<br><br>Le conjoint/partenaire ne bénéficie d'aucun congé spécifique légal (peut mobiliser des CP, RTT, ou un don de jours).<br><br><strong>Si la fausse couche intervient à partir de 22 semaines d'aménorrhée (SA)</strong>, la salariée a droit à un congé maternité complet (voir la carte « Enfant né sans vie »).",
     reference: "Art. L323-1-2 du Code de la sécurité sociale ; loi n°2023-567 du 07/07/2023",
     links: ["enfantSansVie", "maternite", "donJours"]
   },
@@ -6125,7 +6140,7 @@ const OTHER_EVENTS = {
     anciennete: "Aucune",
     apply: "Congé maternité complet (16 à 46 sem.) + congé de naissance/paternité (25 j.) pour l'autre parent + congé de deuil (8 j.)",
     justificatifs: "Certificat médical d'accouchement précisant le terme et le poids ; acte d'enfant sans vie à demander auprès de l'officier d'état civil (démarche volontaire des parents, sans limite de délai).",
-    modalites: "Au-delà du seuil de viabilité fixé par l'OMS (22 semaines d'aménorrhée ou 500g), les droits sociaux liés à une naissance sont intégralement accordés.<br><br>La mère conserve son congé maternité complet (durée selon le rang/nombre d'enfants, voir la carte « Congé maternité »), et le second parent bénéficie du congé de naissance (3 jours) et du congé de paternité et d'accueil de l'enfant (25 jours calendaires, voir la carte correspondante), sur présentation du certificat médical d'accouchement.<br><br>Les deux parents peuvent en outre demander le congé de deuil de 8 jours (art. L3142-1-1), fractionnable en 2 périodes dans l'année suivant le décès (voir le tableau « Évènements familiaux » ci-dessus).<br><br>Le congé supplémentaire de naissance n'est en revanche pas ouvert dans ce cas. En deçà de ce seuil, il s'agit d'une fausse couche (voir cette carte).",
+    modalites: "Au-delà du seuil de viabilité fixé par l'OMS (<strong>22 semaines d'aménorrhée ou 500g</strong>), les droits sociaux liés à une naissance sont <strong>intégralement accordés</strong>.<br><br>La mère conserve son congé maternité complet (durée selon le rang/nombre d'enfants, voir la carte « Congé maternité »), et le second parent bénéficie du congé de naissance (3 jours) et du congé de paternité et d'accueil de l'enfant (25 jours calendaires, voir la carte correspondante), sur présentation du certificat médical d'accouchement.<br><br>Les deux parents peuvent en outre demander le <strong>congé de deuil de 8 jours</strong> (art. L3142-1-1), fractionnable en 2 périodes dans l'année suivant le décès (voir le tableau « Évènements familiaux » ci-dessus).<br><br>Le congé supplémentaire de naissance n'est en revanche pas ouvert dans ce cas. En deçà de ce seuil, il s'agit d'une fausse couche (voir cette carte).",
     reference: "Art. L1225-17, L3142-1-1 du Code du travail ; circulaire du 22/07/1993 (seuil de viabilité OMS)",
     links: ["fausseCouche", "maternite", "paternite"]
   },
@@ -6139,7 +6154,7 @@ const OTHER_EVENTS = {
     anciennete: "Aucune",
     apply: "Autorisations d'absence rémunérées pour tous les rendez-vous médicaux liés au parcours d'AMP",
     justificatifs: "Attestation ou convocation du centre d'AMP/de PMA pour chaque rendez-vous ou acte médical.",
-    modalites: "Depuis la réforme du 2 juillet 2025 (loi du 30/06/2025) : la salariée engagée dans un parcours d'AMP bénéficie d'autorisations d'absence rémunérées pour tous ses rendez-vous médicaux (sans limite de nombre).<br><br>Le conjoint ou partenaire (quel que soit son sexe) bénéficie de 3 autorisations d'absence rémunérées par protocole - et depuis la réforme, ce droit est réciproque et non plus réservé au conjoint de la femme : un salarié homme engagé dans son propre parcours d'AMP bénéficie désormais des mêmes droits que les femmes, sans être limité à 3 actes.<br><br>Les salariés engagés dans un parcours d'AMP ou une procédure d'adoption bénéficient d'une protection contre les discriminations.<br><br>Absences rémunérées intégralement par l'employeur (pas d'IJSS, pas de subrogation, car il ne s'agit pas d'un arrêt de travail).",
+    modalites: "Depuis la réforme du 2 juillet 2025 (loi du 30/06/2025) : la salariée engagée dans un parcours d'AMP bénéficie d'autorisations d'absence rémunérées pour tous ses rendez-vous médicaux (<strong>sans limite de nombre</strong>).<br><br>Le conjoint ou partenaire (quel que soit son sexe) bénéficie de <strong>3 autorisations d'absence rémunérées</strong> par protocole - et depuis la réforme, ce droit est réciproque et non plus réservé au conjoint de la femme : un salarié homme engagé dans son propre parcours d'AMP bénéficie désormais des mêmes droits que les femmes, sans être limité à 3 actes.<br><br>Les salariés engagés dans un parcours d'AMP ou une procédure d'adoption bénéficient d'une protection contre les discriminations.<br><br>Absences rémunérées intégralement par l'employeur (pas d'IJSS, pas de subrogation, car il ne s'agit pas d'un arrêt de travail).",
     reference: "Art. L1225-16 du Code du travail ; loi du 30/06/2025 (entrée en vigueur le 02/07/2025)",
     links: ["paternite", "adoptionConge", "amlExamens"]
   },
@@ -6167,7 +6182,7 @@ const OTHER_EVENTS = {
     anciennete: "Aucune",
     apply: "310 jours ouvrés maximum sur une période de 3 ans, renouvelable en cas de rechute",
     justificatifs: "Certificat médical détaillé du médecin qui suit l'enfant, attestant la gravité et la nécessité d'une présence soutenue et de soins contraignants.",
-    modalites: "Sans condition d'ancienneté. Le contrat de travail est suspendu pendant chaque jour de congé pris (jours ouvrés).<br><br>Non rémunéré par l'employeur, mais indemnisé par l'allocation journalière de présence parentale (AJPP) versée par la CAF/MSA.<br><br>Peut être transformé en activité à temps partiel avec l'accord de l'employeur (voir aussi le congé parental d'éducation à temps partiel).",
+    modalites: "<strong>Sans condition d'ancienneté.</strong> Le contrat de travail est suspendu pendant chaque jour de congé pris (jours ouvrés).<br><br>Non rémunéré par l'employeur, mais indemnisé par l'allocation journalière de présence parentale (AJPP) versée par la CAF/MSA.<br><br>Peut être transformé en activité à temps partiel avec l'accord de l'employeur (voir aussi le congé parental d'éducation à temps partiel).",
     reference: "Art. L1225-62 à L1225-65 du Code du travail",
     links: ["parentalEducation", "donJours"]
   },
@@ -6181,7 +6196,7 @@ const OTHER_EVENTS = {
     anciennete: "Aucune",
     apply: "Priorité d'aménagement de poste, temps partiel de droit, doublement du préavis de licenciement (3 mois max), reclassement renforcé",
     justificatifs: "Notification de la décision de la CDAPH (MDPH) à remettre à l'employeur (démarche volontaire du salarié).",
-    modalites: "La RQTH n'est pas elle-même un congé mais un statut ouvrant des droits : aménagement du poste et des horaires (obligation de l'employeur, art. L5213-6), accès prioritaire au temps partiel choisi, majoration de la durée du préavis en cas de licenciement, prise en compte dans les effectifs OETH de l'entreprise.<br><br>Les absences pour se rendre aux rendez-vous médicaux liés au handicap ne sont pas légalement rémunérées de droit commun ; se référer à un accord d'entreprise éventuel.<br><br>Contacter le service RH pour étudier un aménagement individuel.",
+    modalites: "La RQTH n'est pas elle-même un congé mais un statut ouvrant des droits : aménagement du poste et des horaires (<strong>obligation de l'employeur</strong>, art. L5213-6), accès prioritaire au temps partiel choisi, <strong>majoration de la durée du préavis</strong> en cas de licenciement, prise en compte dans les effectifs OETH de l'entreprise.<br><br>Les absences pour se rendre aux rendez-vous médicaux liés au handicap ne sont pas légalement rémunérées de droit commun ; se référer à un accord d'entreprise éventuel.<br><br>Contacter le service RH pour étudier un aménagement individuel.",
     reference: "Art. L5213-1 à L5213-6 du Code du travail",
     links: ["presenceParentale"]
   },
@@ -6195,7 +6210,7 @@ const OTHER_EVENTS = {
     anciennete: "Aucune",
     apply: "3 mois, renouvelable dans la limite d'1 an sur l'ensemble de la carrière",
     justificatifs: "Attestation sur l'honneur du lien avec la personne aidée et justificatif de son handicap (taux ≥ 80 %) ou de sa perte d'autonomie (GIR 1 à 4).",
-    modalites: "Sans condition d'ancienneté. Demande à l'employeur au moins 1 mois avant (sans délai en cas d'urgence).<br><br>Peut être fractionné (demi-journée min.) ou transformé en temps partiel avec accord de l'employeur.<br><br>Non rémunéré par l'employeur, sauf allocation journalière du proche aidant (AJPA, 66,64 €/jour calendaire en 2026, versée par la CAF/MSA, 66 jours par proche aidé, 264 jours cumulés sur 4 proches).",
+    modalites: "Sans condition d'ancienneté. Demande à l'employeur au moins 1 mois avant (sans délai en cas d'urgence).<br><br>Peut être fractionné (demi-journée min.) ou transformé en temps partiel avec accord de l'employeur.<br><br>Non rémunéré par l'employeur, sauf allocation journalière du proche aidant (AJPA, <strong>66,64 €/jour</strong> calendaire en 2026, versée par la CAF/MSA, <strong>66 jours par proche aidé</strong>, <strong>264 jours cumulés</strong> sur 4 proches).",
     reference: "Art. L3142-16 à L3142-27 du Code du travail",
     links: ["solidariteFamiliale", "donJours", "presenceParentale"]
   },
@@ -6209,7 +6224,7 @@ const OTHER_EVENTS = {
     anciennete: "Aucune",
     apply: "3 mois, renouvelable une fois (6 mois maximum)",
     justificatifs: "Certificat médical du médecin traitant de la personne accompagnée attestant du pronostic vital engagé ou de la phase avancée/terminale.",
-    modalites: "Sans condition d'ancienneté. Demande à l'employeur au moins 15 jours avant (sans délai en cas d'urgence absolue attestée par le médecin).<br><br>Le congé ne peut être ni reporté ni refusé par l'employeur.<br><br>Non rémunéré, mais indemnisable par l'allocation journalière d'accompagnement d'une personne en fin de vie (AJAP, 64,93 €/jour calendaire en 2026, 21 jours max. à temps plein ou 42 jours à temps partiel).",
+    modalites: "Sans condition d'ancienneté. Demande à l'employeur au moins 15 jours avant (sans délai en cas d'urgence absolue attestée par le médecin).<br><br>Le congé <strong>ne peut être ni reporté ni refusé</strong> par l'employeur.<br><br>Non rémunéré, mais indemnisable par l'allocation journalière d'accompagnement d'une personne en fin de vie (AJAP, <strong>64,93 €/jour</strong> calendaire en 2026, <strong>21 jours max.</strong> à temps plein ou <strong>42 jours</strong> à temps partiel).",
     reference: "Art. L3142-6 à L3142-15 du Code du travail",
     links: ["procheAidant", "donJours"]
   },
@@ -6223,7 +6238,7 @@ const OTHER_EVENTS = {
     anciennete: "Aucune (donateur comme bénéficiaire)",
     apply: "Le bénéficiaire perçoit son salaire habituel pendant les jours reçus, sans plafond légal côté bénéficiaire",
     justificatifs: "Pour le bénéficiaire : certificat médical détaillé (enfant gravement malade) ou justificatif de la situation de proche aidant/décès d'un enfant ; demande à l'employeur (accord obligatoire).",
-    modalites: "Peuvent être donnés (en jours ouvrés) : la 5e semaine de CP (au-delà de 24 jours ouvrables), les RTT, les jours de récupération et les jours de CET.<br><br>Don anonyme, volontaire et sans contrepartie, avec accord de l'employeur.<br><br>Bénéficiaires possibles : parent d'un enfant de moins de 20 ans gravement malade/handicapé/accidenté, salarié dont l'enfant de moins de 25 ans est décédé, proche aidant, salarié réserviste.<br><br>La période est assimilée à du temps de travail effectif (ancienneté, CP, primes de présence maintenues).",
+    modalites: "Peuvent être donnés (en jours ouvrés) : la <strong>5e semaine de CP</strong> (au-delà de 24 jours ouvrables), les RTT, les jours de récupération et les jours de CET.<br><br>Don anonyme, volontaire et sans contrepartie, avec accord de l'employeur.<br><br>Bénéficiaires possibles : parent d'un enfant de moins de 20 ans gravement malade/handicapé/accidenté, salarié dont l'enfant de moins de 25 ans est décédé, proche aidant, salarié réserviste.<br><br>La période est assimilée à du temps de travail effectif (ancienneté, CP, primes de présence maintenues).",
     reference: "Art. L1225-65-1, L1225-65-2, L3142-25-1 du Code du travail",
     links: ["procheAidant", "solidariteFamiliale", "presenceParentale", "reserviste"]
   },
@@ -6237,7 +6252,7 @@ const OTHER_EVENTS = {
     anciennete: "Aucune",
     apply: "1/2 journée non rémunérée, pour le salarié concerné et, le cas échéant, son conjoint",
     justificatifs: "Invitation à la cérémonie d'accueil dans la citoyenneté française.",
-    modalites: "Congé de droit, à prendre le jour de la cérémonie.<br><br>Non rémunéré sauf accord ou convention contraire ; la durée ne peut pas être imputée sur les congés payés.<br><br>En l'absence de disposition conventionnelle CYIM spécifique, la durée légale de 0,5 jour s'applique.",
+    modalites: "Congé de droit, à prendre le jour de la cérémonie.<br><br><strong>Non rémunéré sauf accord</strong> ou convention contraire ; la durée ne peut pas être imputée sur les congés payés.<br><br>En l'absence de disposition conventionnelle CYIM spécifique, la durée légale de 0,5 jour s'applique.",
     reference: "Art. L3142-75 à L3142-78 du Code du travail",
     links: []
   },
@@ -6251,7 +6266,7 @@ const OTHER_EVENTS = {
     anciennete: "Aucune",
     apply: "10 jours ouvrés/an de droit (5 jours si l'entreprise compte moins de 50 salariés)",
     justificatifs: "Ordre de mission ou convocation de l'autorité militaire ; demande écrite au moins 1 mois avant l'absence.",
-    modalites: "CYIM comptant moins de 50 salariés, le seuil applicable de plein droit est de 5 jours ouvrés/an, sauf accord individuel étendant ce nombre.<br><br>Au-delà, l'accord de l'employeur est requis (silence de 15 jours = refus motivé obligatoire).<br><br>Non rémunéré par l'employeur (sauf accord), mais assimilé à du temps de travail effectif pour l'ancienneté, l'avancement et les CP. Protection contre le licenciement pendant l'absence.<br><br>Possibilité de don de jours de repos d'un collègue.",
+    modalites: "CYIM comptant moins de 50 salariés, le seuil applicable de plein droit est de <strong>5 jours ouvrés/an</strong>, sauf accord individuel étendant ce nombre.<br><br>Au-delà, l'accord de l'employeur est requis (<strong>silence de 15 jours = refus motivé obligatoire</strong>).<br><br>Non rémunéré par l'employeur (sauf accord), mais assimilé à du temps de travail effectif pour l'ancienneté, l'avancement et les CP. Protection contre le licenciement pendant l'absence.<br><br>Possibilité de don de jours de repos d'un collègue.",
     reference: "Art. L3142-89 à L3142-94-3 du Code du travail",
     links: ["donJours"]
   },
@@ -6265,7 +6280,7 @@ const OTHER_EVENTS = {
     anciennete: "Aucune",
     apply: "12 jours ouvrés/an (18 jours pour animateurs de stage ou responsables syndicaux)",
     justificatifs: "Demande écrite au moins 30 jours avant le stage, précisant l'organisme, la date et la durée.",
-    modalites: "Congé de droit, sauf refus motivé de l'employeur après avis conforme du CSE en cas de conséquences préjudiciables à l'entreprise (réponse sous 8 jours).<br><br>Rémunération intégralement maintenue par l'employeur.<br><br>Non imputable sur les congés payés ; assimilé à du temps de travail effectif.",
+    modalites: "Congé de droit, sauf refus motivé de l'employeur après avis conforme du CSE en cas de conséquences préjudiciables à l'entreprise (réponse sous 8 jours).<br><br><strong>Rémunération intégralement maintenue</strong> par l'employeur.<br><br>Non imputable sur les congés payés ; assimilé à du temps de travail effectif.",
     reference: "Art. L2145-5 à L2145-13 du Code du travail",
     links: []
   },
@@ -6279,7 +6294,7 @@ const OTHER_EVENTS = {
     anciennete: "Aucune",
     apply: "Retenue sur salaire strictement proportionnelle à la durée de l'arrêt de travail",
     justificatifs: "Aucun formalisme requis dans le secteur privé : le salarié n'a pas à prévenir son employeur à l'avance ni à motiver par écrit sa participation à la grève.",
-    modalites: "Le contrat de travail est suspendu pendant la grève (pas rompu).<br><br>La retenue sur salaire et ses accessoires doit être strictement proportionnelle au temps non travaillé, calculée sur l'horaire mensuel de référence (jamais forfaitaire à la journée). Aucune mention de « grève » ne doit apparaître sur le bulletin de paie (mention neutre : absence non rémunérée).<br><br>Le salarié ne peut être ni sanctionné ni licencié pour l'exercice normal du droit de grève ; seule une faute lourde personnelle (violences, entrave à la liberté du travail) peut justifier une sanction.",
+    modalites: "Le contrat de travail est suspendu pendant la grève (pas rompu).<br><br>La retenue sur salaire et ses accessoires doit être <strong>strictement proportionnelle au temps non travaillé</strong>, calculée sur l'horaire mensuel de référence (jamais forfaitaire à la journée). Aucune mention de « grève » ne doit apparaître sur le bulletin de paie (mention neutre : absence non rémunérée).<br><br>Le salarié <strong>ne peut être ni sanctionné ni licencié</strong> pour l'exercice normal du droit de grève ; seule une faute lourde personnelle (violences, entrave à la liberté du travail) peut justifier une sanction.",
     reference: "Art. L2511-1 et L1132-2 du Code du travail",
     links: []
   },
@@ -6293,7 +6308,7 @@ const OTHER_EVENTS = {
     anciennete: "36 mois",
     apply: "Entre 6 et 11 mois, durée choisie librement par le salarié",
     justificatifs: "Aucun motif à justifier - le salarié n'a pas à indiquer la raison de sa demande. Lettre recommandée au moins 3 mois avant le départ souhaité.",
-    modalites: "Conditions cumulatives : 36 mois d'ancienneté dans l'entreprise (consécutifs ou non) et 6 années d'activité professionnelle ; ne pas avoir bénéficié, au cours des 6 années précédentes, d'un congé sabbatique, d'un congé pour création d'entreprise ou d'un projet de transition professionnelle d'au moins 6 mois.<br><br>L'employeur peut différer le départ (9 mois max. si l'entreprise compte moins de 300 salariés, 6 mois au-delà) ou le refuser (uniquement dans les entreprises de moins de 300 salariés, après avis du CSE, pour motif préjudiciable à l'entreprise).<br><br>Non rémunéré, sauf utilisation du CET. Le contrat est suspendu (pas d'acquisition d'ancienneté ni de CP) ; à l'issue, retour au poste ou à un poste similaire avec rémunération au moins équivalente.",
+    modalites: "Conditions cumulatives : <strong>36 mois d'ancienneté</strong> dans l'entreprise (consécutifs ou non) et <strong>6 années d'activité professionnelle</strong> ; ne pas avoir bénéficié, au cours des 6 années précédentes, d'un congé sabbatique, d'un congé pour création d'entreprise ou d'un projet de transition professionnelle d'au moins 6 mois.<br><br>L'employeur peut différer le départ (<strong>9 mois max.</strong> si l'entreprise compte moins de 300 salariés, <strong>6 mois</strong> au-delà) ou le refuser (uniquement dans les entreprises de moins de 300 salariés, après avis du CSE, pour motif préjudiciable à l'entreprise).<br><br>Non rémunéré, sauf utilisation du CET. Le contrat est suspendu (pas d'acquisition d'ancienneté ni de CP) ; à l'issue, retour au poste ou à un poste similaire avec rémunération au moins équivalente.",
     reference: "Art. L3142-28 à L3142-35 du Code du travail",
     links: []
   }
