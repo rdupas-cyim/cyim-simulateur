@@ -6009,13 +6009,13 @@ const OTHER_EVENTS = {
     category: "autre",
     duree: "16 à 46 semaines selon la situation",
     typeJours: "Semaines calendaires",
-    remuneration: "IJSS (+ maintien si accord)",
-    anciennete: "Aucune",
+    remuneration: "IJSS + maintien intégral SYNTEC (dès 1 an d'ancienneté)",
+    anciennete: "Aucune pour le congé - 1 an SYNTEC pour le maintien de salaire",
     apply: "16 à 46 semaines - voir le mini-simulateur ci-dessus pour votre situation précise",
     justificatifs: "Déclaration de grossesse avant la fin de la 14e semaine ; certificat médical du médecin ou de la sage-femme attestant la date présumée d'accouchement.<br><br>Le calendrier de grossesse remis par la CPAM au moment de la déclaration peut également être fourni comme justificatif des dates.",
-    modalites: "Congé obligatoire : la salariée ne peut y renoncer que partiellement (arrêt minimum incompressible de 8 semaines, dont 6 après l'accouchement - interdiction légale de travailler). Elle peut reporter une partie de son congé prénatal sur le postnatal.<br><br>En cas d'accouchement prématuré, la durée totale reste inchangée (le prénatal écourté est reporté sur le postnatal) ; en cas d'accouchement tardif, le congé prénatal est simplement prolongé jusqu'à la naissance. Un congé pathologique prénatal de 14 jours (consécutifs ou non) peut s'ajouter avant le congé mat en cas d'état pathologique attesté médicalement.<br><br>Indemnisée par la CPAM (IJSS, plafond PMSS, jusqu'à 104,02 €/jour en 2026).<br><br><strong>Subrogation :</strong> le Code du travail n'impose pas de maintien de salaire pendant le congé maternité (seules les IJSS sont dues) ; si un accord ou un usage CYIM prévoit un maintien, l'employeur pratique alors la subrogation (il continue de verser le salaire habituel et perçoit directement les IJSS de la CPAM à sa place) - à défaut, la CPAM verse les IJSS directement à la salariée.<br><br>Protection absolue contre le licenciement pendant le congé et les 10 semaines suivant le retour, sauf faute grave étrangère à la grossesse. Peut être suivi du congé parental d'éducation et, depuis le 01/07/2026, du congé supplémentaire de naissance.",
-    reference: "Art. L1225-17 et s. du Code du travail ; art. L331-3 à L331-7 du Code de la sécurité sociale",
-    links: ["paternite", "naissanceSupp", "parentalEducation", "fausseCouche", "enfantSansVie"]
+    modalites: "Congé obligatoire : la salariée ne peut y renoncer que partiellement (arrêt minimum incompressible de 8 semaines, dont 6 après l'accouchement - interdiction légale de travailler). Elle peut reporter une partie de son congé prénatal sur le postnatal.<br><br>En cas d'accouchement prématuré, la durée totale reste inchangée (le prénatal écourté est reporté sur le postnatal) ; en cas d'accouchement tardif, le congé prénatal est simplement prolongé jusqu'à la naissance. Un congé pathologique prénatal de 14 jours (consécutifs ou non) peut s'ajouter avant le congé mat en cas d'état pathologique attesté médicalement.<br><br>Indemnisée par la CPAM (IJSS, plafond PMSS, jusqu'à 104,02 €/jour en 2026).<br><br><strong>Subrogation - obligation conventionnelle chez CYIM :</strong> le Code du travail n'impose que le versement des IJSS, mais la convention SYNTEC va plus loin et impose le maintien intégral du salaire pour toute salariée ayant plus d'1 an d'ancienneté à la date de début du congé maternité (déduction faite des IJSS et, le cas échéant, des prestations de prévoyance). CYIM, relevant de la SYNTEC, doit donc pratiquer la subrogation dans ce cas : l'employeur continue de verser le salaire habituel et perçoit directement les IJSS de la CPAM à sa place. Si l'ancienneté d'1 an est atteinte en cours de congé, le maintien s'applique à partir de cette date pour les jours restants. En deçà d'1 an d'ancienneté, seules les IJSS sont dues (pas de complément employeur), sauf usage plus favorable chez CYIM.<br><br>Protection absolue contre le licenciement pendant le congé et les 10 semaines suivant le retour, sauf faute grave étrangère à la grossesse. Peut être suivi du congé parental d'éducation et, depuis le 01/07/2026, du congé supplémentaire de naissance.",
+    reference: "Art. L1225-17 et s. du Code du travail ; art. L331-3 à L331-7 du Code de la sécurité sociale ; convention SYNTEC (IDCC 1486), avenant n°49 du 22/10/2025 relatif à la parentalité (maintien de salaire dès 1 an d'ancienneté, en vigueur au 01/05/2026)",
+    links: ["paternite", "reductionHoraireGrossesse", "allaitement", "naissanceSupp", "parentalEducation", "fausseCouche", "enfantSansVie"]
   },
   paternite: {
     label: "Congé de naissance + congé de paternité et d'accueil de l'enfant",
@@ -6023,13 +6023,41 @@ const OTHER_EVENTS = {
     category: "autre",
     duree: "3 jours + 25 jours calendaires (32 si naissances multiples)",
     typeJours: "Ouvrables (3j) puis calendaires (25j)",
-    remuneration: "Employeur (3j) puis IJSS (25j)",
-    anciennete: "Aucune",
+    remuneration: "Employeur (3j) puis IJSS + maintien intégral SYNTEC dès 1 an d'ancienneté (25j)",
+    anciennete: "Aucune pour le congé - 1 an SYNTEC pour le maintien de salaire",
     apply: "3 j. ouvrables (naissance) + 25 j. calendaires (paternité), dont 4 j. obligatoires",
     justificatifs: "Copie de l'acte de naissance, du livret de famille mis à jour ou de l'acte de reconnaissance ; justificatif du lien avec la mère si le salarié n'est pas le père.",
-    modalites: "Le congé de naissance (3 jours ouvrables) est OBLIGATOIRE : le salarié ne peut pas y renoncer et l'employeur ne peut pas le faire travailler pendant cette période (interdiction d'emploi), il doit débuter dès la naissance ou le lendemain (au choix du salarié). Il est entièrement à la charge de l'employeur (pas d'IJSS à ce stade).<br><br>Les 4 jours suivants du congé paternité sont également obligatoires. Les 21 jours restants (28 en cas de naissances multiples) sont fractionnables en 2 périodes d'au moins 5 jours, à prendre dans les 6 mois suivant la naissance, indemnisés par la CPAM (IJSS).<br><br><strong>Subrogation :</strong> comme pour la maternité, le maintien de salaire n'est pas une obligation légale pendant le congé paternité indemnisé par la CPAM ; si CYIM le pratique, la subrogation permet à l'employeur de percevoir directement les IJSS.<br><br>Préavis d'1 mois avant le congé de paternité. Se cumule avec le congé de naissance de 3 jours (voir tableau « Évènements familiaux » ci-dessus).",
-    reference: "Art. L1225-35 et s. du Code du travail ; art. L331-8 du Code de la sécurité sociale ; art. L3142-1 (congé naissance)",
-    links: ["maternite", "naissanceSupp", "amp"]
+    modalites: "Le congé de naissance (3 jours ouvrables) est OBLIGATOIRE : le salarié ne peut pas y renoncer et l'employeur ne peut pas le faire travailler pendant cette période (interdiction d'emploi), il doit débuter dès la naissance ou le lendemain (au choix du salarié). Il est entièrement à la charge de l'employeur (pas d'IJSS à ce stade).<br><br>Les 4 jours suivants du congé paternité sont également obligatoires. Les 21 jours restants (28 en cas de naissances multiples) sont fractionnables en 2 périodes d'au moins 5 jours, à prendre dans les 6 mois suivant la naissance, indemnisés par la CPAM (IJSS).<br><br><strong>Subrogation - obligation conventionnelle chez CYIM :</strong> le Code du travail n'impose que le versement des IJSS pendant les 25 jours de congé paternité. Mais depuis l'avenant n°49 du 22/10/2025 (en vigueur au 01/05/2026), la convention SYNTEC aligne le paternité sur le maternité : le salarié ayant plus d'1 an d'ancienneté à la date de début du congé (contre 2 ans auparavant) bénéficie du maintien intégral de son salaire. CYIM, relevant de la SYNTEC, doit donc pratiquer la subrogation dans ce cas : l'employeur continue de verser le salaire habituel et perçoit directement les IJSS de la CPAM à sa place, dans la limite du plafond de la Sécurité sociale. Si l'ancienneté d'1 an est atteinte en cours de congé, le maintien s'applique à partir de cette date pour les jours restants. En deçà d'1 an d'ancienneté, seules les IJSS sont dues (pas de complément employeur), sauf usage plus favorable chez CYIM.<br><br>Préavis d'1 mois avant le congé de paternité. Se cumule avec le congé de naissance de 3 jours (voir tableau « Évènements familiaux » ci-dessus).",
+    reference: "Art. L1225-35 et s. du Code du travail ; art. L331-8 du Code de la sécurité sociale ; art. L3142-1 (congé naissance) ; convention SYNTEC (IDCC 1486), avenant n°49 du 22/10/2025 relatif à la parentalité (maintien de salaire dès 1 an d'ancienneté, en vigueur au 01/05/2026)",
+    links: ["maternite", "naissanceSupp", "amp", "amlExamens"]
+  },
+  reductionHoraireGrossesse: {
+    label: "Réduction d'horaire pour grossesse (avantage SYNTEC)",
+    icon: "🤰",
+    category: "autre",
+    duree: "20 à 30 min/jour selon le stade de grossesse",
+    typeJours: "Minutes/jour, jusqu'au départ en congé maternité",
+    remuneration: "Rémunérée intégralement (avantage SYNTEC)",
+    anciennete: "Aucune",
+    apply: "20 min/jour dès le 3e mois de grossesse, 30 min/jour dès le 5e mois",
+    justificatifs: "Déclaration de grossesse à l'employeur (même justificatif que pour le congé maternité).",
+    modalites: "Avantage propre à la convention SYNTEC, sans équivalent général dans le Code du travail : la salariée ayant déclaré sa grossesse bénéficie d'une réduction rémunérée du temps de travail de 20 minutes par jour à partir du 3e mois de grossesse, puis 30 minutes par jour à partir du 5e mois, jusqu'à son départ en congé maternité.<br><br>Pour une salariée au forfait annuel en jours, l'employeur doit veiller à ce que l'amplitude de travail lui permette de concilier vie professionnelle et vie personnelle, formalisé par écrit, avec adaptation de la charge de travail en conséquence.<br><br>Cette période est assimilée à du temps de travail effectif pour les congés payés et pour les droits liés à l'ancienneté.",
+    reference: "Convention SYNTEC (IDCC 1486), art. 9.3, tel que modifié par l'avenant n°49 du 22/10/2025 (en vigueur au 01/05/2026)",
+    links: ["maternite", "amlExamens"]
+  },
+  allaitement: {
+    label: "Allaitement (avantage SYNTEC)",
+    icon: "🤱",
+    category: "autre",
+    duree: "1 heure/jour pendant 1 an à compter de la naissance",
+    typeJours: "1h/jour, fractionnable en 2 périodes de 30 min",
+    remuneration: "Rémunérée intégralement (avantage SYNTEC)",
+    anciennete: "Aucune",
+    apply: "1 heure par jour durant les heures de travail, pendant 1 an à compter de la naissance",
+    justificatifs: "Simple information de l'employeur ; aucun justificatif médical n'est exigé par la convention.",
+    modalites: "Le Code du travail (art. L1225-30) ouvre un droit à 1 heure par jour pour allaiter, fractionnable en 2 périodes de 30 minutes, mais ne prévoit pas par lui-même le maintien de la rémunération pendant ce temps.<br><br><strong>Avantage propre à la convention SYNTEC :</strong> l'avenant n°49 du 22/10/2025 (en vigueur au 01/05/2026) précise que l'utilisation de ce droit n'entraîne aucune réduction de la rémunération, pendant 1 an à compter de la naissance de l'enfant. Chez CYIM, ce temps doit donc être intégralement rémunéré.<br><br>Les modalités pratiques (horaires précis, aménagement d'un local dédié au-delà de 100 salariées employées dans l'établissement) restent encadrées par le Code du travail (art. L1225-32 et s.).",
+    reference: "Convention SYNTEC (IDCC 1486), art. 9.3, tel que modifié par l'avenant n°49 du 22/10/2025 (en vigueur au 01/05/2026) ; art. L1225-30 à L1225-33 du Code du travail",
+    links: ["maternite"]
   },
   naissanceSupp: {
     label: "Congé supplémentaire de naissance (nouveau, à compter du 01/07/2026)",
@@ -6051,12 +6079,12 @@ const OTHER_EVENTS = {
     category: "autre",
     duree: "16 à 22 semaines selon la situation",
     typeJours: "Semaines + jours calendaires (partage)",
-    remuneration: "IJSS (mode de calcul maternité)",
-    anciennete: "Aucune",
+    remuneration: "IJSS + maintien intégral SYNTEC (dès 1 an d'ancienneté, comme la maternité)",
+    anciennete: "Aucune pour le congé - 1 an SYNTEC pour le maintien de salaire",
     apply: "16 à 22 semaines, +25 ou 32 jours calendaires si partagé entre les 2 parents",
     justificatifs: "Décision de placement en vue d'adoption (ASE, OAA ou AFA) ou jugement d'adoption pour une adoption internationale.",
-    modalites: "16 semaines (0 ou 1 enfant à charge), 18 semaines (3 enfants ou plus à charge), 22 semaines (adoptions multiples simultanées).<br><br>Peut débuter jusqu'à 7 jours avant l'arrivée de l'enfant, à prendre au plus tard dans les 8 mois suivant l'arrivée. Fractionnable en 2 périodes d'au moins 25 jours calendaires (31 jours pour une adoption multiple) si partagé entre les 2 parents salariés, qui peuvent le prendre simultanément.<br><br>Indemnisé par la CPAM (IJSS, même mode de calcul que le congé maternité) ; subrogation possible selon accord CYIM. Un congé non rémunéré de 6 semaines maximum est ouvert pour un déplacement outre-mer ou à l'étranger en vue de l'adoption.<br><br>Peut être suivi, comme les congés maternité et paternité, du congé supplémentaire de naissance.",
-    reference: "Art. L1225-37 à L1225-46 du Code du travail",
+    modalites: "16 semaines (0 ou 1 enfant à charge), 18 semaines (3 enfants ou plus à charge), 22 semaines (adoptions multiples simultanées).<br><br>Peut débuter jusqu'à 7 jours avant l'arrivée de l'enfant, à prendre au plus tard dans les 8 mois suivant l'arrivée. Fractionnable en 2 périodes d'au moins 25 jours calendaires (31 jours pour une adoption multiple) si partagé entre les 2 parents salariés, qui peuvent le prendre simultanément.<br><br>Indemnisé par la CPAM (IJSS, même mode de calcul que le congé maternité).<br><br><strong>Subrogation - obligation conventionnelle chez CYIM :</strong> l'avenant n°49 du 22/10/2025 (en vigueur au 01/05/2026) précise explicitement que les avantages liés à la naissance prévus pour le congé maternité s'appliquent également au congé d'adoption. CYIM doit donc pratiquer la même subrogation avec maintien intégral du salaire pour tout salarié ayant plus d'1 an d'ancienneté à la date de début du congé d'adoption (déduction faite des IJSS). En deçà d'1 an d'ancienneté, seules les IJSS sont dues.<br><br>Les entretiens obligatoires préalables à l'agrément (démarche d'adoption) sont également des absences autorisées, sans perte de salaire, assimilées à du temps de travail effectif.<br><br>Un congé non rémunéré de 6 semaines maximum est ouvert pour un déplacement outre-mer ou à l'étranger en vue de l'adoption.<br><br>Peut être suivi, comme les congés maternité et paternité, du congé supplémentaire de naissance.",
+    reference: "Art. L1225-37 à L1225-46 du Code du travail ; convention SYNTEC (IDCC 1486), avenant n°49 du 22/10/2025 relatif à la parentalité (maintien de salaire dès 1 an d'ancienneté, en vigueur au 01/05/2026)",
     links: ["naissanceSupp", "parentalEducation", "amp"]
   },
   parentalEducation: {
@@ -6121,12 +6149,12 @@ const OTHER_EVENTS = {
     category: "autre",
     duree: "Autant que nécessaire (examens), durée de la visite (VIP)",
     typeJours: "Heures/jours selon les rendez-vous",
-    remuneration: "Maintenue (mère et VIP) - à vérifier (conjoint)",
+    remuneration: "Maintenue intégralement (salariée, conjoint et VIP)",
     anciennete: "Aucune",
-    apply: "Autorisations d'absence légales pour les examens médicaux obligatoires de grossesse et la visite médicale du travail",
+    apply: "Autorisations d'absence légales et conventionnelles pour les examens médicaux obligatoires de grossesse et la visite médicale du travail",
     justificatifs: "Convocation ou attestation de rendez-vous médical (examen prénatal, visite médicale du travail).",
-    modalites: "<strong>Examens médicaux obligatoires de grossesse (salariée enceinte) :</strong> autorisation d'absence pour se rendre aux 7 examens médicaux obligatoires du suivi de grossesse, autant de fois que nécessaire. Le temps d'absence n'entraîne aucune diminution de rémunération et est assimilé à une période de travail effectif.<br><br><strong>Examens du conjoint/partenaire :</strong> le conjoint salarié, le partenaire de PACS ou la personne vivant maritalement avec la salariée enceinte bénéficie d'une autorisation d'absence pour se rendre à 3 de ces examens médicaux obligatoires au maximum.<br><br>À la différence de la salariée enceinte, la loi ne prévoit pas explicitement de maintien de salaire pour ces 3 absences du conjoint - à vérifier selon l'usage CYIM.<br><br><strong>Visite médicale du travail (VIP - visite d'information et de prévention) :</strong> obligatoire à l'embauche (sauf dispense si une visite a déjà eu lieu récemment) puis renouvelée périodiquement. Le temps passé est pris sur le temps de travail ou rémunéré comme tel, sans perte de salaire.<br><br>Pour les postes à risques particuliers, un examen médical d'aptitude par le médecin du travail est requis avant l'affectation.<br><br>Ces absences sont distinctes du parcours d'AMP (voir la carte correspondante) et du congé pour maladie/accident d'un enfant.",
-    reference: "Art. L1225-16 (examens de grossesse) ; art. R4624-10 et s. du Code du travail (visite médicale)",
+    modalites: "<strong>Examens médicaux obligatoires de grossesse (salariée enceinte) :</strong> autorisation d'absence pour se rendre aux 7 examens médicaux obligatoires du suivi de grossesse, autant de fois que nécessaire. Le temps d'absence n'entraîne aucune diminution de rémunération et est assimilé à une période de travail effectif.<br><br><strong>Examens du conjoint/partenaire :</strong> le conjoint salarié, le partenaire de PACS ou la personne vivant maritalement avec la salariée enceinte (ou avec la personne engagée dans un parcours d'AMP) bénéficie d'une autorisation d'absence pour se rendre à 3 de ces examens ou actes médicaux au maximum par protocole.<br><br>La convention SYNTEC (art. 9.3, avenant n°49 du 22/10/2025, en vigueur au 01/05/2026) précise explicitement que ces 3 absences du conjoint n'entraînent aucune diminution de rémunération et sont assimilées à du temps de travail effectif pour les CP et l'ancienneté : chez CYIM, le maintien de salaire est donc garanti pour ces absences, sans qu'il s'agisse d'un simple usage à vérifier.<br><br><strong>Visite médicale du travail (VIP - visite d'information et de prévention) :</strong> obligatoire à l'embauche (sauf dispense si une visite a déjà eu lieu récemment) puis renouvelée périodiquement. Le temps passé est pris sur le temps de travail ou rémunéré comme tel, sans perte de salaire.<br><br>Pour les postes à risques particuliers, un examen médical d'aptitude par le médecin du travail est requis avant l'affectation.<br><br>Ces absences sont distinctes du parcours d'AMP proprement dit (voir la carte correspondante) et du congé pour maladie/accident d'un enfant.",
+    reference: "Art. L1225-16 (examens de grossesse) ; art. R4624-10 et s. du Code du travail (visite médicale) ; convention SYNTEC (IDCC 1486), art. 9.3, avenant n°49 du 22/10/2025 (en vigueur au 01/05/2026)",
     links: ["amp", "maternite", "paternite"]
   },
   presenceParentale: {
@@ -6316,7 +6344,7 @@ function famMaterniteCompute() {
   if (pathoNotes.length) {
     modalites += ` Majoration pour situation pathologique : ${pathoNotes.join(" et ")}.`;
   }
-  modalites += "<br><br>Période incompressible de 8 semaines dont 6 après l'accouchement (interdiction légale de travailler). Hors situation pathologique, jusqu'à 3 semaines de congé prénatal sont reportables sur le postnatal avec accord médical.<br><br>Indemnisé par la CPAM (IJSS, plafond PMSS, jusqu'à 104,02 €/jour en 2026) ; subrogation possible si CYIM pratique le maintien de salaire. Protection absolue contre le licenciement pendant tout le congé et les 10 semaines suivant le retour, sauf faute grave étrangère à la grossesse.";
+  modalites += "<br><br>Période incompressible de 8 semaines dont 6 après l'accouchement (interdiction légale de travailler). Hors situation pathologique, jusqu'à 3 semaines de congé prénatal sont reportables sur le postnatal avec accord médical.<br><br>Indemnisé par la CPAM (IJSS, plafond PMSS, jusqu'à 104,02 €/jour en 2026) ; la convention SYNTEC impose en plus la subrogation avec maintien intégral du salaire dès 1 an d'ancienneté (avenant n°49 du 22/10/2025, en vigueur au 01/05/2026). Protection absolue contre le licenciement pendant tout le congé et les 10 semaines suivant le retour, sauf faute grave étrangère à la grossesse.";
 
   return { apply, modalites, totalPrenatal, totalPostnatal, total };
 }
@@ -6420,7 +6448,7 @@ function famMaterniteRenderDates() {
 // pour ordonner l'affichage des cartes (aucune séparation visuelle par
 // thème n'est affichée - seul l'ordre de rendu suit cette logique).
 const OTHER_THEMES = [
-  { keys: ["maternite", "paternite", "amp", "amlExamens", "naissanceSupp", "adoptionConge", "parentalEducation", "fausseCouche", "enfantSansVie"] },
+  { keys: ["maternite", "reductionHoraireGrossesse", "paternite", "amp", "amlExamens", "allaitement", "naissanceSupp", "adoptionConge", "parentalEducation", "fausseCouche", "enfantSansVie"] },
   { keys: ["presenceParentale", "rqth"] },
   { keys: ["procheAidant", "solidariteFamiliale", "donJours"] },
   { keys: ["naturalisation", "reserviste", "cfess", "greviste"] },
