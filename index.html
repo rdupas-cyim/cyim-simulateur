@@ -3095,7 +3095,7 @@
      ============================================================ -->
 <section class="panel" id="panel-familiaux">
 
-  <div class="fam-updated-badge">🕓 Dernière mise à jour du contenu : 2 juillet 2026 (Code du travail, Code de la sécurité sociale, avenant SYNTEC n°49 du 22/10/2025)</div>
+  <div class="fam-updated-badge">🕓 Dernière mise à jour du contenu : 8 juillet 2026 (Code du travail, Code de la sécurité sociale, avenant SYNTEC n°49 du 22/10/2025, loi n°2026-492 du 12/06/2026, LFSS 2026)</div>
 
   <div class="section">
     <h2>🔍 Quelle est votre situation ?</h2>
@@ -3175,8 +3175,11 @@
       Convention SYNTEC-CINOV (IDCC 1486), avenant n°49 du 22/10/2025 relatif à la parentalité
       et aux évènements familiaux (modifiant l'art. 5.7 de la convention BETIC), en vigueur au
       01/05/2026 - comparé aux planchers légaux (Code du travail, art. L3142-1 à L3142-4 et
-      L3142-1-1). Une convention collective ne peut jamais prévoir moins favorable que la loi :
-      en cas d'écart, c'est toujours la disposition la plus favorable au salarié qui s'applique.
+      L3142-1-1, ce dernier modifié par la loi n°2026-492 du 12/06/2026 pour le congé annonce
+      handicap/cancer). Une convention collective ne peut jamais prévoir moins favorable que la
+      loi : en cas d'écart, c'est toujours la disposition la plus favorable au salarié qui
+      s'applique - y compris lorsque, comme ici, c'est la loi qui devient plus favorable qu'un
+      avenant SYNTEC pas encore mis à jour.
       Cette comparaison ne concerne que les évènements familiaux au sens strict ; les autres
       congés et absences (parentalité, citoyenneté, solidarité, réserve, grève...) sont traités
       séparément ci-dessous, car ils relèvent de dispositifs légaux nationaux sans déclinaison
@@ -3220,6 +3223,27 @@
       plus favorable. Il n'est ouvert que pour les décès d'un enfant/personne à charge de moins
       de 25 ans - <strong>pas</strong> pour un enfant décédé de 25 ans ou plus, même s'il était
       lui-même parent.
+    </div>
+
+    <div class="note warning">
+      <strong>🆕 Loi n°2026-492 du 12/06/2026 (en vigueur depuis le 14/06/2026) - parents d'enfants
+      gravement malades, handicapés ou atteints d'un cancer :</strong> le congé pour l'annonce d'un
+      handicap, d'une pathologie chronique ou d'un cancer chez un enfant est <strong>doublé, passant
+      de 5 à 10 jours ouvrables</strong> (voir ligne « Annonce d'un handicap... » ci-dessus - l'avenant
+      SYNTEC n°49 n'a pas encore été révisé, c'est donc la nouvelle base légale, plus favorable, qui
+      s'applique). Pour le <strong>congé de présence parentale</strong> (carte « Autres absences »
+      ci-dessous) : le délai de prévenance passe de 15 à 10 jours, et la protection contre le
+      licenciement est prolongée pendant les 10 semaines suivant la fin du congé. Cette loi
+      introduit également un nouveau cas de déblocage anticipé des PER (PERECO/PERO) et modifie
+      certaines règles de l'AJPP versée par la CAF (délai de réexamen porté à 14 mois, partage
+      possible entre parents en résidence alternée) - ces derniers points relèvent de la CAF et de
+      l'organisme gestionnaire de l'épargne salariale, pas directement de l'employeur.
+      <br><br>
+      <strong>🆕 LFSS 2026 (loi n°2025-1403 du 30/12/2025) - congé supplémentaire de naissance :</strong>
+      depuis le 01/07/2026, chaque parent peut ajouter 1 à 2 mois de congé indemnisé (70 % puis 60 %
+      du salaire net, versés par la CPAM) à la suite du congé maternité, paternité ou d'adoption
+      (voir la carte « Congé supplémentaire de naissance » dans les « Autres absences » ci-dessous).
+      Ce congé n'a pas d'équivalent dans la convention SYNTEC ; c'est un dispositif légal national.
     </div>
   </div>
 
@@ -3424,6 +3448,7 @@
 
 <footer>
   Simulateur CYIM · usage interne RH · données locales (navigateur) · convention SYNTEC IDCC 1486
+  <div id="footer-update-date" style="margin-top:4px; font-size:11px; color: var(--text-faint);">Contenu absences &amp; congés familiaux à jour au 8 juillet 2026 (loi n°2026-492 du 12/06/2026, LFSS 2026)</div>
 </footer>
 
 <div class="flash" id="flash-msg"></div>
@@ -5860,7 +5885,13 @@ function initClassif() {
 // Sources : Code du travail art. L3142-1, L3142-2, L3142-4, L3142-1-1
 // (congé de deuil), L1225-61 (enfant malade) ; Convention SYNTEC-CINOV
 // IDCC 1486, avenant n°49 du 22/10/2025 (art. 2, modifiant l'art. 5.7
-// de la convention BETIC), en vigueur au 01/05/2026.
+// de la convention BETIC), en vigueur au 01/05/2026 ; Loi n°2026-492 du
+// 12/06/2026 (JO du 14/06/2026) visant à améliorer la protection et
+// l'accompagnement des parents d'enfants atteints d'un cancer, d'une
+// maladie grave ou d'un handicap (congé annonce handicap porté à 10
+// jours, délai de prévenance du congé de présence parentale réduit à
+// 10 jours, protection anti-licenciement prolongée 10 semaines après
+// la fin du congé de présence parentale).
 const FAM_EVENTS = {
   mariage: {
     label: "Mariage / PACS du salarié",
@@ -5910,11 +5941,11 @@ const FAM_EVENTS = {
   handicapCancer: {
     label: "Annonce d'un handicap, d'une pathologie chronique ou d'un cancer chez un enfant",
     category: "familial",
-    legal: "5 jours ouvrables",
-    syntec: "5 jours ouvrables",
-    apply: "5 jours ouvrables",
+    legal: "10 jours ouvrables (depuis le 14/06/2026 - loi n°2026-492 du 12/06/2026 ; 5 jours auparavant)",
+    syntec: "5 jours ouvrables (avenant n°49, non révisé depuis la loi du 12/06/2026)",
+    apply: "10 jours ouvrables",
     justificatifs: "Certificat médical détaillé établissant le diagnostic.",
-    modalites: "Jours ouvrables. À prendre au moment de l'annonce ou dans un délai raisonnable suivant celle-ci. <strong>Rémunération maintenue</strong>, sans impact sur les CP."
+    modalites: "Jours ouvrables. À prendre au moment de l'annonce ou dans un délai raisonnable suivant celle-ci. <strong>Rémunération maintenue</strong>, sans impact sur les CP.<br><br><strong>Doublé depuis le 14/06/2026</strong> (loi n°2026-492 du 12/06/2026) : la durée légale est passée de 5 à 10 jours ouvrables. L'avenant n°49 de la convention SYNTEC n'ayant pas encore été révisé pour intégrer cette hausse, c'est la disposition légale, désormais plus favorable, qui s'applique de plein droit chez CYIM (10 jours, et non 5)."
   },
   decesConjoint: {
     label: "Décès du conjoint / partenaire PACS / concubin",
@@ -6182,8 +6213,8 @@ const OTHER_EVENTS = {
     anciennete: "Aucune",
     apply: "310 jours ouvrés maximum sur une période de 3 ans, renouvelable en cas de rechute",
     justificatifs: "Certificat médical détaillé du médecin qui suit l'enfant, attestant la gravité et la nécessité d'une présence soutenue et de soins contraignants.",
-    modalites: "<strong>Sans condition d'ancienneté.</strong> Le contrat de travail est suspendu pendant chaque jour de congé pris (jours ouvrés).<br><br>Non rémunéré par l'employeur, mais indemnisé par l'allocation journalière de présence parentale (AJPP) versée par la CAF/MSA.<br><br>Peut être transformé en activité à temps partiel avec l'accord de l'employeur (voir aussi le congé parental d'éducation à temps partiel).",
-    reference: "Art. L1225-62 à L1225-65 du Code du travail",
+    modalites: "<strong>Sans condition d'ancienneté.</strong> Le contrat de travail est suspendu pendant chaque jour de congé pris (jours ouvrés).<br><br>Non rémunéré par l'employeur, mais indemnisé par l'allocation journalière de présence parentale (AJPP) versée par la CAF/MSA.<br><br>Peut être transformé en activité à temps partiel avec l'accord de l'employeur (voir aussi le congé parental d'éducation à temps partiel).<br><br><strong>Nouveautés issues de la loi n°2026-492 du 12/06/2026 (en vigueur depuis le 14/06/2026) :</strong> le délai de prévenance à respecter par le salarié auprès de l'employeur pour débuter ou renouveler le congé est réduit de <strong>15 à 10 jours</strong>. La protection contre le licenciement, qui s'appliquait déjà pendant le congé, est désormais <strong>prolongée pendant les 10 semaines suivant la fin du congé de présence parentale</strong> (hors faute grave ou impossibilité de maintenir le contrat pour un motif étranger à la situation de l'enfant).<br><br><strong>Côté AJPP (CAF/MSA)</strong> : le délai maximal de réexamen de la situation médicale de l'enfant par le médecin est porté de 12 à 14 mois, et l'allocation peut désormais être partagée entre les deux parents en cas de séparation avec résidence alternée. Ces deux points relèvent de la CAF/MSA et non de l'employeur, mais sont utiles à connaître pour informer les salariés concernés.<br><br><strong>Épargne salariale :</strong> l'affection grave, le handicap ou l'accident grave de l'enfant à charge constitue désormais un nouveau cas de déblocage anticipé des plans d'épargne retraite (PERECO/PERO - pas les anciens PERCO).",
+    reference: "Art. L1225-62 à L1225-65 du Code du travail ; Loi n°2026-492 du 12/06/2026 (JO du 14/06/2026) ; art. L544-2 du Code de la sécurité sociale (AJPP) ; art. L224-4 du Code monétaire et financier (déblocage anticipé PER)",
     links: ["parentalEducation", "donJours"]
   },
   rqth: {
