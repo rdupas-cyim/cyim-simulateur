@@ -648,6 +648,40 @@
     color: var(--navy);
     box-shadow: 0 0 0 3px rgba(48, 221, 146, 0.15);
   }
+  /* Sélecteur du motif de rupture (onglet Simulations de préavis) - même style que le toggle statut, en grille 3 colonnes */
+  .pv-motif-toggle {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  @media (max-width: 700px) {
+    .pv-motif-toggle { grid-template-columns: 1fr; }
+  }
+  .pv-block { display: none; }
+  .pv-block.active { display: block; }
+  .pv-absence-row {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: end;
+    padding: 10px;
+    background: #FAFAFA;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  @media (max-width: 800px) {
+    .pv-absence-row { grid-template-columns: 1fr; }
+  }
+  .pv-impact-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .pv-impact-tag.prolonge { background: var(--warn-bg); color: var(--warn-text); }
+  .pv-impact-tag.neutre { background: #F3F4F6; color: var(--text-soft); }
   .s4-formula-note {
     background: #EFF6FF !important;
     border-left: 3px solid #BFDBFE !important;
@@ -1275,6 +1309,7 @@
   td.cell-ok    { background: var(--ok-bg) !important; color: var(--ok-text); font-weight: 700; }
   td.cell-warn  { background: var(--warn-bg) !important; color: var(--warn-text); font-weight: 700; }
   td.cell-alert { background: var(--alert-bg) !important; color: var(--alert-text); font-weight: 700; }
+  tr.pv-recap-active td { background: var(--mint-soft) !important; font-weight: 700; }
 
   /* Inputs dans le tableau (enveloppe + grilles éditables) */
   table input[type="text"], table input[type="number"], table select {
@@ -1884,6 +1919,20 @@
      ============================================================ -->
 <section class="panel active" id="panel-sim">
 
+  <!-- Sous-onglets : simulations salariales / simulations de préavis -->
+  <div class="s4-statut-toggle" style="margin-bottom:24px;">
+    <button type="button" class="s4-statut-btn active" data-subtab="salarial" onclick="simSetSubtab('salarial')">
+      <strong>💰 Simulations salariales</strong>
+      <span style="display:block; font-size:11px; font-weight:normal; opacity:0.85; margin-top:2px;">Augmentation, classification, convertisseur, temps partiel</span>
+    </button>
+    <button type="button" class="s4-statut-btn" data-subtab="preavis" onclick="simSetSubtab('preavis')">
+      <strong>📅 Simulations de préavis</strong>
+      <span style="display:block; font-size:11px; font-weight:normal; opacity:0.85; margin-top:2px;">Période d'essai, démission, licenciement, rupture conventionnelle</span>
+    </button>
+  </div>
+
+  <div id="sim-salarial">
+
   <!-- Données du salarié (commun à tous les scénarios) -->
   <div class="section">
     <h2>Données du salarié</h2>
@@ -1901,9 +1950,36 @@
         <select id="emp-position"></select>
       </div>
       <div class="field">
-        <label for="emp-salary">Salaire brut annuel actuel (€)</label>
+        <label for="emp-salary">Salaire brut annuel actuel - ETP (€)</label>
         <input type="text" id="emp-salary" value="28 718,52 €" data-money="true" inputmode="decimal">
       </div>
+    </div>
+
+    <!-- Filtre temps partiel (s'applique aux scénarios 1, 2, 3 et au mode compact) -->
+    <div class="input-grid cols-3" style="margin-top:16px; align-items:end;">
+      <div class="field">
+        <label class="checkbox-label" style="display:flex; align-items:center; gap:8px; padding:9px 12px; background: rgba(255,255,255,0.6); border: 1px solid var(--border); border-radius:6px; cursor:pointer; font-size:13px;">
+          <input type="checkbox" id="emp-temps-partiel">
+          <span>⏳ Salarié à temps partiel</span>
+        </label>
+      </div>
+      <div class="field" id="emp-quotite-field-etam" style="display:none;">
+        <label for="emp-quotite">Quotité de travail (%) <span class="hint" style="display:inline; margin:0;">- ETAM</span></label>
+        <input type="number" id="emp-quotite" value="80" step="0.01" min="0.01" max="99.99">
+      </div>
+      <div class="field" id="emp-quotite-field-cadre" style="display:none;">
+        <label for="emp-forfait-reduit">Forfait réduit (jours/an) <span class="hint" style="display:inline; margin:0;">- Cadre</span></label>
+        <input type="number" id="emp-forfait-reduit" value="174" step="1" min="1" max="217">
+      </div>
+      <div class="field" id="emp-salary-reel-field" style="display:none;">
+        <label>Salaire actuel à temps partiel</label>
+        <div id="emp-salary-reel" style="font-weight:700; font-size:15px; padding:9px 12px; background:var(--mint-soft); border-radius:var(--radius); color:var(--ok-text);">-</div>
+      </div>
+    </div>
+    <div class="note info" id="emp-tp-note" style="margin-top:14px; display:none; font-size:12.5px;">
+      ℹ️ Dans cet onglet, le salaire actuel et les montants simulés (scénarios 1 à 3) sont saisis et comparés aux minima SYNTEC en <strong>équivalent temps plein (ETP)</strong>. Le salaire réellement versé au salarié à temps partiel est affiché à part.<br>
+      <strong>ETAM :</strong> la quotité se saisit directement en % du temps plein (ex. 80 %).<br>
+      <strong>Cadre au forfait jours :</strong> le temps partiel se traduit par un <strong>forfait annuel réduit</strong>, en nombre de jours, et non par un pourcentage. La quotité est déduite du forfait réduit saisi, rapporté au forfait plein de 218 jours : <code>quotité = jours du forfait réduit ÷ 218</code>. Exemple : un forfait réduit de 174 jours correspond à 174 ÷ 218 = 79,8 % ≈ 80 % d'un forfait plein.
     </div>
   </div>
 
@@ -2034,7 +2110,7 @@
         <div>
           <h3>Saisie</h3>
           <div class="field">
-            <label for="s1-new-salary">Nouveau salaire brut annuel proposé (€)</label>
+            <label for="s1-new-salary">Nouveau salaire brut annuel proposé - ETP (€)</label>
             <input type="number" id="s1-new-salary" value="29500" step="0.01" data-mirror="eur">
           </div>
 
@@ -2051,6 +2127,16 @@
             <div class="result-row highlight">
               <span class="label-side">Variation salaire</span>
               <span class="value" id="s1-pct">-</span>
+            </div>
+            <div class="result-row suggestion" id="s1-reel-row" style="display:none;">
+              <span class="label-side">
+                Salaire à temps partiel <span class="hint" id="s1-reel-label-hint">- quotité 100 %</span>
+              </span>
+              <span class="value" id="s1-reel-an">-</span>
+            </div>
+            <div class="result-row suggestion" id="s1-reel-mens-row" style="display:none;">
+              <span class="label-side">Salaire à temps partiel (mensuel)</span>
+              <span class="value" id="s1-reel-mens">-</span>
             </div>
             <div class="result-row" id="s1-mens39-row" style="display:none;">
               <span class="label-side" id="s1-mens39-label">
@@ -2111,7 +2197,7 @@
           <h3>Résultats</h3>
           <div class="results">
             <div class="result-row highlight">
-              <span class="label-side">Nouveau salaire brut annuel</span>
+              <span class="label-side">Nouveau salaire brut annuel - ETP</span>
               <span class="value" id="s2-new-sal">-</span>
             </div>
             <div class="result-row">
@@ -2121,6 +2207,16 @@
             <div class="result-row">
               <span class="label-side">Augmentation mensuelle</span>
               <span class="value" id="s2-aug-mens">-</span>
+            </div>
+            <div class="result-row suggestion" id="s2-reel-row" style="display:none;">
+              <span class="label-side">
+                Salaire à temps partiel <span class="hint" id="s2-reel-label-hint">- quotité 100 %</span>
+              </span>
+              <span class="value" id="s2-reel-an">-</span>
+            </div>
+            <div class="result-row suggestion" id="s2-reel-mens-row" style="display:none;">
+              <span class="label-side">Salaire à temps partiel (mensuel)</span>
+              <span class="value" id="s2-reel-mens">-</span>
             </div>
             <div class="result-row" id="s2-mens39-row" style="display:none;">
               <span class="label-side" id="s2-mens39-label">
@@ -2175,6 +2271,8 @@
               <th class="num">Aug. annuelle</th>
               <th class="num">Nouveau sal. mensuel</th>
               <th class="num">Aug. mensuelle</th>
+              <th class="num col-tp" id="s2-th-tp-an" style="display:none;">Salaire réel annuel</th>
+              <th class="num col-tp" id="s2-th-tp-mens" style="display:none;">Salaire réel mensuel</th>
               <th class="center">SYNTEC</th>
               <th class="center">CYIM</th>
             </tr>
@@ -2214,16 +2312,26 @@
               <span class="value" id="s3-aug-mens">-</span>
             </div>
             <div class="result-row highlight">
-              <span class="label-side">Nouveau salaire brut annuel</span>
+              <span class="label-side">Nouveau salaire brut annuel - ETP</span>
               <span class="value" id="s3-new-sal">-</span>
             </div>
             <div class="result-row">
-              <span class="label-side">Nouveau salaire brut mensuel</span>
+              <span class="label-side">Nouveau salaire brut mensuel - ETP</span>
               <span class="value" id="s3-new-sal-mens">-</span>
             </div>
             <div class="result-row highlight">
               <span class="label-side">Variation salaire</span>
               <span class="value" id="s3-pct">-</span>
+            </div>
+            <div class="result-row suggestion" id="s3-reel-row" style="display:none;">
+              <span class="label-side">
+                Salaire à temps partiel <span class="hint" id="s3-reel-label-hint">- quotité 100 %</span>
+              </span>
+              <span class="value" id="s3-reel-an">-</span>
+            </div>
+            <div class="result-row suggestion" id="s3-reel-mens-row" style="display:none;">
+              <span class="label-side">Salaire à temps partiel (mensuel)</span>
+              <span class="value" id="s3-reel-mens">-</span>
             </div>
             <div class="result-row" id="s3-mens39-row" style="display:none;">
               <span class="label-side" id="s3-mens39-label">
@@ -2288,6 +2396,29 @@
         </button>
       </div>
 
+      <!-- Filtre temps partiel du convertisseur (indépendant de l'onglet Simulations) -->
+      <div class="input-grid cols-3" style="margin-bottom:20px; align-items:end;">
+        <div class="field">
+          <label class="checkbox-label" style="display:flex; align-items:center; gap:8px; padding:9px 12px; background: rgba(255,255,255,0.6); border: 1px solid var(--border); border-radius:6px; cursor:pointer; font-size:13px;">
+            <input type="checkbox" id="s4-temps-partiel">
+            <span>⏳ Temps partiel</span>
+          </label>
+        </div>
+        <div class="field" id="s4-quotite-field-etam" style="display:none;">
+          <label for="s4-quotite">Quotité de travail (%) <span class="hint" style="display:inline; margin:0;">- ETAM</span></label>
+          <input type="number" id="s4-quotite" value="80" step="0.01" min="0.01" max="99.99">
+        </div>
+        <div class="field" id="s4-quotite-field-cadre" style="display:none;">
+          <label for="s4-forfait-reduit">Forfait réduit (jours/an) <span class="hint" style="display:inline; margin:0;">- Cadre</span></label>
+          <input type="number" id="s4-forfait-reduit" value="174" step="1" min="1" max="217">
+        </div>
+      </div>
+      <div class="note info" id="s4-tp-note" style="margin-bottom:20px; display:none; font-size:12.5px;">
+        ℹ️ Les montants saisis et décomposés ci-dessous (annuel / mensuel / horaire) sont en <strong>équivalent temps plein (ETP)</strong>. Le taux horaire n'est pas proratisé (il ne dépend pas de la quotité) ; seuls les montants annuel et mensuel réellement versés le sont.<br>
+        <strong>ETAM :</strong> quotité saisie directement en %.<br>
+        <strong>Cadre au forfait jours :</strong> le temps partiel se traduit par un <strong>forfait réduit</strong> (nombre de jours travaillés/an), pas par un pourcentage. La quotité est déduite : <code>quotité = jours du forfait réduit ÷ forfait plein</code> (forfait plein = valeur saisie dans le module RTT ci-dessous, 218 jours par défaut). Exemple : 174 j ÷ 218 j = 79,8 % ≈ 80 %.
+      </div>
+
       <!-- Note explicative dynamique -->
       <div class="note info s4-formula-note" id="s4-formula-note" style="margin-bottom:20px;">
         <!-- contenu injecté par JS -->
@@ -2296,15 +2427,15 @@
       <!-- Saisie : 3 champs synchronisés -->
       <div class="input-grid cols-3" id="s4-inputs-row">
         <div class="field">
-          <label for="s4-annuel">Salaire brut annuel</label>
+          <label for="s4-annuel">Salaire brut annuel - ETP</label>
           <input type="text" id="s4-annuel" value="28 718,52 €" data-money="true" data-s4="annuel" inputmode="decimal">
         </div>
         <div class="field">
-          <label for="s4-mensuel">Salaire brut mensuel</label>
+          <label for="s4-mensuel">Salaire brut mensuel - ETP</label>
           <input type="text" id="s4-mensuel" value="2 393,21 €" data-money="true" data-s4="mensuel" inputmode="decimal">
         </div>
         <div class="field" id="s4-horaire-field">
-          <label for="s4-horaire">Taux horaire brut</label>
+          <label for="s4-horaire">Taux horaire brut - ETP</label>
           <input type="text" id="s4-horaire" value="14,16 €" data-money="true" data-s4="horaire" inputmode="decimal" data-decimals="4">
         </div>
       </div>
@@ -2313,11 +2444,21 @@
       <div id="s4-results-etam" style="margin-top:24px;">
         <h3 style="font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 10px;">Décomposition ETAM</h3>
         <div class="results">
-          <div class="result-row"><span class="label-side">Salaire annuel brut (39h, HS majorées 25% incluses)</span><span class="value" id="s4-r-annuel">-</span></div>
+          <div class="result-row"><span class="label-side">Salaire annuel brut - ETP (39h, HS majorées 25% incluses)</span><span class="value" id="s4-r-annuel">-</span></div>
           <div class="result-row"><span class="label-side">Mensuel brut 39h (= annuel / 12, HS majorées incluses)</span><span class="value" id="s4-r-mens39-tot">-</span></div>
           <div class="result-row"><span class="label-side">Mensuel brut 39h avant majoration des HS (35h + 4h × 1)</span><span class="value" id="s4-r-mens39-nomaj">-</span></div>
           <div class="result-row"><span class="label-side">Mensuel brut 35h (de référence pour le taux horaire)</span><span class="value" id="s4-r-mens35">-</span></div>
-          <div class="result-row"><span class="label-side">Taux horaire brut</span><span class="value" id="s4-r-horaire">-</span></div>
+          <div class="result-row"><span class="label-side">Taux horaire brut <span class="hint">- non proratisé, inchangé à temps partiel</span></span><span class="value" id="s4-r-horaire">-</span></div>
+        </div>
+        <div class="results" id="s4-reel-block-etam" style="display:none; margin-top:10px;">
+          <div class="result-row suggestion">
+            <span class="label-side">Salaire à temps partiel <span class="hint" id="s4-reel-label-hint-etam">- quotité 100 %</span></span>
+            <span class="value" id="s4-reel-annuel-etam">-</span>
+          </div>
+          <div class="result-row suggestion">
+            <span class="label-side">Salaire à temps partiel (mensuel)</span>
+            <span class="value" id="s4-reel-mensuel-etam">-</span>
+          </div>
         </div>
 
         <!-- Simulateur d'heures supplémentaires (au-delà de 39h) -->
@@ -2380,8 +2521,18 @@
       <div id="s4-results-cadre" style="display:none; margin-top:24px;">
         <h3 style="font-size:13px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 10px;">Décomposition Cadre forfait jours</h3>
         <div class="results">
-          <div class="result-row"><span class="label-side">Salaire annuel brut</span><span class="value" id="s4-c-annuel">-</span></div>
-          <div class="result-row"><span class="label-side">Salaire mensuel brut (= annuel / 12)</span><span class="value" id="s4-c-mensuel">-</span></div>
+          <div class="result-row"><span class="label-side">Salaire annuel brut - ETP</span><span class="value" id="s4-c-annuel">-</span></div>
+          <div class="result-row"><span class="label-side">Salaire mensuel brut - ETP (= annuel / 12)</span><span class="value" id="s4-c-mensuel">-</span></div>
+        </div>
+        <div class="results" id="s4-reel-block-cadre" style="display:none; margin-top:10px;">
+          <div class="result-row suggestion">
+            <span class="label-side">Salaire à temps partiel <span class="hint" id="s4-reel-label-hint-cadre">- forfait réduit</span></span>
+            <span class="value" id="s4-reel-annuel-cadre">-</span>
+          </div>
+          <div class="result-row suggestion">
+            <span class="label-side">Salaire à temps partiel (mensuel)</span>
+            <span class="value" id="s4-reel-mensuel-cadre">-</span>
+          </div>
         </div>
         <div class="note info" style="margin-top:10px; font-size:12px;">
           Pour un cadre en forfait jours, le salaire n'est pas décomposé en taux horaire : la rémunération couvre 218 jours travaillés par an, sans référence à un volume horaire.
@@ -2449,6 +2600,517 @@
 
   </div><!-- /detailed-view -->
 
+  </div><!-- /sim-salarial -->
+
+  <!-- ============================================================
+       SIMULATIONS DE PRÉAVIS
+       ============================================================ -->
+  <div id="sim-preavis" style="display:none;">
+  <!-- Sélecteur du motif de rupture -->
+  <div class="section">
+    <h2>Choisir le motif de rupture</h2>
+    <div class="pv-motif-toggle">
+      <button type="button" class="s4-statut-btn active" data-motif="essai" onclick="pvSetMotif('essai')">
+        <strong>1 · Période d'essai</strong>
+        <span style="display:block; font-size:11px; font-weight:normal; opacity:0.85; margin-top:2px;">Délai de prévenance</span>
+      </button>
+      <button type="button" class="s4-statut-btn" data-motif="demission" onclick="pvSetMotif('demission')">
+        <strong>2 · Démission</strong>
+        <span style="display:block; font-size:11px; font-weight:normal; opacity:0.85; margin-top:2px;">Préavis SYNTEC</span>
+      </button>
+      <button type="button" class="s4-statut-btn" data-motif="licenciement" onclick="pvSetMotif('licenciement')">
+        <strong>3 · Licenciement</strong>
+        <span style="display:block; font-size:11px; font-weight:normal; opacity:0.85; margin-top:2px;">Selon le motif disciplinaire</span>
+      </button>
+      <button type="button" class="s4-statut-btn" data-motif="rc" onclick="pvSetMotif('rc')">
+        <strong>4 · Rupture conventionnelle</strong>
+        <span style="display:block; font-size:11px; font-weight:normal; opacity:0.85; margin-top:2px;">Procédure TéléRC</span>
+      </button>
+      <button type="button" class="s4-statut-btn" data-motif="abandon" onclick="pvSetMotif('abandon')">
+        <strong>5 · Abandon de poste</strong>
+        <span style="display:block; font-size:11px; font-weight:normal; opacity:0.85; margin-top:2px;">Présomption de démission</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Données communes au calcul de préavis -->
+  <div class="section" id="pv-donnees-salarie-section">
+    <h2>Données du salarié (préavis)</h2>
+    <div class="section-desc">Indépendant de l'onglet Simulations salariales - saisissez les informations propres au calcul de préavis.</div>
+    <div class="input-grid cols-3">
+      <div class="field">
+        <label for="pv-nom">Nom du salarié</label>
+        <input type="text" id="pv-nom" value="DUPONT Marie">
+      </div>
+      <div class="field">
+        <label for="pv-statut">Statut</label>
+        <select id="pv-statut">
+          <option value="ETAM">ETAM</option>
+          <option value="Cadre">Cadre (IC)</option>
+        </select>
+      </div>
+      <div class="field" id="pv-coef400-field">
+        <label class="checkbox-label" style="display:flex; align-items:center; gap:8px; padding:9px 12px; background: rgba(255,255,255,0.6); border: 1px solid var(--border); border-radius:6px; cursor:pointer; font-size:13px; margin-top:22px;">
+          <input type="checkbox" id="pv-coef400">
+          <span>Coefficient ETAM 400, 450 ou 500</span>
+        </label>
+      </div>
+    </div>
+    <div class="input-grid cols-3" style="margin-top:14px;">
+      <div class="field">
+        <label for="pv-date-entree">Date d'entrée dans l'entreprise</label>
+        <input type="date" id="pv-date-entree">
+      </div>
+      <div class="field">
+        <label for="pv-date-notif">Date de notification de la rupture</label>
+        <input type="date" id="pv-date-notif">
+      </div>
+      <div class="field">
+        <label>Ancienneté à la date de notification</label>
+        <div id="pv-anciennete-display" style="font-weight:700; font-size:14px; padding:9px 12px; background:var(--mint-soft); border-radius:var(--radius); color:var(--ok-text);">-</div>
+      </div>
+    </div>
+    <div class="input-grid cols-3" style="margin-top:14px;">
+      <div class="field">
+        <label for="pv-salaire-mensuel">Salaire brut mensuel de référence (€) <span class="hint" style="display:inline;">- pour indemnités compensatrices</span></label>
+        <input type="text" id="pv-salaire-mensuel" value="2 500,00 €" data-money="true" inputmode="decimal">
+      </div>
+    </div>
+    <div class="note info" style="margin-top:14px; font-size:12.5px;">
+      ℹ️ La date de notification retenue est en principe la date de première présentation de la lettre recommandée (ou la date de remise en main propre contre décharge) : c'est elle qui fait courir le délai.
+    </div>
+  </div>
+
+  <!-- ===================== BLOC 1 : PÉRIODE D'ESSAI ===================== -->
+  <div class="pv-block active" data-motif-block="essai">
+    <div class="section">
+      <h2>Période d'essai - délai de prévenance</h2>
+      <div class="section-desc">Barème du Code du travail, plafonné à 6 semaines même pour les périodes d'essai cadres longues (renouvellement compris, jusqu'à 8 mois).</div>
+
+      <div class="input-grid cols-3">
+        <div class="field">
+          <label>Qui rompt la période d'essai ?</label>
+          <div class="s4-statut-toggle">
+            <button type="button" class="s4-statut-btn active" data-essai-qui="employeur" onclick="pvSetEssaiQui('employeur')" style="padding:9px 12px; font-size:13px;">Employeur</button>
+            <button type="button" class="s4-statut-btn" data-essai-qui="salarie" onclick="pvSetEssaiQui('salarie')" style="padding:9px 12px; font-size:13px;">Salarié</button>
+          </div>
+        </div>
+        <div class="field" id="pv-essai-coef-field">
+          <label for="pv-essai-coef-band">Coefficient ETAM <span class="hint" style="display:inline;">- détermine la durée SYNTEC</span></label>
+          <select id="pv-essai-coef-band">
+            <option value="240-250">240 à 250</option>
+            <option value="275-500">275 à 500</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="checkbox-label" style="display:flex; align-items:center; gap:8px; padding:9px 12px; background: rgba(255,255,255,0.6); border: 1px solid var(--border); border-radius:6px; cursor:pointer; font-size:13px; margin-top:22px;">
+            <input type="checkbox" id="pv-essai-renouvelee">
+            <span>Période d'essai renouvelée</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="results" style="margin-top:16px;">
+        <div class="result-row">
+          <span class="label-side">Durée initiale (SYNTEC) <span class="hint" id="pv-essai-duree-hint">-</span></span>
+          <span class="value" id="pv-essai-duree-initiale-display">-</span>
+        </div>
+        <div class="result-row" id="pv-essai-renouv-row" style="display:none;">
+          <span class="label-side">Durée du renouvellement (SYNTEC)</span>
+          <span class="value" id="pv-essai-duree-renouv-display">-</span>
+        </div>
+        <div class="result-row">
+          <span class="label-side">Date de fin initiale de la période d'essai <span class="hint">- date d'entrée + durée(s) ci-dessus, calculée automatiquement</span></span>
+          <span class="value" id="pv-essai-fin-initiale">-</span>
+        </div>
+      </div>
+      <div class="note info" style="margin-top:14px; font-size:12.5px;">
+        ℹ️ Durées fixées par la convention SYNTEC (IDCC 1486, avenant n° 46 du 16 juillet 2021, "Conditions d'engagement et d'exécution du contrat de travail") : ETAM coefficient 240 à 250 = 2 mois, renouvelable 2 mois (4 mois maximum) ; ETAM coefficient 275 à 500 = 3 mois, renouvelable 3 mois (6 mois maximum) ; ingénieurs et cadres coefficient 95 à 270 = 4 mois, renouvelable 4 mois (8 mois maximum), quelle que soit la position (1.1 à 3.3). Le renouvellement, s'il est prévu, doit faire l'objet d'un accord écrit du salarié et de l'employeur.
+      </div>
+
+      <h3 style="margin-top:24px;">Absences pendant la période d'essai</h3>
+      <div class="section-desc">Contrairement au préavis, <strong>toute</strong> suspension du contrat (y compris un arrêt maladie ordinaire) pendant la période d'essai en reporte la fin d'une durée équivalente à l'absence.</div>
+      <div id="pv-essai-absences"></div>
+      <button type="button" class="btn outline" onclick="pvAddAbsenceRow('essai')">+ Ajouter une période d'absence</button>
+
+      <div id="pv-essai-absences-detail" style="margin-top:14px;"></div>
+
+      <div class="results" style="margin-top:14px;">
+        <div class="result-row"><span class="label-side">Total jours de report</span><span class="value" id="pv-essai-jours-report">-</span></div>
+        <div class="result-row highlight">
+          <span class="label-side">Date de fin reportée de la période d'essai</span>
+          <span class="value" id="pv-essai-fin-reportee">-</span>
+        </div>
+      </div>
+      <div class="note info" style="margin-top:10px; font-size:12.5px;">
+        ℹ️ Les durées d'absence et de report sont comptées en <strong>jours calendaires</strong> : les samedis, dimanches et jours fériés compris entre le début et la fin d'une absence sont décomptés au même titre que les autres jours.
+      </div>
+
+      <div class="results" style="margin-top:20px;">
+        <div class="result-row highlight">
+          <span class="label-side">Délai de prévenance applicable <span class="hint" id="pv-essai-delai-hint">- Code du travail</span></span>
+          <span class="value" id="pv-essai-delai">-</span>
+        </div>
+        <div class="result-row highlight">
+          <span class="label-side">Date de départ effectif</span>
+          <span class="value" id="pv-essai-date-depart">-</span>
+        </div>
+        <div class="result-row" id="pv-essai-date-limite-row" style="display:none;">
+          <span class="label-side" style="color:var(--alert-text); font-weight:700;">Date limite pour notifier la rupture <span class="hint">- fin (reportée) de la PE − délai de prévenance ci-dessus, pour que le départ tombe dans la période d'essai</span></span>
+          <span class="value" id="pv-essai-date-limite" style="color:var(--alert-text); font-weight:700;">-</span>
+        </div>
+      </div>
+
+      <div class="note warning" id="pv-essai-date-limite-note" style="display:none; margin-top:6px; font-size:12.5px; border-left-color:var(--alert-border); background:var(--alert-bg); color:var(--alert-text);">
+        ⚠️ Notifiez la rupture au plus tard le <strong id="pv-essai-date-limite-note-date" style="color:var(--alert-text);">-</strong> pour que le délai de prévenance s'écoule intégralement avant la fin de la période d'essai.
+        <span id="pv-essai-date-limite-note-extra" style="display:none;"><br><br>⚠️ La date de notification actuellement renseignée <strong style="color:var(--alert-text);">dépasse cette limite</strong> : le délai de prévenance calculé se prolonge au-delà de la fin de la période d'essai. Le contrat prend fin au plus tard à cette date (il ne peut pas se poursuivre au-delà), et l'indemnité compensatrice calculée ci-dessous est due.</span>
+      </div>
+
+      <div class="results" id="pv-essai-indemnite-block" style="display:none; margin-top:14px;">
+        <div class="result-row">
+          <span class="label-side">Jours de dépassement non travaillés <span class="hint">- délai de prévenance − jours restants jusqu'à la fin (reportée) de la période d'essai</span></span>
+          <span class="value" id="pv-essai-jours-depassement">-</span>
+        </div>
+        <div class="result-row">
+          <span class="label-side">Indemnité compensatrice de préavis <span class="hint">- salaire mensuel ÷ 30 × jours de dépassement</span></span>
+          <span class="value" id="pv-essai-indemnite-preavis">-</span>
+        </div>
+        <div class="result-row">
+          <span class="label-side">+ Indemnité compensatrice de congés payés afférents <span class="hint">- méthode du dixième, 10 % de l'indemnité de préavis</span></span>
+          <span class="value" id="pv-essai-indemnite-cp">-</span>
+        </div>
+        <div class="result-row highlight">
+          <span class="label-side">= Indemnité totale due au salarié</span>
+          <span class="value" id="pv-essai-indemnite-totale">-</span>
+        </div>
+      </div>
+
+      <div class="note info" style="margin-top:14px; font-size:12.5px;">
+        ℹ️ <strong>Rupture par l'employeur</strong> (Code du travail, art. L1221-25, complété en pratique pour les présences longues) : 1 à 7 jours de présence = 24 h ; 8 jours à 1 mois = 48 h ; 1 à moins de 3 mois = 2 semaines ; 3 à moins de 5 mois = 4 semaines ; 5 à moins de 6 mois = 5 semaines ; à partir de 6 mois = <strong>6 semaines, plafond</strong> (le délai n'augmente plus au-delà).<br>
+        <strong>Rupture par le salarié</strong> (art. L1221-26) : moins de 8 jours de présence = 24 h ; 8 jours ou plus = 48 h.<br>
+        La convention SYNTEC ne prévoit pas de barème de délai de prévenance propre plus favorable : c'est le barème légal ci-dessus qui s'applique. En cas de situation limite ou litigieuse, faites valider par un juriste.
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== BLOC 2 : DÉMISSION ===================== -->
+  <div class="pv-block" data-motif-block="demission">
+    <div class="section">
+      <h2>Démission - préavis SYNTEC</h2>
+      <div class="section-desc">Le préavis SYNTEC est réciproque : la même durée s'applique en cas de démission ou de licenciement pour cause réelle et sérieuse (IDCC 1486, art. 4.2).</div>
+
+      <div class="results">
+        <div class="result-row highlight">
+          <span class="label-side">Préavis conventionnel SYNTEC</span>
+          <span class="value" id="pv-dem-duree">-</span>
+        </div>
+        <div class="result-row">
+          <span class="label-side">Date de fin de préavis théorique <span class="hint">- de date à date, sans absence</span></span>
+          <span class="value" id="pv-dem-fin-theo">-</span>
+        </div>
+      </div>
+
+      <table id="pv-dem-recap-table" style="margin-top:14px;">
+        <thead>
+          <tr><th>Statut</th><th>Ancienneté</th><th style="text-align:center;">Préavis</th></tr>
+        </thead>
+        <tbody>
+          <tr data-recap="etam-lt2"><td>ETAM (coefficient &lt; 400)</td><td>Moins de 2 ans</td><td class="center">1 mois</td></tr>
+          <tr data-recap="etam-ge2"><td>ETAM (coefficient &lt; 400)</td><td>2 ans ou plus</td><td class="center">2 mois</td></tr>
+          <tr data-recap="etam-400"><td>ETAM (coefficient 400, 450 ou 500)</td><td>Quelle que soit l'ancienneté</td><td class="center">2 mois</td></tr>
+          <tr data-recap="cadre"><td>Ingénieur / cadre</td><td>Quelle que soit l'ancienneté</td><td class="center">3 mois</td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:11px; color:var(--text-faint); margin-top:6px;">La ligne surlignée correspond au statut et à l'ancienneté actuellement renseignés.</div>
+
+      <div class="field" style="margin-top:18px;">
+        <label class="checkbox-label" style="display:flex; align-items:center; gap:8px; padding:9px 12px; background: rgba(255,255,255,0.6); border: 1px solid var(--border); border-radius:6px; cursor:pointer; font-size:13px; max-width:460px;">
+          <input type="checkbox" id="pv-dem-dispense">
+          <span>Salarié dispensé d'exécuter le préavis (à l'initiative de l'employeur)</span>
+        </label>
+      </div>
+      <div class="results" id="pv-dem-dispense-block" style="display:none; margin-top:12px;">
+        <div class="result-row">
+          <span class="label-side">Indemnité compensatrice de préavis <span class="hint">- salaire mensuel × durée du préavis</span></span>
+          <span class="value" id="pv-dem-dispense-indemnite-preavis">-</span>
+        </div>
+        <div class="result-row">
+          <span class="label-side">+ Indemnité compensatrice de congés payés afférents <span class="hint">- méthode du dixième, 10 % de l'indemnité de préavis</span></span>
+          <span class="value" id="pv-dem-dispense-indemnite-cp">-</span>
+        </div>
+        <div class="result-row highlight">
+          <span class="label-side">= Indemnité totale due au salarié</span>
+          <span class="value" id="pv-dem-dispense-indemnite-totale">-</span>
+        </div>
+      </div>
+      <div class="note warning" id="pv-dem-dispense-note" style="display:none; margin-top:10px; font-size:12.5px;">
+        ⚠️ Dispense à l'initiative de l'employeur : le contrat prend fin à la date de la dispense, mais l'employeur doit verser l'indemnité compensatrice ci-dessus, égale à la rémunération que le salarié aurait perçue s'il avait travaillé jusqu'au terme du préavis.
+      </div>
+
+      <h3 style="margin-top:24px;">Absences pendant le préavis</h3>
+      <div class="section-desc">Ajoutez les congés payés déjà posés avant la notification, ou un accident du travail/une maladie professionnelle survenu(e) pendant le préavis, pour recalculer la date de départ réelle - ce sont les deux seules causes qui le prolongent (les RTT, même posées avant, n'ont pas d'effet).</div>
+      <div id="pv-dem-absences"></div>
+      <button type="button" class="btn outline" onclick="pvAddAbsenceRow('dem')">+ Ajouter une période d'absence</button>
+
+      <div id="pv-dem-absences-detail" style="margin-top:14px;"></div>
+
+      <div class="results" style="margin-top:16px;">
+        <div class="result-row"><span class="label-side">Total jours prolongeant le préavis</span><span class="value" id="pv-dem-jours-prolonge">-</span></div>
+        <div class="result-row highlight">
+          <span class="label-side">Date de fin de préavis réelle (départ effectif)</span>
+          <span class="value" id="pv-dem-fin-reelle">-</span>
+        </div>
+      </div>
+
+      <div class="note info" style="margin-top:14px; font-size:12.5px; line-height:1.7;">
+        ✅ <strong>Prolonge :</strong> CP posés avant la notification, accident du travail/maladie pro survenu pendant le préavis.<br>
+        ➖ <strong>Sans effet :</strong> RTT (même posées avant), maladie ordinaire, congé maternité/paternité, jours fériés, absences recherche d'emploi.<br>
+        📅 <strong>Décompte :</strong> jours calendaires (week-ends et fériés inclus).
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== BLOC 3 : LICENCIEMENT ===================== -->
+  <div class="pv-block" data-motif-block="licenciement">
+    <div class="section">
+      <h2>Licenciement</h2>
+      <div class="field">
+        <label for="pv-lic-motif">Motif du licenciement</label>
+        <select id="pv-lic-motif">
+          <option value="crs">Cause réelle et sérieuse (préavis normal)</option>
+          <option value="faute-grave">Faute grave</option>
+          <option value="faute-lourde">Faute lourde</option>
+          <option value="inaptitude-nonpro">Inaptitude d'origine non professionnelle</option>
+          <option value="inaptitude-pro">Inaptitude d'origine professionnelle (accident du travail / maladie professionnelle)</option>
+        </select>
+      </div>
+
+      <h3 style="margin-top:20px;">Procédure applicable selon le motif</h3>
+      <div style="overflow-x:auto;">
+      <table id="pv-lic-recap-table" style="min-width:760px; margin-top:6px;">
+        <thead>
+          <tr>
+            <th>Motif</th>
+            <th>Convocation à l'entretien</th>
+            <th>Entretien préalable</th>
+            <th>Notification</th>
+            <th>Préavis</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-recap="crs">
+            <td>Cause réelle et sérieuse</td>
+            <td>LRAR ou main propre contre décharge, ≥ 5 j ouvrables avant l'entretien</td>
+            <td>Obligatoire ; le salarié peut se faire assister</td>
+            <td>LRAR, ≥ 2 j ouvrables après l'entretien ; pas de délai maximal légal (hors motif disciplinaire), mais délai raisonnable</td>
+            <td class="center">Normal (SYNTEC)</td>
+          </tr>
+          <tr data-recap="faute-grave">
+            <td>Faute grave</td>
+            <td>LRAR/main propre ; mise à pied conservatoire possible ; à envoyer dans les 2 mois de la connaissance des faits (prescription, art. L1332-4)</td>
+            <td>Obligatoire</td>
+            <td>LRAR, entre 2 j ouvrables et 1 mois après l'entretien (délai d'ordre public, art. L1332-2)</td>
+            <td class="center">Aucun</td>
+          </tr>
+          <tr data-recap="faute-lourde">
+            <td>Faute lourde</td>
+            <td>Identique à la faute grave</td>
+            <td>Obligatoire</td>
+            <td>Identique à la faute grave</td>
+            <td class="center">Aucun</td>
+          </tr>
+          <tr data-recap="inaptitude-nonpro">
+            <td>Inaptitude non professionnelle</td>
+            <td>Après avis d'inaptitude + recherche de reclassement infructueuse (+ consultation du CSE si existant) ; puis LRAR/main propre, ≥ 5 j ouvrables avant l'entretien</td>
+            <td>Obligatoire</td>
+            <td>LRAR, ≥ 2 j ouvrables après l'entretien</td>
+            <td class="center">Non exécuté, non rémunéré</td>
+          </tr>
+          <tr data-recap="inaptitude-pro">
+            <td>Inaptitude professionnelle</td>
+            <td>Idem inaptitude non professionnelle</td>
+            <td>Obligatoire</td>
+            <td>LRAR, ≥ 2 j ouvrables après l'entretien</td>
+            <td class="center">Non exécuté, indemnité compensatrice due (durée légale)</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <div style="font-size:11px; color:var(--text-faint); margin-top:6px;">La ligne surlignée correspond au motif actuellement sélectionné ci-dessus. Pour l'entretien préalable et la mise à pied conservatoire, rester attentif au formalisme exact (contenu de la convocation, lieu, assistance) : à valider au besoin avec un juriste sur un cas litigieux.</div>
+
+      <div class="results" style="margin-top:18px;">
+        <div class="result-row highlight">
+          <span class="label-side">Préavis applicable</span>
+          <span class="value" id="pv-lic-duree">-</span>
+        </div>
+        <div class="result-row">
+          <span class="label-side">Date de fin de préavis théorique <span class="hint">- de date à date, sans absence</span></span>
+          <span class="value" id="pv-lic-fin-theo">-</span>
+        </div>
+      </div>
+      <div class="note info" id="pv-lic-motif-note" style="margin-top:12px; font-size:12.5px;"></div>
+
+      <!-- Dispense de préavis - uniquement pertinent pour la cause réelle et sérieuse -->
+      <div class="field" id="pv-lic-dispense-field" style="margin-top:18px; display:none;">
+        <label class="checkbox-label" style="display:flex; align-items:center; gap:8px; padding:9px 12px; background: rgba(255,255,255,0.6); border: 1px solid var(--border); border-radius:6px; cursor:pointer; font-size:13px; max-width:460px;">
+          <input type="checkbox" id="pv-lic-dispense">
+          <span>Salarié dispensé d'exécuter le préavis</span>
+        </label>
+      </div>
+
+      <!-- Indemnité compensatrice de préavis - calculée selon le motif -->
+      <div class="results" id="pv-lic-indemnite-block" style="margin-top:12px; display:none;">
+        <div class="result-row" id="pv-lic-indemnite-preavis-row">
+          <span class="label-side" id="pv-lic-indemnite-preavis-label">Indemnité compensatrice de préavis</span>
+          <span class="value" id="pv-lic-indemnite-preavis">-</span>
+        </div>
+        <div class="result-row" id="pv-lic-indemnite-cp-row">
+          <span class="label-side">+ Indemnité compensatrice de congés payés afférents <span class="hint">- méthode du dixième, 10 % de l'indemnité de préavis</span></span>
+          <span class="value" id="pv-lic-indemnite-cp">-</span>
+        </div>
+        <div class="result-row highlight" id="pv-lic-indemnite-totale-row">
+          <span class="label-side">= Indemnité totale due au salarié</span>
+          <span class="value" id="pv-lic-indemnite-totale">-</span>
+        </div>
+      </div>
+
+      <div id="pv-lic-absence-wrap">
+        <h3 style="margin-top:24px;">Absences pendant le préavis</h3>
+        <div class="section-desc">Ajoutez les congés payés déjà posés avant la notification, ou un accident du travail/une maladie professionnelle survenu(e) pendant le préavis, pour recalculer la date de départ réelle - ce sont les deux seules causes qui le prolongent (les RTT, même posées avant, n'ont pas d'effet).</div>
+        <div id="pv-lic-absences"></div>
+        <button type="button" class="btn outline" onclick="pvAddAbsenceRow('lic')">+ Ajouter une période d'absence</button>
+
+        <div id="pv-lic-absences-detail" style="margin-top:14px;"></div>
+
+        <div class="results" style="margin-top:16px;">
+          <div class="result-row"><span class="label-side">Total jours prolongeant le préavis</span><span class="value" id="pv-lic-jours-prolonge">-</span></div>
+          <div class="result-row highlight">
+            <span class="label-side">Date de fin de préavis réelle (départ effectif)</span>
+            <span class="value" id="pv-lic-fin-reelle">-</span>
+          </div>
+        </div>
+
+        <div class="note info" style="margin-top:14px; font-size:12.5px; line-height:1.7;">
+          ✅ <strong>Prolonge :</strong> CP posés avant la notification, accident du travail/maladie pro survenu pendant le préavis.<br>
+          ➖ <strong>Sans effet :</strong> RTT (même posées avant), maladie ordinaire, congé maternité/paternité, jours fériés, absences recherche d'emploi.<br>
+          📅 <strong>Décompte :</strong> jours calendaires (week-ends et fériés inclus).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== BLOC 4 : RUPTURE CONVENTIONNELLE ===================== -->
+  <div class="pv-block" data-motif-block="rc">
+    <div class="section">
+      <h2>Rupture conventionnelle</h2>
+      <div class="section-desc">La rupture conventionnelle ne comporte pas de préavis au sens strict : la date de fin de contrat est librement fixée par les parties dans la convention de rupture, à l'issue de la procédure ci-dessous.</div>
+
+      <table id="pv-rc-procedure-table" style="margin-top:6px;">
+        <thead>
+          <tr><th>Étape</th><th>Délai / Modalités</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1. Entretien(s) préalable(s)</td>
+            <td>Au moins un, obligatoire (art. L1237-12). Aucune convocation formalisée ni délai minimum légal imposé (contrairement au licenciement), mais le salarié doit être informé de son droit à se faire assister avant l'entretien. Assistance possible par un salarié de l'entreprise (représentant du personnel ou non) ou, à défaut de représentant du personnel, par un conseiller du salarié inscrit sur liste préfectorale - jamais par un avocat.</td>
+          </tr>
+          <tr>
+            <td>2. Signature de la convention de rupture</td>
+            <td>Fixe l'indemnité spécifique de rupture conventionnelle (au moins égale à l'indemnité légale de licenciement) et la date de fin de contrat envisagée.</td>
+          </tr>
+          <tr>
+            <td>3. Délai de rétractation</td>
+            <td>15 jours calendaires à compter du lendemain de la signature, pour chaque partie.</td>
+          </tr>
+          <tr>
+            <td>4. Demande d'homologation</td>
+            <td>À l'issue du délai de rétractation, télétransmise via TéléRC (salarié non protégé).</td>
+          </tr>
+          <tr>
+            <td>5. Instruction</td>
+            <td>15 jours ouvrables par la DDETS à réception de la demande complète ; absence de réponse dans ce délai = homologation tacite.</td>
+          </tr>
+          <tr>
+            <td>6. Date de rupture</td>
+            <td>Ne peut être antérieure au lendemain du jour de l'homologation (ou de l'autorisation, pour un salarié protégé).</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note info" style="margin-top:14px; font-size:12.5px;">
+        ℹ️ <strong>Salarié protégé</strong> (représentant du personnel, ancien élu, candidat...) : la demande ne passe pas par TéléRC mais par une demande d'<strong>autorisation préalable de l'inspecteur du travail</strong>, par lettre recommandée, avec une procédure et des délais d'instruction spécifiques (généralement plus longs). À anticiper avec l'inspection du travail compétente.
+      </div>
+
+      <div style="margin-top:20px; text-align:center;">
+        <a href="https://www.telerc.travail.gouv.fr" target="_blank" rel="noopener" class="btn primary" style="text-decoration:none; display:inline-block;">
+          🔗 Ouvrir TéléRC (télérc.travail.gouv.fr)
+        </a>
+      </div>
+      <div class="note info" style="margin-top:16px; font-size:12.5px;">
+        ℹ️ Depuis le 1ᵉʳ avril 2022, la demande d'homologation d'une rupture conventionnelle individuelle (salarié non protégé) doit obligatoirement être télétransmise via le téléservice TéléRC (télérc.travail.gouv.fr), qui a remplacé l'envoi postal du formulaire Cerfa n° 14598/14599. Pour un salarié protégé, la demande reste hors TéléRC : elle relève d'une autorisation de l'inspecteur du travail, par lettre recommandée. Ce simulateur n'effectue pas de calcul de préavis pour ce mode de rupture, qui n'en comporte pas.
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== BLOC 5 : ABANDON DE POSTE ===================== -->
+  <div class="pv-block" data-motif-block="abandon">
+    <div class="section">
+      <h2>Abandon de poste - présomption de démission</h2>
+      <div class="section-desc">Depuis la loi du 21 décembre 2022 et son décret d'application du 17 avril 2023 (Code du travail, art. L1237-1-1 et R1237-13), l'abandon de poste n'est plus systématiquement traité comme un motif de licenciement : il déclenche, sous conditions, une <strong>présomption de démission</strong>.</div>
+
+      <table id="pv-abandon-procedure-table" style="margin-top:6px;">
+        <thead>
+          <tr><th>Étape</th><th>Délai / Modalités</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1. Constat de l'absence injustifiée</td>
+            <td>Absence non autorisée et non justifiée (hors arrêt maladie, droit de retrait, droit de grève, ou autre motif légitime).</td>
+          </tr>
+          <tr>
+            <td>2. Mise en demeure</td>
+            <td>LRAR ou remise en main propre contre décharge, demandant au salarié de justifier son absence ou de reprendre son poste, et mentionnant les conséquences légales (présomption de démission) en l'absence de réponse.</td>
+          </tr>
+          <tr>
+            <td>3. Délai de réponse du salarié</td>
+            <td>Minimum 15 jours calendaires à compter de la présentation de la mise en demeure (art. R1237-13). L'employeur peut fixer un délai plus long.</td>
+          </tr>
+          <tr>
+            <td>4. Absence de réponse ou de reprise</td>
+            <td>Présomption de démission à l'expiration du délai (art. L1237-1-1) : le contrat est réputé rompu à l'initiative du salarié, à cette date.</td>
+          </tr>
+          <tr>
+            <td>5. Contestation possible</td>
+            <td>Le salarié peut saisir le conseil de prud'hommes (procédure accélérée au fond) pour faire écarter la présomption, en invoquant un motif légitime (raison médicale, droit de retrait pour danger grave et imminent, droit de grève, modification unilatérale du contrat par l'employeur, etc.).</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="input-grid cols-3" style="margin-top:16px;">
+        <div class="field">
+          <label for="pv-abandon-date-med">Date de présentation de la mise en demeure</label>
+          <input type="date" id="pv-abandon-date-med">
+        </div>
+      </div>
+      <div class="results" style="margin-top:14px;">
+        <div class="result-row highlight">
+          <span class="label-side">Date limite de réponse du salarié <span class="hint">- présentation + 15 jours calendaires minimum</span></span>
+          <span class="value" id="pv-abandon-date-limite">-</span>
+        </div>
+        <div class="result-row">
+          <span class="label-side">Date de la présomption de démission <span class="hint">- si le salarié ne répond pas et ne reprend pas son poste</span></span>
+          <span class="value" id="pv-abandon-date-presomption">-</span>
+        </div>
+      </div>
+
+      <div class="note info" style="margin-top:16px; font-size:12.5px;">
+        ℹ️ <strong>Conséquence principale :</strong> le salarié présumé démissionnaire perd son droit aux allocations chômage (ARE), sauf motif légitime reconnu par France Travail ou par le juge.<br>
+        <strong>L'employeur garde le choix</strong> de ne pas activer cette présomption et d'engager à la place un licenciement disciplinaire classique pour faute grave (cf. tableau de procédure du bloc « Licenciement » ci-dessus), notamment s'il souhaite sécuriser une rupture plus rapide ou éviter l'aléa d'une contestation prud'homale.<br>
+        <strong>Préavis :</strong> assimilée à une démission, cette rupture emporte en principe l'obligation d'exécuter le préavis SYNTEC habituel - mais en pratique, le salarié ne se représentant pas, ce préavis n'est pas exécuté. Le sort d'une éventuelle indemnité compensatrice à la charge du salarié reste débattu en pratique et rarement réclamé ; ce simulateur ne le calcule pas.
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /sim-preavis -->
 
 </section>
 
@@ -3679,6 +4341,61 @@ const fmtEurSigned = (n) => {
 const fmtPct = (n) => isNaN(n) || n === null ? "-" :
   (n >= 0 ? "+" : "") + _normalize((n * 100).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })) + "\u00A0%";
 
+// =============================================================
+// TEMPS PARTIEL - proratisation du salaire (onglet Simulations + Convertisseur)
+// =============================================================
+// Forfait jours plein de référence pour les cadres SYNTEC (accord CYIM du 01/08/2023).
+const FORFAIT_JOURS_PLEIN = 218;
+
+// Calcule la quotité de temps partiel en tenant compte du statut du salarié :
+// - ETAM : quotité saisie directement en % du temps plein (ex. 80 %).
+// - Cadre au forfait jours : le temps partiel se traduit par un FORFAIT RÉDUIT (nombre de jours
+//   travaillés par an), pas par un pourcentage - ce n'est pas une notion horaire.
+//   La quotité est déduite du forfait réduit saisi, rapporté au forfait plein :
+//     quotité = jours du forfait réduit ÷ forfait plein
+//   Exemple : un forfait réduit de 174 jours ÷ un forfait plein de 218 jours = 79,8 % ≈ 80 %.
+// Renvoie { active, isETAM, quotite (0-1), pct (0-100), joursReduit (null si ETAM), forfaitPlein }.
+function getQuotite(checkboxId, isETAM, pctInputId, joursInputId, forfaitPlein) {
+  forfaitPlein = forfaitPlein || FORFAIT_JOURS_PLEIN;
+  const cb = document.getElementById(checkboxId);
+  const active = !!(cb && cb.checked);
+  if (!active) return { active: false, isETAM, quotite: 1, pct: 100, joursReduit: null, forfaitPlein };
+
+  if (isETAM) {
+    const input = document.getElementById(pctInputId);
+    let pct = input ? parseFloat(String(input.value).replace(",", ".")) : NaN;
+    if (isNaN(pct) || pct <= 0) pct = 100;
+    if (pct > 100) pct = 100;
+    return { active: true, isETAM: true, quotite: pct / 100, pct, joursReduit: null, forfaitPlein };
+  } else {
+    const input = document.getElementById(joursInputId);
+    let jours = input ? parseFloat(String(input.value).replace(",", ".")) : NaN;
+    if (isNaN(jours) || jours <= 0) jours = forfaitPlein;
+    if (jours > forfaitPlein) jours = forfaitPlein;
+    const quotite = jours / forfaitPlein;
+    return { active: true, isETAM: false, quotite, pct: quotite * 100, joursReduit: jours, forfaitPlein };
+  }
+}
+
+// Texte d'appoint affiché à côté de "Salaire à temps partiel" :
+// quotité en % pour un ETAM, forfait réduit (jours) pour un cadre.
+function tpHintText(q) {
+  if (!q.active) return "";
+  if (q.isETAM) {
+    return `- quotité ${q.pct.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} %`;
+  }
+  return `- forfait réduit ${q.joursReduit} j / ${q.forfaitPlein} j (${q.pct.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %)`;
+}
+
+// Déclenche un recalcul quand la case "temps partiel" change d'état (l'affichage des
+// champs quotité/forfait réduit, statut-dépendant, est géré dans computeAll / computeS4).
+function bindTempsPartielToggle(checkboxId, recomputeFn) {
+  const cb = document.getElementById(checkboxId);
+  if (!cb || cb.dataset.tpBound === "1") return;
+  cb.dataset.tpBound = "1";
+  cb.addEventListener("change", recomputeFn);
+}
+
 // Parser tolérant pour les champs monétaires en texte ("28 718,52 €" → 28718.52)
 // Supprime les espaces (insécables, fines, normaux), le €, et convertit la virgule en point.
 function parseMoney(s) {
@@ -3844,6 +4561,38 @@ function computeS4() {
     document.getElementById("s4-r-horaire").textContent    = fmtEur4(horaire);
     computeS4HS(horaire);
   }
+
+  // Temps partiel : salaire à temps partiel = montant temps plein (ETP) × quotité
+  // (le taux horaire ETAM n'est jamais proratisé, cf. note affichée dans l'outil)
+  const s4IsETAM = s4Statut === "etam";
+  const s4ForfaitPlein = parseFloat(document.getElementById("s4-rtt-forfait")?.value) || FORFAIT_JOURS_PLEIN;
+  const s4tp = getQuotite("s4-temps-partiel", s4IsETAM, "s4-quotite", "s4-forfait-reduit", s4ForfaitPlein);
+  const s4QuotiteFieldEtam = document.getElementById("s4-quotite-field-etam");
+  const s4QuotiteFieldCadre = document.getElementById("s4-quotite-field-cadre");
+  if (s4QuotiteFieldEtam)  s4QuotiteFieldEtam.style.display  = (s4tp.active && s4IsETAM)  ? "" : "none";
+  if (s4QuotiteFieldCadre) s4QuotiteFieldCadre.style.display = (s4tp.active && !s4IsETAM) ? "" : "none";
+  const s4TpNote = document.getElementById("s4-tp-note");
+  if (s4TpNote) s4TpNote.style.display = s4tp.active ? "" : "none";
+  const s4TpHint = tpHintText(s4tp);
+
+  const reelBlockEtam = document.getElementById("s4-reel-block-etam");
+  if (reelBlockEtam) {
+    reelBlockEtam.style.display = (s4tp.active && s4Statut === "etam") ? "block" : "none";
+    if (s4tp.active && s4Statut === "etam") {
+      document.getElementById("s4-reel-label-hint-etam").textContent = s4TpHint;
+      document.getElementById("s4-reel-annuel-etam").textContent  = fmtEur(annuel * s4tp.quotite);
+      document.getElementById("s4-reel-mensuel-etam").textContent = fmtEur((annuel * s4tp.quotite) / 12);
+    }
+  }
+  const reelBlockCadre = document.getElementById("s4-reel-block-cadre");
+  if (reelBlockCadre) {
+    reelBlockCadre.style.display = (s4tp.active && s4Statut === "cadre") ? "block" : "none";
+    if (s4tp.active && s4Statut === "cadre") {
+      document.getElementById("s4-reel-label-hint-cadre").textContent = s4TpHint;
+      document.getElementById("s4-reel-annuel-cadre").textContent  = fmtEur(annuel * s4tp.quotite);
+      document.getElementById("s4-reel-mensuel-cadre").textContent = fmtEur((annuel * s4tp.quotite) / 12);
+    }
+  }
 }
 
 // Marque le champ comme "dernier modifié" pour orienter la conversion
@@ -3869,6 +4618,16 @@ function bindS4Inputs() {
       el.addEventListener("input", () => computeS4RTT());
       el.addEventListener("change", () => computeS4RTT());
       el.dataset.s4RttBound = "1";
+    }
+  });
+  // Filtre temps partiel du convertisseur
+  bindTempsPartielToggle("s4-temps-partiel", computeS4);
+  ["s4-quotite", "s4-forfait-reduit"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.dataset.tpBound !== "1") {
+      el.dataset.tpBound = "1";
+      el.addEventListener("input", computeS4);
+      el.addEventListener("change", computeS4);
     }
   });
 }
@@ -4125,6 +4884,23 @@ function buildS4PrintContent() {
     `;
   }
 
+  // === Temps partiel ===
+  const s4IsETAMPrint = s4Statut === "etam";
+  const s4ForfaitPleinPrint = parseFloat(document.getElementById("s4-rtt-forfait")?.value) || FORFAIT_JOURS_PLEIN;
+  const s4tp = getQuotite("s4-temps-partiel", s4IsETAMPrint, "s4-quotite", "s4-forfait-reduit", s4ForfaitPleinPrint);
+  let s4tpBlock = "";
+  if (s4tp.active) {
+    s4tpBlock = `
+      <h3 class="ps-section">Temps partiel</h3>
+      <div class="ps-block">
+        <div class="ps-row"><span class="ps-label">${s4tp.isETAM ? "Quotité de travail" : "Forfait réduit"}</span><span class="ps-val">${s4tp.isETAM ? s4tp.pct.toLocaleString("fr-FR",{maximumFractionDigits:2}) + " %" : s4tp.joursReduit + " j / " + s4tp.forfaitPlein + " j (" + s4tp.pct.toLocaleString("fr-FR",{maximumFractionDigits:1}) + " %)"}</span></div>
+        <div class="ps-row ps-highlight"><span class="ps-label">Salaire annuel à temps partiel</span><span class="ps-val">${fmtEur(annuel * s4tp.quotite)}</span></div>
+        <div class="ps-row ps-highlight"><span class="ps-label">Salaire mensuel à temps partiel</span><span class="ps-val">${fmtEur((annuel * s4tp.quotite) / 12)}</span></div>
+        ${s4Statut === "etam" ? `<div class="ps-row"><span class="ps-label"></span><span class="ps-val" style="font-size:9pt; color:#6B7280;">Taux horaire non proratisé (inchangé à temps partiel)</span></div>` : ""}
+      </div>
+    `;
+  }
+
   // === HS ETAM ===
   let hsBlock = "";
   if (s4Statut === "etam") {
@@ -4209,6 +4985,7 @@ function buildS4PrintContent() {
       ${detailRows}
     </div>
 
+    ${s4tpBlock}
     ${hsBlock}
     ${rttBlock}
 
@@ -4218,6 +4995,709 @@ function buildS4PrintContent() {
       Document à usage interne RH
     </div>
   `;
+}
+
+// =============================================================
+// SIMULATIONS DE PRÉAVIS (période d'essai, démission, licenciement, rupture conventionnelle)
+// =============================================================
+// Sources : convention SYNTEC IDCC 1486 (art. 4.1 délai de prévenance période d'essai,
+// art. 4.2 préavis démission/licenciement) ; Code du travail art. L1221-25/L1221-26
+// (délai de prévenance période d'essai), L1234-1 (préavis de licenciement), L1226-4 et
+// L1226-14 (inaptitude), L1237-14 et s. (rupture conventionnelle - TéléRC).
+
+// --- Sous-onglet Simulations salariales / Simulations de préavis ---
+function simSetSubtab(tab) {
+  document.querySelectorAll('#panel-sim > .s4-statut-toggle > .s4-statut-btn[data-subtab]').forEach(b => {
+    b.classList.toggle('active', b.dataset.subtab === tab);
+  });
+  const salEl = document.getElementById('sim-salarial');
+  const pvEl = document.getElementById('sim-preavis');
+  if (salEl) salEl.style.display = tab === 'salarial' ? '' : 'none';
+  if (pvEl) pvEl.style.display = tab === 'preavis' ? '' : 'none';
+  if (tab === 'preavis') pvComputeAll();
+}
+
+// --- Sélecteur du motif de rupture ---
+let pvMotif = 'essai';
+function pvSetMotif(motif) {
+  pvMotif = motif;
+  document.querySelectorAll('.pv-motif-toggle > .s4-statut-btn[data-motif]').forEach(b => {
+    b.classList.toggle('active', b.dataset.motif === motif);
+  });
+  document.querySelectorAll('.pv-block').forEach(b => {
+    b.classList.toggle('active', b.dataset.motifBlock === motif);
+  });
+  // La rupture conventionnelle ne nécessite aucune donnée salarié (pas de préavis à calculer).
+  const donneesSection = document.getElementById('pv-donnees-salarie-section');
+  if (donneesSection) donneesSection.style.display = motif === 'rc' ? 'none' : '';
+  pvComputeAll();
+}
+
+// --- Qui rompt la période d'essai ---
+let pvEssaiQui = 'employeur';
+function pvSetEssaiQui(qui) {
+  pvEssaiQui = qui;
+  document.querySelectorAll('[data-essai-qui]').forEach(b => b.classList.toggle('active', b.dataset.essaiQui === qui));
+  pvComputeAll();
+}
+
+// --- Utilitaires dates ---
+function pvParseDate(id) {
+  const el = document.getElementById(id);
+  if (!el || !el.value) return null;
+  const d = new Date(el.value + "T00:00:00");
+  return isNaN(d.getTime()) ? null : d;
+}
+function pvFmtDate(d) {
+  if (!d) return "-";
+  return _normalize(d.toLocaleDateString("fr-FR", { weekday: "long", day: "2-digit", month: "long", year: "numeric" }));
+}
+function pvAddDays(d, n) {
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+}
+// Ajoute N mois "de date à date" puis retire un jour : un préavis d'1 mois notifié le
+// 28 février se termine le 27 mars au soir (règle usuelle de décompte "de date à date").
+function pvAddMonthsDateADate(d, n) {
+  const r = new Date(d);
+  r.setMonth(r.getMonth() + n);
+  r.setDate(r.getDate() - 1);
+  return r;
+}
+function pvDiffDays(d1, d2) {
+  return Math.round((d2 - d1) / 86400000);
+}
+
+// --- Statut : n'affiche le coefficient 400/450/500 que pour un ETAM ---
+function pvUpdateStatutVisibility() {
+  const statut = document.getElementById("pv-statut").value;
+  const field = document.getElementById("pv-coef400-field");
+  if (field) field.style.display = statut === "ETAM" ? "" : "none";
+}
+
+// --- Ancienneté commune (jours de présence, mois complets, années) ---
+function pvComputeAnciennete() {
+  const entree = pvParseDate("pv-date-entree");
+  const notif = pvParseDate("pv-date-notif");
+  const disp = document.getElementById("pv-anciennete-display");
+  if (!entree || !notif || notif < entree) {
+    if (disp) disp.textContent = "-";
+    return { jours: null, mois: null, annees: null };
+  }
+  const jours = pvDiffDays(entree, notif);
+  const annees = jours / 365.25;
+  let mois = (notif.getFullYear() - entree.getFullYear()) * 12 + (notif.getMonth() - entree.getMonth());
+  if (notif.getDate() < entree.getDate()) mois -= 1;
+  if (mois < 0) mois = 0;
+  if (disp) {
+    disp.textContent = `${jours} jours (≈ ${annees.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} an${annees >= 2 ? "s" : ""}, ${mois} mois complet${mois > 1 ? "s" : ""})`;
+  }
+  return { jours, mois, annees };
+}
+
+// --- Délai de prévenance pendant la période d'essai (Code du travail) ---
+// La convention SYNTEC ne prévoit pas de barème propre plus favorable pour ce délai :
+// c'est le barème légal qui s'applique, complété en pratique pour les présences longues
+// (périodes d'essai cadres renouvelées, jusqu'à 8 mois), non couvertes explicitement par
+// la lettre de l'art. L1221-25 au-delà de 3 mois. Le délai est plafonné à 6 semaines :
+// il n'augmente plus au-delà, quelle que soit la durée de présence.
+// Salarié (art. L1221-26) : <8j = 24h ; >=8j = 48h, quelle que soit l'ancienneté au-delà.
+// Employeur (art. L1221-25, étendu au-delà de 3 mois) : voir bornes ci-dessous.
+function pvDelaiEssai(joursPresence, qui) {
+  if (joursPresence === null) return null;
+  if (qui === "salarie") {
+    return joursPresence < 8 ? { jours: 1, label: "24 h (1 jour)" } : { jours: 2, label: "48 h (2 jours)" };
+  }
+  const moisPresence = joursPresence / 30; // mois pleins de 30 jours, convention usuelle pour ce barème
+  if (joursPresence < 8) return { jours: 1, label: "24 h (1 jour)" };
+  if (moisPresence < 1)  return { jours: 2, label: "48 h (2 jours)" };
+  if (moisPresence < 3)  return { jours: 14, label: "2 semaines (14 j)" };
+  if (moisPresence < 5)  return { jours: 28, label: "4 semaines (28 j)" };
+  if (moisPresence < 6)  return { jours: 35, label: "5 semaines (35 j)" };
+  return                   { jours: 42, label: "6 semaines (42 j)" };
+}
+
+// --- Préavis SYNTEC hors période d'essai (démission ET licenciement pour cause réelle
+// et sérieuse - durée réciproque), selon statut et ancienneté (IDCC 1486, art. 4.2). ---
+function pvPreavisSyntecMois(statut, coef400, anneesAnciennete) {
+  if (statut === "Cadre") return 3;
+  if (coef400) return 2;
+  return (anneesAnciennete || 0) >= 2 ? 2 : 1;
+}
+
+// --- Préavis légal (Code du travail, art. L1234-1), selon l'ancienneté uniquement. ---
+// Sert spécifiquement au calcul de l'indemnité compensatrice de préavis en cas de licenciement
+// pour inaptitude d'origine professionnelle : la Cour de cassation a jugé que cette indemnité se
+// calcule sur la durée LÉGALE du préavis, et non sur la durée conventionnelle SYNTEC, même si
+// celle-ci est plus favorable (Cass. soc. 20 nov. 2024, n° 23-14.949 ; art. L1226-14).
+function pvPreavisLegalMois(anneesAnciennete) {
+  const a = anneesAnciennete || 0;
+  if (a >= 2) return 2;
+  if (a >= 0.5) return 1;
+  return 0;
+}
+
+// --- Gestion des lignes d'absence (période d'essai / démission / licenciement) ---
+let pvAbsenceCounters = { essai: 0, dem: 0, lic: 0 };
+function pvAddAbsenceRow(prefix) {
+  const container = document.getElementById("pv-" + prefix + "-absences");
+  if (!container) return;
+  const idx = pvAbsenceCounters[prefix]++;
+  const rowId = `pv-${prefix}-abs-${idx}`;
+  const row = document.createElement("div");
+  row.className = "pv-absence-row";
+  row.id = rowId;
+  // Période d'essai : CP et RTT y ont exactement le même effet (toute suspension la reporte),
+  // donc une seule option fusionnée. Préavis (démission/licenciement) : CP et RTT sont
+  // distingués, seuls les CP le prolongent (cf. pvAbsenceProlonge).
+  const typeOptions = prefix === "essai"
+    ? `<option value="cp_rtt">Congés payés / RTT posés avant la notification</option>`
+    : `<option value="cp">Congés payés posés avant la notification</option>
+        <option value="rtt">RTT posés avant la notification</option>`;
+  row.innerHTML = `
+    <div class="field" style="margin:0;">
+      <label>Type d'absence</label>
+      <select class="pv-abs-type">
+        ${typeOptions}
+        <option value="maladie">Arrêt maladie non professionnelle (ordinaire)</option>
+        <option value="atmp">Accident du travail / maladie professionnelle</option>
+        <option value="materpat">Congé maternité / paternité</option>
+        <option value="autre">Autre suspension du contrat</option>
+      </select>
+    </div>
+    <div class="field" style="margin:0;">
+      <label>Début</label>
+      <input type="date" class="pv-abs-debut">
+    </div>
+    <div class="field" style="margin:0;">
+      <label>Fin</label>
+      <input type="date" class="pv-abs-fin">
+    </div>
+    <button type="button" class="btn outline" onclick="document.getElementById('${rowId}').remove(); pvComputeAll();" style="padding:8px 12px;">✕</button>
+  `;
+  container.appendChild(row);
+  row.querySelectorAll("select, input").forEach(el => {
+    el.addEventListener("input", pvComputeAll);
+    el.addEventListener("change", pvComputeAll);
+  });
+  pvComputeAll();
+}
+// Seules deux causes prolongent un préavis "ordinaire" (règle jurisprudentielle constante,
+// le préavis étant en principe un délai préfix insusceptible de suspension) :
+// - les CP déjà posés avant la notification, qui tombent pendant le préavis ;
+// - un accident du travail / une maladie professionnelle survenu(e) PENDANT le préavis lui-même.
+// Les RTT sont d'une autre nature juridique que les CP (repos compensateur, pas congé légal) :
+// même posées avant la notification, elles ne prolongent PAS le préavis (position constante,
+// faute de texte ou de jurisprudence contraire), sauf accord contraire entre les parties.
+// Congé maternité et congé paternité sont, par défaut, également SANS effet sur la durée du
+// préavis - de même que la maladie ordinaire. "Autre suspension du contrat" reste à
+// l'appréciation de l'utilisateur, pour les cas particuliers non couverts par cette liste
+// (à valider au besoin avec un juriste).
+function pvAbsenceProlonge(type) {
+  return type === "cp" || type === "cp_rtt" || type === "atmp" || type === "autre";
+}
+function pvAbsenceTypeLabel(type) {
+  return {
+    cp: "Congés payés posés avant la notification",
+    rtt: "RTT posés avant la notification",
+    cp_rtt: "Congés payés / RTT posés avant la notification",
+    maladie: "Arrêt maladie non professionnelle (ordinaire)",
+    atmp: "Accident du travail / maladie professionnelle",
+    materpat: "Congé maternité / paternité",
+    autre: "Autre suspension du contrat"
+  }[type] || type;
+}
+function pvReadAbsences(prefix, minDate) {
+  const container = document.getElementById("pv-" + prefix + "-absences");
+  if (!container) return [];
+  const rows = [];
+  container.querySelectorAll(".pv-absence-row").forEach(row => {
+    const type = row.querySelector(".pv-abs-type").value;
+    const debutStr = row.querySelector(".pv-abs-debut").value;
+    const finStr = row.querySelector(".pv-abs-fin").value;
+    if (!debutStr || !finStr) return;
+    const d1 = new Date(debutStr + "T00:00:00");
+    const d2 = new Date(finStr + "T00:00:00");
+    if (isNaN(d1.getTime()) || isNaN(d2.getTime()) || d2 < d1) return;
+    const jours = pvDiffDays(d1, d2) + 1; // durée telle que saisie (affichage)
+
+    // Seuls les jours d'absence à partir de la date de référence (notification du préavis,
+    // ou date d'entrée pour la période d'essai) sont retenus : une absence entièrement
+    // antérieure est sans effet, une absence à cheval est rognée à sa partie postérieure.
+    let horsPeriode = false;
+    let joursRetenus = jours;
+    if (minDate) {
+      if (d2 < minDate) {
+        horsPeriode = true;
+        joursRetenus = 0;
+      } else if (d1 < minDate) {
+        joursRetenus = pvDiffDays(minDate, d2) + 1;
+      }
+    }
+    rows.push({ type, debut: d1, fin: d2, jours, joursRetenus, horsPeriode, prolonge: pvAbsenceProlonge(type) });
+  });
+  return rows;
+}
+function pvRenderAbsenceDetail(prefix, absences, opts) {
+  opts = opts || {};
+  const forceAll = !!opts.forceAllProlonge;
+  const labelProlonge = opts.labelProlonge || "Prolonge le préavis";
+  const container = document.getElementById("pv-" + prefix + "-absences-detail");
+  if (!container) return;
+  if (absences.length === 0) { container.innerHTML = ""; return; }
+  container.innerHTML = absences.map(a => {
+    if (a.horsPeriode) {
+      return `
+      <div class="result-row">
+        <span class="label-side">${pvAbsenceTypeLabel(a.type)} <span class="hint">${pvFmtDate(a.debut)} → ${pvFmtDate(a.fin)} (${a.jours} j)</span></span>
+        <span class="pv-impact-tag neutre">Entièrement antérieure à la notification - sans effet</span>
+      </div>`;
+    }
+    const prolonge = forceAll || a.prolonge;
+    const clipped = a.joursRetenus !== a.jours;
+    const dureeLabel = clipped ? `${a.joursRetenus} j retenus sur ${a.jours} j saisis - partie antérieure à la notification exclue` : `${a.jours} j`;
+    return `
+    <div class="result-row">
+      <span class="label-side">${pvAbsenceTypeLabel(a.type)} <span class="hint">${pvFmtDate(a.debut)} → ${pvFmtDate(a.fin)} (${dureeLabel})</span></span>
+      <span class="pv-impact-tag ${prolonge ? "prolonge" : "neutre"}">${prolonge ? labelProlonge : "Sans effet sur la date de fin"}</span>
+    </div>`;
+  }).join("");
+}
+
+// --- Bloc Période d'essai ---
+// Date de fin théorique d'une période d'essai (avant report), "de date à date" :
+// début + durée en mois (entiers ou demi-mois), moins un jour.
+function pvEssaiFinTheorique(debut, dureeMois) {
+  if (!debut || !dureeMois) return null;
+  const wholeMonths = Math.floor(dureeMois);
+  const halfMonth = (dureeMois - wholeMonths) >= 0.5;
+  const r = new Date(debut);
+  r.setMonth(r.getMonth() + wholeMonths);
+  if (halfMonth) r.setDate(r.getDate() + 15);
+  r.setDate(r.getDate() - 1);
+  return r;
+}
+
+// Durées de période d'essai fixées par la convention SYNTEC (IDCC 1486, avenant n° 46 du
+// 16 juillet 2021, "Conditions d'engagement et d'exécution du contrat de travail") :
+// - ETAM coefficient 240 à 250 : 2 mois, renouvelable 2 mois (4 mois maximum)
+// - ETAM coefficient 275 à 500 : 3 mois, renouvelable 3 mois (6 mois maximum)
+// - Ingénieurs et cadres coefficient 95 à 270 : 4 mois, renouvelable 4 mois (8 mois maximum),
+//   quelle que soit la position (1.1 à 3.3) dans la grille.
+// Durées de période d'essai fixées par la convention SYNTEC (IDCC 1486, avenant n° 46 du
+// 16 juillet 2021, "Conditions d'engagement et d'exécution du contrat de travail") :
+// - ETAM coefficient 240 à 250 : 2 mois, renouvelable 2 mois (4 mois maximum)
+// - ETAM coefficient 275 à 500 : 3 mois, renouvelable 3 mois (6 mois maximum)
+// - Ingénieurs et cadres coefficient 95 à 270 : 4 mois, renouvelable 4 mois (8 mois maximum),
+//   quelle que soit la position (1.1 à 3.3) dans la grille.
+// coef400 affine uniquement le libellé affiché (400 à 500 plutôt que 275 à 500) : la durée
+// SYNTEC est identique sur toute la tranche 275-500, coefficient 400/450/500 inclus.
+function pvEssaiDureeSyntec(statut, coefBand, coef400) {
+  if (statut === "Cadre") return { initiale: 4, renouv: 4, label: "ingénieur/cadre, coefficient 95 à 270" };
+  if (coefBand === "275-500") {
+    return { initiale: 3, renouv: 3, label: coef400 ? "ETAM, coefficient 400 à 500" : "ETAM, coefficient 275 à 500" };
+  }
+  return { initiale: 2, renouv: 2, label: "ETAM, coefficient 240 à 250" };
+}
+
+function pvComputeEssai() {
+  const hintEl = document.getElementById("pv-essai-delai-hint");
+  if (hintEl) {
+    hintEl.textContent = pvEssaiQui === "employeur"
+      ? "- rupture par l'employeur, Code du travail art. L1221-25"
+      : "- rupture par le salarié, Code du travail art. L1221-26";
+  }
+  const entree = pvParseDate("pv-date-entree");
+  const notif = pvParseDate("pv-date-notif");
+  const indemBlock = document.getElementById("pv-essai-indemnite-block");
+
+  // Durée de la période d'essai (déduite du barème SYNTEC, non saisie manuellement) :
+  // durée initiale + renouvellement éventuel, de date à date à partir de la date d'entrée.
+  const statutEssai = document.getElementById("pv-statut").value;
+  const coefField = document.getElementById("pv-essai-coef-field");
+  if (coefField) coefField.style.display = statutEssai === "ETAM" ? "" : "none";
+  const coefBandSelect = document.getElementById("pv-essai-coef-band");
+  const option275500 = coefBandSelect.querySelector('option[value="275-500"]');
+  const coef400 = document.getElementById("pv-coef400").checked;
+  const coefHint = coefField ? coefField.querySelector(".hint") : null;
+  if (statutEssai === "ETAM" && coef400) {
+    // Coefficient 400/450/500 coché dans les données du salarié : ne peut relever que de la
+    // tranche 275-500, pré-rempli automatiquement et verrouillé pour éviter toute contradiction.
+    // Le libellé affiché est resserré sur "400 à 500" pour refléter le coefficient réel coché.
+    coefBandSelect.value = "275-500";
+    coefBandSelect.disabled = true;
+    if (option275500) option275500.textContent = "400 à 500";
+    if (coefHint) coefHint.textContent = "- pré-rempli d'après le coefficient 400/450/500 coché ci-dessus";
+  } else {
+    coefBandSelect.disabled = false;
+    if (option275500) option275500.textContent = "275 à 500";
+    if (coefHint) coefHint.textContent = "- détermine la durée SYNTEC";
+  }
+  const coefBand = coefBandSelect.value;
+  const dureeSyntec = pvEssaiDureeSyntec(statutEssai, coefBand, coef400);
+
+  const dureeHint = document.getElementById("pv-essai-duree-hint");
+  if (dureeHint) dureeHint.textContent = "- " + dureeSyntec.label;
+  document.getElementById("pv-essai-duree-initiale-display").textContent = dureeSyntec.initiale + " mois";
+
+  const renouvelee = document.getElementById("pv-essai-renouvelee").checked;
+  const renouvRow = document.getElementById("pv-essai-renouv-row");
+  let dureeTotale = dureeSyntec.initiale;
+  if (renouvelee) {
+    document.getElementById("pv-essai-duree-renouv-display").textContent = dureeSyntec.renouv + " mois";
+    if (renouvRow) renouvRow.style.display = "flex";
+    dureeTotale += dureeSyntec.renouv;
+  } else if (renouvRow) {
+    renouvRow.style.display = "none";
+  }
+
+  const finTheoInitiale = entree ? pvEssaiFinTheorique(entree, dureeTotale) : null;
+  document.getElementById("pv-essai-fin-initiale").textContent = finTheoInitiale ? pvFmtDate(finTheoInitiale) : "-";
+
+  // Absences pendant la période d'essai : contrairement au préavis, TOUTE suspension
+  // (y compris une maladie ordinaire) en reporte la fin d'une durée équivalente. Seuls les
+  // jours d'absence à partir de la date d'entrée sont retenus (une absence antérieure au
+  // début de la période d'essai n'a pas de sens et est ignorée).
+  const absencesEssai = pvReadAbsences("essai", entree);
+  pvRenderAbsenceDetail("essai", absencesEssai, { forceAllProlonge: true, labelProlonge: "Reporte la fin de la période d'essai" });
+  const joursReport = absencesEssai.reduce((s, a) => s + a.joursRetenus, 0);
+  document.getElementById("pv-essai-jours-report").textContent = joursReport > 0 ? (joursReport + " jour" + (joursReport > 1 ? "s" : "")) : "0 jour";
+  const finTheoReportee = finTheoInitiale ? pvAddDays(finTheoInitiale, joursReport) : null;
+  document.getElementById("pv-essai-fin-reportee").textContent = finTheoReportee ? pvFmtDate(finTheoReportee) : "-";
+
+  const delaiEl = document.getElementById("pv-essai-delai");
+  const departEl = document.getElementById("pv-essai-date-depart");
+  const dlRow0 = document.getElementById("pv-essai-date-limite-row");
+  const dlNote0 = document.getElementById("pv-essai-date-limite-note");
+
+  if (!entree) {
+    if (delaiEl) delaiEl.textContent = "-";
+    if (departEl) departEl.textContent = "-";
+    if (indemBlock) indemBlock.style.display = "none";
+    if (dlRow0) dlRow0.style.display = "none";
+    if (dlNote0) dlNote0.style.display = "none";
+    return;
+  }
+
+  if (notif && notif < entree) {
+    if (delaiEl) delaiEl.textContent = "Date de notification antérieure à la date d'entrée";
+    if (departEl) departEl.textContent = "-";
+    if (indemBlock) indemBlock.style.display = "none";
+    if (dlRow0) dlRow0.style.display = "none";
+    if (dlNote0) dlNote0.style.display = "none";
+    return;
+  }
+
+  if (!notif) {
+    // Pas de date de notification saisie : le délai de prévenance dépend des jours de présence
+    // à cette date, donc encore inconnus. On donne malgré tout une estimation à la date du jour,
+    // clairement signalée comme telle - elle évoluera si la rupture intervient plus tard.
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const joursPresenceEstim = Math.max(0, pvDiffDays(entree, today));
+    const delaiEstim = pvDelaiEssai(joursPresenceEstim, pvEssaiQui);
+    if (delaiEl) delaiEl.innerHTML = delaiEstim.label + '<br><span style="font-size:11px; font-weight:normal; color:var(--text-faint);">(estimation à la date du jour)</span>';
+    if (hintEl) {
+      hintEl.textContent += " - estimation à défaut de date de notification saisie, sera recalculée avec la date exacte";
+    }
+    if (departEl) departEl.textContent = "Saisissez la date de notification pour la calculer";
+    if (indemBlock) indemBlock.style.display = "none";
+    if (dlRow0) dlRow0.style.display = "none";
+    if (dlNote0) dlNote0.style.display = "none";
+    return;
+  }
+
+  const joursPresence = pvDiffDays(entree, notif);
+  const delai = pvDelaiEssai(joursPresence, pvEssaiQui);
+  document.getElementById("pv-essai-delai").textContent = delai.label;
+
+  let depart = pvAddDays(notif, delai.jours);
+  const depasse = !!(finTheoReportee && depart > finTheoReportee);
+
+  if (depasse) {
+    // Jours de délai de prévenance qui n'ont pas pu être travaillés car ils tombent
+    // après la fin (reportée) de la période d'essai (le contrat ne peut pas se poursuivre au-delà).
+    const joursRestants = Math.max(0, pvDiffDays(notif, finTheoReportee));
+    const joursDepassement = delai.jours - joursRestants;
+    depart = finTheoReportee;
+
+    const salaireMensuel = parseMoney(document.getElementById("pv-salaire-mensuel").value) || 0;
+    const indemPreavis = (joursDepassement / 30) * salaireMensuel;
+    const indemCP = indemPreavis * 0.10;
+    const indemTotale = indemPreavis + indemCP;
+
+    document.getElementById("pv-essai-jours-depassement").textContent = joursDepassement + " jour" + (joursDepassement > 1 ? "s" : "");
+    document.getElementById("pv-essai-indemnite-preavis").textContent = fmtEur(indemPreavis);
+    document.getElementById("pv-essai-indemnite-cp").textContent = fmtEur(indemCP);
+    document.getElementById("pv-essai-indemnite-totale").textContent = fmtEur(indemTotale);
+    if (indemBlock) indemBlock.style.display = "";
+  } else {
+    if (indemBlock) indemBlock.style.display = "none";
+  }
+
+  document.getElementById("pv-essai-date-depart").textContent = pvFmtDate(depart);
+
+  // Date limite pour notifier la rupture : dernier jour de notification permettant au délai
+  // de prévenance calculé ci-dessus de s'écouler intégralement avant la fin (reportée) de la PE.
+  // Un seul panneau d'avertissement regroupe le rappel de cette date et, le cas échéant,
+  // la conséquence concrète (dépassement + indemnité) si la notification actuelle la dépasse.
+  const dateLimiteRow = document.getElementById("pv-essai-date-limite-row");
+  const dateLimiteNote = document.getElementById("pv-essai-date-limite-note");
+  const dateLimiteNoteExtra = document.getElementById("pv-essai-date-limite-note-extra");
+  if (finTheoReportee) {
+    const dateLimite = pvAddDays(finTheoReportee, -delai.jours);
+    const dateLimiteLabel = pvFmtDate(dateLimite);
+    document.getElementById("pv-essai-date-limite").textContent = dateLimiteLabel;
+    if (dateLimiteRow) dateLimiteRow.style.display = "flex";
+    const dateLimiteNoteDate = document.getElementById("pv-essai-date-limite-note-date");
+    if (dateLimiteNoteDate) dateLimiteNoteDate.textContent = dateLimiteLabel;
+    if (dateLimiteNote) dateLimiteNote.style.display = "block";
+    if (dateLimiteNoteExtra) dateLimiteNoteExtra.style.display = depasse ? "inline" : "none";
+  } else {
+    if (dateLimiteRow) dateLimiteRow.style.display = "none";
+    if (dateLimiteNote) dateLimiteNote.style.display = "none";
+  }
+}
+
+// --- Bloc Démission ---
+function pvComputeDemission() {
+  const statut = document.getElementById("pv-statut").value;
+  const coef400 = document.getElementById("pv-coef400").checked;
+  const anc = pvComputeAnciennete();
+  const notif = pvParseDate("pv-date-notif");
+  const dispense = document.getElementById("pv-dem-dispense").checked;
+  const dispenseBlock = document.getElementById("pv-dem-dispense-block");
+
+  const mois = pvPreavisSyntecMois(statut, coef400, anc.annees);
+  document.getElementById("pv-dem-duree").textContent = `${mois} mois`;
+  document.getElementById("pv-dem-dispense-note").style.display = dispense ? "block" : "none";
+
+  // Surligne, dans le tableau récapitulatif, la ligne correspondant au statut/ancienneté saisis.
+  let recapKey;
+  if (statut === "Cadre") recapKey = "cadre";
+  else if (coef400) recapKey = "etam-400";
+  else recapKey = (anc.annees || 0) >= 2 ? "etam-ge2" : "etam-lt2";
+  document.querySelectorAll("#pv-dem-recap-table tbody tr").forEach(tr => {
+    tr.classList.toggle("pv-recap-active", tr.dataset.recap === recapKey);
+  });
+
+  if (!notif) {
+    document.getElementById("pv-dem-fin-theo").textContent = "-";
+    document.getElementById("pv-dem-jours-prolonge").textContent = "-";
+    document.getElementById("pv-dem-fin-reelle").textContent = "-";
+    document.getElementById("pv-dem-absences-detail").innerHTML = "";
+    if (dispenseBlock) dispenseBlock.style.display = "none";
+    return;
+  }
+
+  const finTheo = pvAddMonthsDateADate(notif, mois);
+  document.getElementById("pv-dem-fin-theo").textContent = pvFmtDate(finTheo);
+
+  if (dispense) {
+    document.getElementById("pv-dem-fin-reelle").textContent = pvFmtDate(notif) + " (dispense - contrat rompu à cette date)";
+    document.getElementById("pv-dem-jours-prolonge").textContent = "-";
+    document.getElementById("pv-dem-absences-detail").innerHTML = "";
+
+    const salaireMensuel = parseMoney(document.getElementById("pv-salaire-mensuel").value) || 0;
+    const indemPreavis = mois * salaireMensuel;
+    const indemCP = indemPreavis * 0.10;
+    const indemTotale = indemPreavis + indemCP;
+    document.getElementById("pv-dem-dispense-indemnite-preavis").textContent = fmtEur(indemPreavis);
+    document.getElementById("pv-dem-dispense-indemnite-cp").textContent = fmtEur(indemCP);
+    document.getElementById("pv-dem-dispense-indemnite-totale").textContent = fmtEur(indemTotale);
+    if (dispenseBlock) dispenseBlock.style.display = "";
+    return;
+  }
+  if (dispenseBlock) dispenseBlock.style.display = "none";
+
+  // Seuls les jours d'absence à compter de la notification sont retenus pour prolonger le
+  // préavis (une absence antérieure à la notification n'a pas d'effet sur son décompte).
+  const absences = pvReadAbsences("dem", notif);
+  pvRenderAbsenceDetail("dem", absences);
+  const joursProlonge = absences.filter(a => a.prolonge).reduce((s, a) => s + a.joursRetenus, 0);
+  document.getElementById("pv-dem-jours-prolonge").textContent = joursProlonge + " jour" + (joursProlonge > 1 ? "s" : "");
+  const finReelle = pvAddDays(finTheo, joursProlonge);
+  document.getElementById("pv-dem-fin-reelle").textContent = pvFmtDate(finReelle);
+}
+
+// --- Bloc Licenciement ---
+function pvComputeLicenciement() {
+  const statut = document.getElementById("pv-statut").value;
+  const coef400 = document.getElementById("pv-coef400").checked;
+  const motif = document.getElementById("pv-lic-motif").value;
+  const anc = pvComputeAnciennete();
+  const notif = pvParseDate("pv-date-notif");
+  const salaireMensuel = parseMoney(document.getElementById("pv-salaire-mensuel").value) || 0;
+
+  const dureeEl = document.getElementById("pv-lic-duree");
+  const finTheoEl = document.getElementById("pv-lic-fin-theo");
+  const finTheoRow = finTheoEl ? finTheoEl.closest(".result-row") : null;
+  const noteEl = document.getElementById("pv-lic-motif-note");
+  const absenceWrap = document.getElementById("pv-lic-absence-wrap");
+  const jpEl = document.getElementById("pv-lic-jours-prolonge");
+  const frEl = document.getElementById("pv-lic-fin-reelle");
+  const dispenseField = document.getElementById("pv-lic-dispense-field");
+  const dispense = document.getElementById("pv-lic-dispense").checked;
+  const indemBlock = document.getElementById("pv-lic-indemnite-block");
+  const indemPreavisRow = document.getElementById("pv-lic-indemnite-preavis-row");
+  const indemPreavisLabel = document.getElementById("pv-lic-indemnite-preavis-label");
+  const indemCpRow = document.getElementById("pv-lic-indemnite-cp-row");
+  const indemTotaleRow = document.getElementById("pv-lic-indemnite-totale-row");
+
+  // Surligne, dans le tableau récapitulatif de procédure, la ligne du motif sélectionné.
+  document.querySelectorAll("#pv-lic-recap-table tbody tr").forEach(tr => {
+    tr.classList.toggle("pv-recap-active", tr.dataset.recap === motif);
+  });
+
+
+  const mois = pvPreavisSyntecMois(statut, coef400, anc.annees);
+
+  // Affiche une indemnité (préavis + 10 % CP) calculée pour "moisIndemnise" mois de salaire.
+  const afficherIndemnite = (moisIndemnise, labelPreavis) => {
+    const indemPreavis = moisIndemnise * salaireMensuel;
+    const indemCP = indemPreavis * 0.10;
+    const indemTotale = indemPreavis + indemCP;
+    indemPreavisLabel.innerHTML = labelPreavis;
+    document.getElementById("pv-lic-indemnite-preavis").textContent = fmtEur(indemPreavis);
+    document.getElementById("pv-lic-indemnite-cp").textContent = fmtEur(indemCP);
+    document.getElementById("pv-lic-indemnite-totale").textContent = fmtEur(indemTotale);
+    indemPreavisRow.style.display = "flex";
+    indemCpRow.style.display = "flex";
+    indemTotaleRow.style.display = "flex";
+    indemBlock.style.display = "";
+  };
+  const afficherIndemniteNulle = (labelPreavis) => {
+    indemPreavisLabel.innerHTML = labelPreavis;
+    document.getElementById("pv-lic-indemnite-preavis").textContent = fmtEur(0);
+    indemPreavisRow.style.display = "flex";
+    indemCpRow.style.display = "none";
+    indemTotaleRow.style.display = "none";
+    indemBlock.style.display = "";
+  };
+
+  if (motif === "faute-grave" || motif === "faute-lourde") {
+    dureeEl.textContent = "Aucun (rupture immédiate)";
+    if (finTheoRow) finTheoRow.style.display = "none";
+    if (absenceWrap) absenceWrap.style.display = "none";
+    if (dispenseField) dispenseField.style.display = "none";
+    noteEl.innerHTML = motif === "faute-grave"
+      ? "La <strong>faute grave</strong> prive le salarié du préavis et de l'indemnité de licenciement (l'indemnité compensatrice de congés payés reste due). Le contrat prend fin immédiatement à la notification."
+      : "La <strong>faute lourde</strong> prive également le salarié du préavis et de l'indemnité de licenciement. L'indemnité compensatrice de congés payés reste due (le Conseil constitutionnel a supprimé sa privation en cas de faute lourde). Le contrat prend fin immédiatement à la notification.";
+    afficherIndemniteNulle("Indemnité compensatrice de préavis <span class=\"hint\">- non due (faute grave/lourde)</span>");
+    if (jpEl) jpEl.textContent = "-";
+    if (frEl) frEl.textContent = "-";
+    return;
+  }
+
+  if (motif === "inaptitude-nonpro") {
+    dureeEl.textContent = `${mois} mois (SYNTEC) - non exécuté, non rémunéré`;
+    if (finTheoRow) finTheoRow.style.display = "none";
+    if (absenceWrap) absenceWrap.style.display = "none";
+    if (dispenseField) dispenseField.style.display = "none";
+    noteEl.innerHTML = "En cas d'<strong>inaptitude d'origine non professionnelle</strong>, le préavis n'est ni exécuté ni rémunéré (art. L1226-4 du Code du travail), mais il compte pour le calcul de l'ancienneté. Le contrat prend fin à la notification du licenciement.<br><br>⚠️ <strong>Reprise du salaire après 1 mois :</strong> si, à l'issue d'un délai d'1 mois à compter de la date de l'examen médical de reprise (avis d'inaptitude), le salarié n'est ni reclassé ni licencié, l'employeur doit reprendre le versement de son salaire habituel dès le 31ᵉ jour, même si le salarié ne travaille pas (art. L1226-4). Le licenciement pour inaptitude a donc tout intérêt à être notifié avant l'expiration de ce délai.";
+    afficherIndemniteNulle("Indemnité compensatrice de préavis <span class=\"hint\">- non due (art. L1226-4)</span>");
+    if (jpEl) jpEl.textContent = "-";
+    if (frEl) frEl.textContent = "-";
+    return;
+  }
+
+  if (motif === "inaptitude-pro") {
+    const moisLegal = pvPreavisLegalMois(anc.annees);
+    dureeEl.textContent = `${moisLegal} mois (durée légale) - non exécuté, indemnité compensatrice due`;
+    if (finTheoRow) finTheoRow.style.display = "none";
+    if (absenceWrap) absenceWrap.style.display = "none";
+    if (dispenseField) dispenseField.style.display = "none";
+    noteEl.innerHTML = "En cas d'<strong>inaptitude d'origine professionnelle</strong> (accident du travail / maladie professionnelle), le préavis n'est pas exécuté mais l'indemnité compensatrice de préavis reste due, comme si le salarié avait travaillé (art. L1226-14 du Code du travail). Cette indemnité se calcule sur la <strong>durée légale</strong> du préavis (Code du travail, art. L1234-1 : 1 mois entre 6 mois et 2 ans d'ancienneté, 2 mois au-delà) et non sur la durée conventionnelle SYNTEC, même si celle-ci est plus favorable (Cass. soc. 20 novembre 2024, n° 23-14.949). Le contrat prend fin à la notification du licenciement.<br><br>➕ <strong>Indemnité spéciale de licenciement (distincte, non calculée ici) :</strong> le même article L1226-14 accorde en plus une indemnité spéciale de licenciement égale au <strong>double</strong> de l'indemnité légale de licenciement, sauf si l'indemnité conventionnelle SYNTEC est plus favorable (auquel cas c'est elle qui s'applique, sans doublement). Ces deux indemnités ne sont pas dues si l'employeur établit que le refus du reclassement proposé par le salarié était abusif.<br><br>⚠️ <strong>Reprise du salaire après 1 mois :</strong> si, à l'issue d'un délai d'1 mois à compter de la date de l'examen médical de reprise (avis d'inaptitude), le salarié n'est ni reclassé ni licencié, l'employeur doit reprendre le versement de son salaire habituel dès le 31ᵉ jour, même si le salarié ne travaille pas (art. L1226-11). Le licenciement pour inaptitude a donc tout intérêt à être notifié avant l'expiration de ce délai.";
+    afficherIndemnite(moisLegal, "Indemnité compensatrice de préavis <span class=\"hint\">- durée légale (non conventionnelle), due bien que non exécuté, art. L1226-14</span>");
+    if (jpEl) jpEl.textContent = "-";
+    if (frEl) frEl.textContent = "-";
+    return;
+  }
+
+  // Cause réelle et sérieuse : préavis normal, identique à la démission
+  if (finTheoRow) finTheoRow.style.display = "flex";
+  dureeEl.textContent = `${mois} mois`;
+  noteEl.innerHTML = "Préavis SYNTEC standard (IDCC 1486, art. 4.2), identique à celui d'une démission pour ce statut et cette ancienneté.";
+  if (dispenseField) dispenseField.style.display = "";
+
+  if (!notif) {
+    finTheoEl.textContent = "-";
+    if (jpEl) jpEl.textContent = "-";
+    if (frEl) frEl.textContent = "-";
+    document.getElementById("pv-lic-absences-detail").innerHTML = "";
+    indemBlock.style.display = "none";
+    if (absenceWrap) absenceWrap.style.display = "";
+    return;
+  }
+  const finTheo = pvAddMonthsDateADate(notif, mois);
+  finTheoEl.textContent = pvFmtDate(finTheo);
+
+  if (dispense) {
+    if (absenceWrap) absenceWrap.style.display = "none";
+    if (frEl) frEl.textContent = pvFmtDate(notif) + " (dispense - contrat rompu à cette date)";
+    if (jpEl) jpEl.textContent = "-";
+    afficherIndemnite(mois, "Indemnité compensatrice de préavis <span class=\"hint\">- salarié dispensé</span>");
+    return;
+  }
+
+  if (absenceWrap) absenceWrap.style.display = "";
+  indemBlock.style.display = "none";
+  // Seuls les jours d'absence à compter de la notification sont retenus pour prolonger le
+  // préavis (une absence antérieure à la notification n'a pas d'effet sur son décompte).
+  const absences = pvReadAbsences("lic", notif);
+  pvRenderAbsenceDetail("lic", absences);
+  const joursProlonge = absences.filter(a => a.prolonge).reduce((s, a) => s + a.joursRetenus, 0);
+  if (jpEl) jpEl.textContent = joursProlonge + " jour" + (joursProlonge > 1 ? "s" : "");
+  const finReelle = pvAddDays(finTheo, joursProlonge);
+  if (frEl) frEl.textContent = pvFmtDate(finReelle);
+}
+
+// --- Bloc Abandon de poste ---
+function pvComputeAbandon() {
+  const dateMed = pvParseDate("pv-abandon-date-med");
+  const limiteEl = document.getElementById("pv-abandon-date-limite");
+  const presompEl = document.getElementById("pv-abandon-date-presomption");
+  if (!limiteEl || !presompEl) return;
+  if (!dateMed) {
+    limiteEl.textContent = "-";
+    presompEl.textContent = "-";
+    return;
+  }
+  // Délai minimum légal de 15 jours calendaires à compter de la présentation (art. R1237-13).
+  const dateLimite = pvAddDays(dateMed, 15);
+  limiteEl.textContent = pvFmtDate(dateLimite);
+  // En l'absence de réponse ou de reprise, la présomption de démission joue au lendemain
+  // de l'expiration du délai.
+  const datePresomption = pvAddDays(dateLimite, 1);
+  presompEl.textContent = pvFmtDate(datePresomption);
+}
+
+// --- Orchestrateur ---
+function pvComputeAll() {
+  if (!document.getElementById("pv-statut")) return; // panel pas encore rendu
+  pvUpdateStatutVisibility();
+  pvComputeAnciennete();
+  pvComputeEssai();
+  pvComputeDemission();
+  pvComputeLicenciement();
+  pvComputeAbandon();
+}
+
+function pvBindInputs() {
+  [
+    "pv-statut", "pv-coef400", "pv-date-entree", "pv-date-notif",
+    "pv-essai-coef-band", "pv-essai-renouvelee",
+    "pv-dem-dispense", "pv-lic-motif", "pv-lic-dispense", "pv-salaire-mensuel",
+    "pv-abandon-date-med"
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.dataset.pvBound !== "1") {
+      el.dataset.pvBound = "1";
+      el.addEventListener("input", pvComputeAll);
+      el.addEventListener("change", pvComputeAll);
+    }
+  });
 }
 
 // =============================================================
@@ -5336,6 +6816,44 @@ function computeAll() {
   const salHorsHS = (sal) => sal * ratioHorsHS;
   const salAcHorsHS = salHorsHS(salaryAct);
 
+  // ===== Temps partiel (onglet Simulations) =====
+  // Tous les salaires ci-dessus sont en équivalent temps plein (ETP), conforme aux minima SYNTEC.
+  // Si "temps partiel" est coché, on affiche en plus le salaire réellement versé = ETP × quotité.
+  // ETAM : quotité en %. Cadre au forfait jours : quotité déduite du forfait réduit (jours/218).
+  const empIsETAM = plancher ? isETAM : true;
+  const tp = getQuotite("emp-temps-partiel", empIsETAM, "emp-quotite", "emp-forfait-reduit");
+  const tpHint = tpHintText(tp);
+  const empSalReelField = document.getElementById("emp-salary-reel-field");
+  if (empSalReelField) {
+    empSalReelField.style.display = tp.active ? "" : "none";
+    const empSalReelEl = document.getElementById("emp-salary-reel");
+    if (empSalReelEl) empSalReelEl.textContent = tp.active ? fmtEur(salaryAct * tp.quotite) : "-";
+  }
+  const empQuotiteFieldEtam = document.getElementById("emp-quotite-field-etam");
+  const empQuotiteFieldCadre = document.getElementById("emp-quotite-field-cadre");
+  if (empQuotiteFieldEtam)  empQuotiteFieldEtam.style.display  = (tp.active && empIsETAM)  ? "" : "none";
+  if (empQuotiteFieldCadre) empQuotiteFieldCadre.style.display = (tp.active && !empIsETAM) ? "" : "none";
+  const empTpNote = document.getElementById("emp-tp-note");
+  if (empTpNote) empTpNote.style.display = tp.active ? "" : "none";
+
+  // Affiche/masque les lignes "salaire à temps partiel" (annuel + mensuel) d'un scénario s1/s2/s3
+  const applyReel = (prefix, newSalAnnualETP) => {
+    const row = document.getElementById(prefix + "-reel-row");
+    const mensRow = document.getElementById(prefix + "-reel-mens-row");
+    const hint = document.getElementById(prefix + "-reel-label-hint");
+    if (!row || !mensRow) return;
+    if (tp.active && newSalAnnualETP > 0) {
+      row.style.display = "flex";
+      mensRow.style.display = "flex";
+      if (hint) hint.textContent = tpHint;
+      document.getElementById(prefix + "-reel-an").textContent = fmtEur(newSalAnnualETP * tp.quotite);
+      document.getElementById(prefix + "-reel-mens").textContent = fmtEur((newSalAnnualETP * tp.quotite) / 12);
+    } else {
+      row.style.display = "none";
+      mensRow.style.display = "none";
+    }
+  };
+
   const applySuggestion = (id, newSal) => {
     const statut = plancher ? plancher.statut : null;
     // Pour la suggestion de position aussi, on utilise le salaire hors majo HS pour les ETAM
@@ -5399,6 +6917,7 @@ function computeAll() {
   applyMensuel("s1-mens39-row", "s1-mens39", "s1-mens39-label", s1New);
   applyHorsHS("s1-horshs-row", "s1-horshs", s1New, isETAM, ratioHorsHS);
   applySuggestion("s1-suggest", s1New);
+  applyReel("s1", s1New);
 
   // Scénario 2
   const s2Pct = (parseFloat(document.getElementById("s2-pct").value) || 0) / 100;
@@ -5412,6 +6931,12 @@ function computeAll() {
   applyMensuel("s2-mens39-row", "s2-mens39", "s2-mens39-label", s2New);
   applyHorsHS("s2-horshs-row", "s2-horshs", s2New, isETAM, ratioHorsHS);
   applySuggestion("s2-suggest", s2New);
+  applyReel("s2", s2New);
+
+  const thTpAn = document.getElementById("s2-th-tp-an");
+  const thTpMens = document.getElementById("s2-th-tp-mens");
+  if (thTpAn) thTpAn.style.display = tp.active ? "" : "none";
+  if (thTpMens) thTpMens.style.display = tp.active ? "" : "none";
 
   const tbody = document.querySelector("#s2-sensitivity tbody");
   tbody.innerHTML = "";
@@ -5423,12 +6948,16 @@ function computeAll() {
     const tr = document.createElement("tr");
     const okSyntec = plancherAn !== null && newSalHorsHS >= plancherAn;
     const okCyim = seuilCYIMAn !== null && newSalHorsHS >= seuilCYIMAn;
+    const tpCells = tp.active
+      ? `<td class="num col-tp">${fmtEur(newSal * tp.quotite)}</td><td class="num col-tp">${fmtEur((newSal * tp.quotite) / 12)}</td>`
+      : `<td class="num col-tp" style="display:none;"></td><td class="num col-tp" style="display:none;"></td>`;
     tr.innerHTML = `
       <td class="center"><strong>${(pct*100).toLocaleString("fr-FR",{minimumFractionDigits:1,maximumFractionDigits:2})} %</strong></td>
       <td class="num">${fmtEur(newSal)}</td>
       <td class="num">${fmtEurSigned(augAn)}</td>
       <td class="num">${fmtEur(newSal/12)}</td>
       <td class="num">${fmtEurSigned(augAn/12)}</td>
+      ${tpCells}
       <td class="center ${plancherAn===null?'':(okSyntec?'cell-ok':'cell-alert')}">${plancherAn===null?'-':(okSyntec?'✓':'✗')}</td>
       <td class="center ${seuilCYIMAn===null?'':(okCyim?'cell-ok':'cell-warn')}">${seuilCYIMAn===null?'-':(okCyim?'✓':'⚠')}</td>`;
     tbody.appendChild(tr);
@@ -5453,6 +6982,7 @@ function computeAll() {
   applyMensuel("s3-mens39-row", "s3-mens39", "s3-mens39-label", s3New);
   applyHorsHS("s3-horshs-row", "s3-horshs", s3New, isETAM, ratioHorsHS);
   applySuggestion("s3-suggest", s3New);
+  applyReel("s3", s3New);
 
   // Scénario 4 : géré par sa propre fonction (logique différente)
   if (typeof computeS4 === "function") computeS4();
@@ -6880,6 +8410,15 @@ function buildScenarioBlock(scenario) {
     ? `${sugg.label}`
     : "Aucune (salaire sous le minima)";
 
+  // Temps partiel : salaire à temps partiel = salaire ETP × quotité
+  const empIsETAMPrint = plancher ? isETAM : true;
+  const tp = getQuotite("emp-temps-partiel", empIsETAMPrint, "emp-quotite", "emp-forfait-reduit");
+  let tpRow = "";
+  if (tp.active && newSal > 0) {
+    tpRow = `<div class="ps-row ps-highlight"><span class="ps-label">Salaire à temps partiel <span style="color:#6B7280;font-weight:normal;font-size:9pt;">${tpHintText(tp)}</span></span><span class="ps-val">${fmtEur(newSal * tp.quotite)}</span></div>
+      <div class="ps-row"><span class="ps-label">Salaire à temps partiel (mensuel)</span><span class="ps-val">${fmtEur((newSal * tp.quotite) / 12)}</span></div>`;
+  }
+
   return `
     <div class="ps-scenario">
       <h3 class="ps-scenario-title">${scenarioName}</h3>
@@ -6890,6 +8429,7 @@ function buildScenarioBlock(scenario) {
           <div class="ps-row ps-highlight"><span class="ps-label">Augmentation mensuelle</span><span class="ps-val">${fmtEurSigned(augMens)}</span></div>
           <div class="ps-row ps-highlight"><span class="ps-label">Variation salaire</span><span class="ps-val">${fmtPct(pct)}</span></div>
           ${mens39Row}
+          ${tpRow}
         </div>
         <div class="ps-verdicts-col">
           ${syntecVerdict}
@@ -7055,6 +8595,17 @@ function bindScenarioInputs() {
   });
   document.getElementById("envelope-budget").addEventListener("change", renderTeam);
 
+  // Filtre temps partiel (onglet Simulations)
+  bindTempsPartielToggle("emp-temps-partiel", computeAll);
+  ["emp-quotite", "emp-forfait-reduit"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.dataset.tpBound !== "1") {
+      el.dataset.tpBound = "1";
+      el.addEventListener("input", computeAll);
+      el.addEventListener("change", computeAll);
+    }
+  });
+
   // Sélecteur de scénario - multi-sélection via toggle
   document.querySelectorAll(".scenario-option").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -7154,6 +8705,8 @@ async function boot() {
   setupFamiliaux();
   updateLegendVisibility("sim");
   applyReadOnlyMode();
+  pvBindInputs();
+  pvComputeAll();
 }
 
 function showBootBanner(msg, type) {
