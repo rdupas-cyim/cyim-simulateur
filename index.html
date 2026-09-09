@@ -2745,6 +2745,9 @@
       <div class="note info" style="margin-top:10px; font-size:12.5px;">
         ℹ️ Les durées d'absence et de report sont comptées en <strong>jours calendaires</strong> : les samedis, dimanches et jours fériés compris entre le début et la fin d'une absence sont décomptés au même titre que les autres jours.
       </div>
+      <div class="note info" style="margin-top:10px; font-size:12.5px;">
+        ℹ️ Le délai de prévenance court à compter de la <strong>date de notification de la rupture</strong>, ce jour étant lui-même compté comme le <strong>jour 1</strong> du décompte (et non le lendemain). Exemple : pour un délai de 48 heures notifié un lundi, le jour 2 (dernier jour du délai) tombe le mardi, et la sortie est effective le mardi soir.
+      </div>
 
       <div class="results" style="margin-top:20px;">
         <div class="result-row highlight">
@@ -2752,7 +2755,7 @@
           <span class="value" id="pv-essai-delai">-</span>
         </div>
         <div class="result-row" id="pv-essai-fin-delai-row" style="display:none;">
-          <span class="label-side">Fin du délai de prévenance <span class="hint">- date de notification + délai ci-dessus, avant écrêtement par la fin de la période d'essai</span></span>
+          <span class="label-side">Fin du délai de prévenance <span class="hint">- dernier jour couvert par le délai (jour de la notification = jour 1)</span></span>
           <span class="value" id="pv-essai-fin-delai">-</span>
         </div>
         <div class="result-row highlight">
@@ -5420,9 +5423,11 @@ function pvComputeEssai() {
   const delai = pvDelaiEssai(joursPresence, pvEssaiQui);
   document.getElementById("pv-essai-delai").textContent = delai.label;
 
-  const finDelaiPrevenance = pvAddDays(notif, delai.jours);
-  let depart = finDelaiPrevenance;
-  const depasse = !!(finTheoReportee && depart > finTheoReportee);
+  // Fin du délai de prévenance = dernier jour couvert par le délai, en comptant le jour de la
+  // notification comme jour 1 (ex. délai de 42 jours notifié le 04/09 : jour 42 = 15/10).
+  // Cette date n'est PAS écrêtée : elle peut tomber après la fin de la période d'essai.
+  const finDelaiPrevenance = pvAddDays(notif, delai.jours - 1);
+  const depasse = !!(finTheoReportee && finDelaiPrevenance > finTheoReportee);
 
   const finDelaiEl = document.getElementById("pv-essai-fin-delai");
   const finDelaiRow = document.getElementById("pv-essai-fin-delai-row");
@@ -5433,12 +5438,15 @@ function pvComputeEssai() {
   }
   if (finDelaiRow) finDelaiRow.style.display = "flex";
 
+  // Dernier jour réellement travaillé (écrêté par la fin de la PE si le délai déborde) :
+  // c'est cette date, affichée "au soir", qui constitue la sortie effective du salarié.
+  let dernierJourReel = finDelaiPrevenance;
+
   if (depasse) {
     // Jours de délai de prévenance qui n'ont pas pu être travaillés car ils tombent
     // après la fin (reportée) de la période d'essai (le contrat ne peut pas se poursuivre au-delà).
-    const joursRestants = Math.max(0, pvDiffDays(notif, finTheoReportee));
-    const joursDepassement = delai.jours - joursRestants;
-    depart = finTheoReportee;
+    const joursDepassement = pvDiffDays(finTheoReportee, finDelaiPrevenance);
+    dernierJourReel = finTheoReportee;
 
     const salaireMensuel = parseMoney(document.getElementById("pv-salaire-mensuel").value) || 0;
     const indemPreavis = (joursDepassement / 30) * salaireMensuel;
@@ -5454,17 +5462,16 @@ function pvComputeEssai() {
     if (indemBlock) indemBlock.style.display = "none";
   }
 
-  document.getElementById("pv-essai-date-depart").textContent = pvFmtDate(depart);
+  document.getElementById("pv-essai-date-depart").textContent = pvFmtDate(dernierJourReel) + " au soir";
 
   // Date limite pour notifier la rupture : dernier jour de notification permettant au délai
-  // de prévenance calculé ci-dessus de s'écouler intégralement avant la fin (reportée) de la PE.
-  // Un seul panneau d'avertissement regroupe le rappel de cette date et, le cas échéant,
-  // la conséquence concrète (dépassement + indemnité) si la notification actuelle la dépasse.
+  // de prévenance (dernier jour couvert = jour de notif + délai - 1) de tomber au plus tard
+  // le dernier jour (reporté) de la PE.
   const dateLimiteRow = document.getElementById("pv-essai-date-limite-row");
   const dateLimiteNote = document.getElementById("pv-essai-date-limite-note");
   const dateLimiteNoteExtra = document.getElementById("pv-essai-date-limite-note-extra");
   if (finTheoReportee) {
-    const dateLimite = pvAddDays(finTheoReportee, -delai.jours);
+    const dateLimite = pvAddDays(finTheoReportee, -(delai.jours - 1));
     const dateLimiteLabel = pvFmtDate(dateLimite);
     document.getElementById("pv-essai-date-limite").textContent = dateLimiteLabel;
     if (dateLimiteRow) dateLimiteRow.style.display = "flex";
