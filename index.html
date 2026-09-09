@@ -2751,6 +2751,10 @@
           <span class="label-side">Délai de prévenance applicable <span class="hint" id="pv-essai-delai-hint">- Code du travail</span></span>
           <span class="value" id="pv-essai-delai">-</span>
         </div>
+        <div class="result-row" id="pv-essai-fin-delai-row" style="display:none;">
+          <span class="label-side">Fin du délai de prévenance <span class="hint">- date de notification + délai ci-dessus, avant écrêtement par la fin de la période d'essai</span></span>
+          <span class="value" id="pv-essai-fin-delai">-</span>
+        </div>
         <div class="result-row highlight">
           <span class="label-side">Date de départ effectif</span>
           <span class="value" id="pv-essai-date-depart">-</span>
@@ -5370,6 +5374,7 @@ function pvComputeEssai() {
   const departEl = document.getElementById("pv-essai-date-depart");
   const dlRow0 = document.getElementById("pv-essai-date-limite-row");
   const dlNote0 = document.getElementById("pv-essai-date-limite-note");
+  const fdRow0 = document.getElementById("pv-essai-fin-delai-row");
 
   if (!entree) {
     if (delaiEl) delaiEl.textContent = "-";
@@ -5377,6 +5382,7 @@ function pvComputeEssai() {
     if (indemBlock) indemBlock.style.display = "none";
     if (dlRow0) dlRow0.style.display = "none";
     if (dlNote0) dlNote0.style.display = "none";
+    if (fdRow0) fdRow0.style.display = "none";
     return;
   }
 
@@ -5386,6 +5392,7 @@ function pvComputeEssai() {
     if (indemBlock) indemBlock.style.display = "none";
     if (dlRow0) dlRow0.style.display = "none";
     if (dlNote0) dlNote0.style.display = "none";
+    if (fdRow0) fdRow0.style.display = "none";
     return;
   }
 
@@ -5405,6 +5412,7 @@ function pvComputeEssai() {
     if (indemBlock) indemBlock.style.display = "none";
     if (dlRow0) dlRow0.style.display = "none";
     if (dlNote0) dlNote0.style.display = "none";
+    if (fdRow0) fdRow0.style.display = "none";
     return;
   }
 
@@ -5412,8 +5420,18 @@ function pvComputeEssai() {
   const delai = pvDelaiEssai(joursPresence, pvEssaiQui);
   document.getElementById("pv-essai-delai").textContent = delai.label;
 
-  let depart = pvAddDays(notif, delai.jours);
+  const finDelaiPrevenance = pvAddDays(notif, delai.jours);
+  let depart = finDelaiPrevenance;
   const depasse = !!(finTheoReportee && depart > finTheoReportee);
+
+  const finDelaiEl = document.getElementById("pv-essai-fin-delai");
+  const finDelaiRow = document.getElementById("pv-essai-fin-delai-row");
+  if (finDelaiEl) {
+    finDelaiEl.textContent = pvFmtDate(finDelaiPrevenance);
+    finDelaiEl.style.color = depasse ? "var(--alert-text)" : "";
+    finDelaiEl.style.fontWeight = depasse ? "700" : "";
+  }
+  if (finDelaiRow) finDelaiRow.style.display = "flex";
 
   if (depasse) {
     // Jours de délai de prévenance qui n'ont pas pu être travaillés car ils tombent
